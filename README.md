@@ -7,4 +7,9 @@ De Career Launch Website is ontworpen om studenten, bedrijven en organisatoren e
    - De voordelen van deelname
    - Een inschrijfformulier voor studenten
 
+  ## 🔐 Login- en Registratiepagina
+    Hier kunnen:
+    - Studenten een account aanmaken of inloggen om hun profiel en       planning te beheren 
+    - Bedrijven zich registreren om deel te nemen als standhouder
+
   
