@@ -20,7 +20,7 @@ Dit project wordt ontwikkeld door:
 - **EL ABDELKHALKI Chaimae**  
 - **MICHIELSEN Silke**  
 - **LODHl Mutahir**  
-- **Assarar Nisrine** 
+- **ASSARAR Nisrine** 
 
 ---
 
