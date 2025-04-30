@@ -1,4 +1,10 @@
-# Welcome to your organization's demo respository
-This code repository (or "repo") is designed to demonstrate the best GitHub has to offer with the least amount of noise.
+# Career Launch Website
+## Wat vind je op de website?
+De Career Launch Website is ontworpen om studenten, bedrijven en organisatoren een gebruiksvriendelijke en informatieve ervaring te bieden. De website bestaat uit meerdere pagina's, elk met een specifieke functie:
+  ##Startpagina
+   -Een overzichtelijke introductie tot de beurs met:
+   -Praktische info(datum,locatie,doel)
+   -De voordelen van deelname
+   -Een inschrijfformulier voor studenten
 
-The repo includes an `index.html` file (so it can render a web page), two GitHub Actions workflows, and a CSS stylesheet dependency.
+  
