@@ -33,17 +33,17 @@ Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
  - Navigatie:
 `Home | Inschrijven | Plattegrond | Bedrijven | Speeddates | Reservaties | Contact | Feedback`
  - Footer met contactgegevens en social media
-### 3. Inschrijvingspagina
+### 2. Inschrijvingspagina
 - Formulier met naam, e-mailadres, wachtwoord + bevestiging
 - Keuzeoptie: "Ik ben student/alumni"
-### 4. Plattegrondpagina
+### 3. Plattegrondpagina
 - Interactieve schoolplattegrond met alle bedrijven aangeduid
 - Klik op een bedrijf opent de volgende pagina
-### 5. Bedrijfspagina + Reservatie
+### 4. Bedrijfspagina + Reservatie
 - Bedrijfsinformatie
 - Beschikbare tijdstippen
 - Selectie + reservatie van gewenst moment
-### 6. Bevestigingspagina
+### 5. Bevestigingspagina
 - Bevestiging van reservatie
 - E-mail met datum, tijd, locatie en annuleeroptie
 ## 🏢 Voor bedrijven
