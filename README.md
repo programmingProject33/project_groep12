@@ -9,21 +9,21 @@ Studenten en alumni zich kunnen inschrijven en gesprekken boeken
 ## 👥 Wie zijn we?
 Dit project wordt ontwikkeld door:
 
-MEZIANI Bilal
-IBRAHIM SHEXO Mohammad
-EL ABDELKHALKI Chaimae
-MICHIELSEN Silke
-LODHl Mutahir
-ASSARAR Nisrine
+- MEZIANI Bilal
+- IBRAHIM SHEXO Mohammad
+- EL ABDELKHALKI Chaimae
+- MICHIELSEN Silke
+- LODHl Mutahir
+- ASSARAR Nisrine
 ## 🔧 Gebruikte technologieën
 Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
 
-HTML
-CSS
-JavaScript
-figma
-trello
-github
+- HTML
+- CSS
+- JavaScript
+- figma
+- trello
+- github
 ## ✨ We hebben ChatGPT gebruikt voor het verfijnen en mooier maken van deze README.
 
 ## 🧑‍🎓 Voor studenten en alumni
