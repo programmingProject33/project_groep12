@@ -24,7 +24,7 @@ Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
 - figma
 - trello
 - github
-## ✨ We hebben ChatGPT gebruikt voor het verfijnen en mooier maken van deze README.
+> ✨ We hebben ChatGPT gebruikt voor het verfijnen en mooier maken van deze README.
 
 ## 🧑‍🎓 Voor studenten en alumni
 ### 1. Startpagina
