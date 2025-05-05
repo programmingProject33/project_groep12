@@ -4,8 +4,8 @@ Welkom bij ons project! Wij bouwen een interactieve website voor de Career Launc
 ## 🎯 Doel van het project
 Een gebruiksvriendelijke reserveringswebsite waarmee:
 
-Bedrijven hun aanwezigheid en beschikbaarheid beheren
-Studenten en alumni zich kunnen inschrijven en gesprekken boeken
+- Bedrijven hun aanwezigheid en beschikbaarheid beheren
+- Studenten en alumni zich kunnen inschrijven en gesprekken boeken
 ## 👥 Wie zijn we?
 Dit project wordt ontwikkeld door:
 
@@ -28,11 +28,11 @@ Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
 
 ## 🧑‍🎓 Voor studenten en alumni
 1. Startpagina
-Welkomsttekst
-Inschrijvingsformulier
-Navigatie:
-Home | Inschrijven | Plattegrond | Bedrijven | Speeddates | Reservaties | Contact | Feedback
-Footer met contactgegevens en social media
+- Welkomsttekst
+- Inschrijvingsformulier
+- Navigatie:
+  Home | Inschrijven | Plattegrond | Bedrijven | Speeddates | Reservaties | Contact | Feedback
+  Footer met contactgegevens en social media
 2. Inschrijvingspagina
 Formulier met naam, e-mailadres, wachtwoord + bevestiging
 Keuzeoptie: "Ik ben student/alumni"
