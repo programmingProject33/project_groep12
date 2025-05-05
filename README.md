@@ -28,11 +28,11 @@ Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
 
 ## 🧑‍🎓 Voor studenten en alumni
 ### 1. Startpagina
- Welkomsttekst
-### 2.Inschrijvingsformulier
- Navigatie:
+ - Welkomsttekst
+ - Inschrijvingsformulier
+ - Navigatie:
 `Home | Inschrijven | Plattegrond | Bedrijven | Speeddates | Reservaties | Contact | Feedback`
-- Footer met contactgegevens en social media
+ - Footer met contactgegevens en social media
 ### 3. Inschrijvingspagina
 - Formulier met naam, e-mailadres, wachtwoord + bevestiging
 - Keuzeoptie: "Ik ben student/alumni"
