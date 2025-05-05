@@ -27,39 +27,39 @@ Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
 ## ✨ We hebben ChatGPT gebruikt voor het verfijnen en mooier maken van deze README.
 
 ## 🧑‍🎓 Voor studenten en alumni
-1. Startpagina
+### 1. Startpagina
  Welkomsttekst
- Inschrijvingsformulier
+### 2.Inschrijvingsformulier
  Navigatie:
-Home | Inschrijven | Plattegrond | Bedrijven | Speeddates | Reservaties | Contact | Feedback
-Footer met contactgegevens en social media
-3. Inschrijvingspagina
-Formulier met naam, e-mailadres, wachtwoord + bevestiging
-Keuzeoptie: "Ik ben student/alumni"
-4. Plattegrondpagina
-Interactieve schoolplattegrond met alle bedrijven aangeduid
-Klik op een bedrijf opent de volgende pagina
-5. Bedrijfspagina + Reservatie
-Bedrijfsinformatie
-Beschikbare tijdstippen
-Selectie + reservatie van gewenst moment
-6. Bevestigingspagina
-Bevestiging van reservatie
-E-mail met datum, tijd, locatie en annuleeroptie
+`Home | Inschrijven | Plattegrond | Bedrijven | Speeddates | Reservaties | Contact | Feedback`
+- Footer met contactgegevens en social media
+### 3. Inschrijvingspagina
+- Formulier met naam, e-mailadres, wachtwoord + bevestiging
+- Keuzeoptie: "Ik ben student/alumni"
+### 4. Plattegrondpagina
+- Interactieve schoolplattegrond met alle bedrijven aangeduid
+- Klik op een bedrijf opent de volgende pagina
+### 5. Bedrijfspagina + Reservatie
+- Bedrijfsinformatie
+- Beschikbare tijdstippen
+- Selectie + reservatie van gewenst moment
+### 6. Bevestigingspagina
+- Bevestiging van reservatie
+- E-mail met datum, tijd, locatie en annuleeroptie
 ## 🏢 Voor bedrijven
-1. Startpagina
-Zelfde als bij studenten
-Inschrijving met keuzeoptie: "Ik ben een bedrijf"
-2. Inschrijvingspagina
-Bedrijfsnaam, e-mail, wachtwoord
-Na registratie: doorgestuurd naar invulformulier
-3. Bedrijfsformulier
-Bedrijfsomschrijving
-Keuze van locatie (stand/lokaal)
-Toevoegen van beschikbare tijdstippen
-4. Bevestiging
-Overzicht van de registratie
-Bevestiging per e-mail
+### 1. Startpagina
+- Zelfde als bij studenten
+- Inschrijving met keuzeoptie: "Ik ben een bedrijf"
+### 2. Inschrijvingspagina
+- Bedrijfsnaam, e-mail, wachtwoord
+- Na registratie: doorgestuurd naar invulformulier
+### 3. Bedrijfsformulier
+- Bedrijfsomschrijving
+- Keuze van locatie (stand/lokaal)
+- Toevoegen van beschikbare tijdstippen
+### 4. Bevestiging
+- Overzicht van de registratie
+- Bevestiging per e-mail
 ## 📩 Contact
 Voor vragen, feedback of samenwerking:
 📧 careerlaunch@school.be
