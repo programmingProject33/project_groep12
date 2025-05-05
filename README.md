@@ -1,12 +1,12 @@
-💼 Career Launch Speeddate Website
+# 💼 Career Launch Speeddate Website
 Welkom bij ons project! Wij bouwen een interactieve website voor de Career Launch Beurs, waarbij studenten en alumni speeddates kunnen reserveren met bedrijven. De bedoeling is om gerichte connecties te maken tussen jong talent en werkgevers in een moderne, efficiënte omgeving.
 
-🎯 Doel van het project
+## 🎯 Doel van het project
 Een gebruiksvriendelijke reserveringswebsite waarmee:
 
 Bedrijven hun aanwezigheid en beschikbaarheid beheren
 Studenten en alumni zich kunnen inschrijven en gesprekken boeken
-👥 Wie zijn we?
+## 👥 Wie zijn we?
 Dit project wordt ontwikkeld door:
 
 MEZIANI Bilal
@@ -15,7 +15,7 @@ EL ABDELKHALKI Chaimae
 MICHIELSEN Silke
 LODHl Mutahir
 ASSARAR Nisrine
-🔧 Gebruikte technologieën
+## 🔧 Gebruikte technologieën
 Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
 
 HTML
@@ -24,9 +24,9 @@ JavaScript
 figma
 trello
 github
-✨ We hebben ChatGPT gebruikt voor het verfijnen en mooier maken van deze README.
+## ✨ We hebben ChatGPT gebruikt voor het verfijnen en mooier maken van deze README.
 
-🧑‍🎓 Voor studenten en alumni
+## 🧑‍🎓 Voor studenten en alumni
 1. Startpagina
 Welkomsttekst
 Inschrijvingsformulier
@@ -46,7 +46,7 @@ Selectie + reservatie van gewenst moment
 5. Bevestigingspagina
 Bevestiging van reservatie
 E-mail met datum, tijd, locatie en annuleeroptie
-🏢 Voor bedrijven
+## 🏢 Voor bedrijven
 1. Startpagina
 Zelfde als bij studenten
 Inschrijving met keuzeoptie: "Ik ben een bedrijf"
@@ -60,7 +60,7 @@ Toevoegen van beschikbare tijdstippen
 4. Bevestiging
 Overzicht van de registratie
 Bevestiging per e-mail
-📩 Contact
+## 📩 Contact
 Voor vragen, feedback of samenwerking:
 📧 careerlaunch@school.be
 📍 Schoolstraat 123, Brussel
