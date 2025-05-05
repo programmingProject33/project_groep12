@@ -60,6 +60,17 @@ Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
 ### 4. Bevestiging
 - Overzicht van de registratie
 - Bevestiging per e-mail
+
+## 🛠️ Voor organisatoren / administrators
+
+De organisatoren hebben toegang tot een aparte beheerpagina waarop ze:
+- Een overzicht zien van **alle geregistreerde studenten, alumni en bedrijven**
+- Kunnen bekijken **welke tijdstippen gereserveerd zijn**
+- **Reservaties beheren**, aanpassen of verwijderen indien nodig
+- **De plattegrond updaten** (bv. verplaatsen van bedrijfsstanden)
+- **Feedback** van gebruikers kunnen lezen en opvolgen
+- In de toekomst eventueel: gebruikers goedkeuren, automatische herinneringen sturen of statistieken bekijken
+  
 ## 📩 Contact
 Voor vragen, feedback of samenwerking:
 📧 careerlaunch@school.be
