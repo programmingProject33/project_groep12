@@ -28,22 +28,22 @@ Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
 
 ## 🧑‍🎓 Voor studenten en alumni
 1. Startpagina
-- Welkomsttekst
-- Inschrijvingsformulier
-- Navigatie:
-  Home | Inschrijven | Plattegrond | Bedrijven | Speeddates | Reservaties | Contact | Feedback
-  Footer met contactgegevens en social media
-2. Inschrijvingspagina
+ Welkomsttekst
+ Inschrijvingsformulier
+ Navigatie:
+Home | Inschrijven | Plattegrond | Bedrijven | Speeddates | Reservaties | Contact | Feedback
+Footer met contactgegevens en social media
+3. Inschrijvingspagina
 Formulier met naam, e-mailadres, wachtwoord + bevestiging
 Keuzeoptie: "Ik ben student/alumni"
-3. Plattegrondpagina
+4. Plattegrondpagina
 Interactieve schoolplattegrond met alle bedrijven aangeduid
 Klik op een bedrijf opent de volgende pagina
-4. Bedrijfspagina + Reservatie
+5. Bedrijfspagina + Reservatie
 Bedrijfsinformatie
 Beschikbare tijdstippen
 Selectie + reservatie van gewenst moment
-5. Bevestigingspagina
+6. Bevestigingspagina
 Bevestiging van reservatie
 E-mail met datum, tijd, locatie en annuleeroptie
 ## 🏢 Voor bedrijven
