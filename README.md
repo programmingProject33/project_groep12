@@ -69,7 +69,6 @@ De organisatoren hebben toegang tot een aparte beheerpagina waarop ze:
 - **Reservaties beheren**, aanpassen of verwijderen indien nodig
 - **De plattegrond updaten** (bv. verplaatsen van bedrijfsstanden)
 - **Feedback** van gebruikers kunnen lezen en opvolgen
-- In de toekomst eventueel: gebruikers goedkeuren, automatische herinneringen sturen of statistieken bekijken
   
 ## 📩 Contact
 Voor vragen, feedback of samenwerking:
