@@ -52,12 +52,9 @@ Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
 - Inschrijving met keuzeoptie: "Ik ben een bedrijf"
 ### 2. Inschrijvingspagina
 - Bedrijfsnaam, e-mail, wachtwoord
-- Na registratie: doorgestuurd naar invulformulier
-### 3. Bedrijfsformulier
 - Bedrijfsomschrijving
-- Keuze van locatie (stand/lokaal)
 - Toevoegen van beschikbare tijdstippen
-### 4. Bevestiging
+### 3. Bevestiging
 - Overzicht van de registratie
 - Bevestiging per e-mail
 
