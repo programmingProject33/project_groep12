@@ -31,7 +31,7 @@ Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
  - Welkomsttekst
  - Inschrijvingsformulier
  - Navigatie:
-`Home | Inschrijven | Plattegrond | Bedrijven | Speeddates | Reservaties | Contact | Feedback`
+`Home | Inschrijven | Reservaties | Contact | Login`
  - Footer met contactgegevens en social media
 ### 2. Inschrijvingspagina
 - Formulier met naam, e-mailadres, wachtwoord + bevestiging
