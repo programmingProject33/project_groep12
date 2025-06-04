@@ -11,8 +11,6 @@ Dit project wordt ontwikkeld door:
 
 - MEZIANI Bilal
 - IBRAHIM SHEXO Mohammad
-- EL ABDELKHALKI Chaimae
-- MICHIELSEN Silke
 - LODHl Mutahir
 - ASSARAR Nisrine
 ## 🔧 Gebruikte technologieën
@@ -24,6 +22,9 @@ Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
 - figma
 - trello
 - github
+- node.js
+- EXPRESS
+- mySQL
 > ✨ We hebben ChatGPT gebruikt voor het verfijnen en mooier maken van deze README.
 
 ## 🧑‍🎓 Voor studenten en alumni
