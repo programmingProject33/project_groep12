@@ -218,7 +218,7 @@ body {
   font-family: 'Inter', Arial, sans-serif;
   font-size: 1.13rem;
 }
-
+ 
 .footer-row {
   display: flex;
   justify-content: space-between;
@@ -228,7 +228,7 @@ body {
   gap: 0;
   position: relative;
 }
-
+ 
 .footer-col {
   flex: 1;
   min-width: 190px;
@@ -238,24 +238,24 @@ body {
   flex-direction: column;
   align-items: flex-start;
 }
-
+ 
 .footer-col.left {
   padding-left: 0;
 }
-
+ 
 .footer-col.middle {
   align-items: center;
 }
-
+ 
 .footer-col.right {
   align-items: flex-end;
   padding-right: 0;
 }
-
-
-
-
-
+ 
+ 
+ 
+ 
+ 
 .footer-mail {
   color: #fff;
   font-size: 1rem;
@@ -263,36 +263,37 @@ body {
   text-align: left;
   word-break: break-all;
 }
-
+ 
 /* Menu midden */
 .footer-menu {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-
+ 
 .footer-menu li {
   margin-bottom: 1.2rem;
   font-size: 1.2rem;
   color: #fff;
   cursor: pointer;
 }
-
+ 
 .footer-menu li:last-child {
   margin-bottom: 0;
 }
-
+ 
 .footer-socials {
   display: flex;
   flex-wrap: wrap;
   gap: 1.3rem;
   font-size: 2rem;
 }
-
+ 
 .icon {
   display: inline-block;
+  color: #e5e7eb;
 }
-
+ 
 /* Verticale lijnen tussen de kolommen */
 .footer-col:not(:last-child)::after {
   content: "";
@@ -304,11 +305,11 @@ body {
   background: #fff;
   opacity: 0.55;
 }
-
+ 
 .footer-col.right::after {
   display: none;
 }
-
+ 
 /* Responsive */
 @media (max-width: 900px) {
   .footer-row {
