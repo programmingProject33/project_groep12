@@ -70,6 +70,14 @@ De organisatoren hebben toegang tot een aparte beheerpagina waarop ze:
   
 ## 📩 Contact
 Voor vragen, feedback of samenwerking:
-📧 careerlaunch@school.be
-📍 Schoolstraat 123, Brussel
+📧 pp-test@ehb.be
+📍 Quai de l'Industrie 170, 1070 Anderlecht
 📱 Volg ons op Instagram & LinkedIn @careerlaunch
+
+
+## 🚀 Installatie en starten
+- Clone de repo
+- Installeer de dependencies:
+    * npm install
+-Start de dev-server:
+    * npm run dev
