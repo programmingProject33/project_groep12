@@ -77,7 +77,9 @@ Voor vragen, feedback of samenwerking:
 
 ## 🚀 Installatie en starten
 - Clone de repo https://github.com/programmingProject33/project_groep12.git
+- cd client
 - Installeer de dependencies:
     * npm install
 - Start de dev-server:
     * npm run dev
+    *   http://localhost:5173/ 
