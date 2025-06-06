@@ -1,16 +1,18 @@
 import React from "react";
 import "./Home.css";
 import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
-
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+  const navigate = useNavigate();  // Binnen de component!
+
   return (
     <div>
       {/* NAVIGATIEBALK */}
       <nav className="navbar">
         <div className="navbar-logo">
           <span className="navbar-title">Careerlaunch</span>
-         </div>
+        </div>
         <ul className="navbar-links">
           <li><a href="#">Home</a></li>
           <li><a href="#">Bedrijven</a></li>
@@ -29,13 +31,19 @@ export default function Home() {
         <div className="hero-content">
           <h1>Career Launch '25-'26</h1>
           <p>
-          Het evenement Career Launch '24-'25 aan de Erasmus Hogeschool Brussel biedt studenten van de EHB de kans om in contact te komen met bedrijven die op zoek zijn naar stagiairs en werknemers. Het richt zich op studenten van de opleidingen Toegepaste Informatica, Multimedia & Creative Technologies, Programmeren, Systeem- en Netwerkbeheer, en Internet of Things. 
-          Tijdens de Career Launch kunnen studenten deelnemen aan groepsessies, speeddates en netwerkmomenten met vertegenwoordigers van diverse bedrijven. Organisaties zoals Accenture, Capgemini, Colruyt Group en vele anderen zijn aanwezig om hun werking toe te lichten en potentiële kandidaten te ontmoeten.
-          Het doel van dit evenement is om studenten te helpen bij het vinden van stages en jobs, en bedrijven de kans te geven getalenteerde en gemotiveerde studenten te leren kennen.
+            Het evenement Career Launch '24-'25 aan de Erasmus Hogeschool Brussel biedt studenten van de EHB de kans om in contact te komen met bedrijven die op zoek zijn naar stagiairs en werknemers. Het richt zich op studenten van de opleidingen Toegepaste Informatica, Multimedia & Creative Technologies, Programmeren, Systeem- en Netwerkbeheer, en Internet of Things. 
+            Tijdens de Career Launch kunnen studenten deelnemen aan groepsessies, speeddates en netwerkmomenten met vertegenwoordigers van diverse bedrijven. Organisaties zoals Accenture, Capgemini, Colruyt Group en vele anderen zijn aanwezig om hun werking toe te lichten en potentiële kandidaten te ontmoeten.
+            Het doel van dit evenement is om studenten te helpen bij het vinden van stages en jobs, en bedrijven de kans te geven getalenteerde en gemotiveerde studenten te leren kennen.
           </p>
           <div className="hero-btns">
             <button className="btn primary">Registreer als bedrijf</button>
-            <button className="btn secondary">Registreer als student</button>
+            <button
+  className="btn secondary"
+  onClick={() => navigate("/studenten/nieuw")}
+>
+  Registreer als student
+</button>
+
           </div>
         </div>
         <div className="hero-img" />
@@ -61,40 +69,33 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-    <footer className="footer">
-  <div className="footer-row">
-    {/* Links: Logo + mail */}
-    <div className="footer-col left">
-      <div className="footer-logo-box">
-       
-      </div>
-      <div className="footer-mail">
-        E-mailadres: pp-test@ehb.be<br />
-        +32 494 77 08 550
-      </div>
-    </div>
- 
-    {/* Midden: Menu */}
-    <div className="footer-col middle">
-      <ul className="footer-menu">
-        <li>Home</li>
-        <li>Inschrijving</li>
-        <li>Contact</li>
-        <li>Login</li>
-      </ul>
-    </div>
- 
-    {/* Rechts: Socials */}
-    <div className="footer-col right">
-          <div className="footer-socials">
-            <a href="#" className="icon" title="LinkedIn"><FaLinkedin /></a>
-            <a href="#" className="icon" title="Instagram"><FaInstagram /></a>
-            <a href="#" className="icon" title="X"><FaXTwitter /></a>
-            <a href="#" className="icon" title="TikTok"><FaTiktok /></a>
+      <footer className="footer">
+        <div className="footer-row">
+          <div className="footer-col left">
+            <div className="footer-logo-box"></div>
+            <div className="footer-mail">
+              E-mailadres: pp-test@ehb.be<br />
+              +32 494 77 08 550
+            </div>
+          </div>
+          <div className="footer-col middle">
+            <ul className="footer-menu">
+              <li>Home</li>
+              <li>Inschrijving</li>
+              <li>Contact</li>
+              <li>Login</li>
+            </ul>
+          </div>
+          <div className="footer-col right">
+            <div className="footer-socials">
+              <a href="#" className="icon" title="LinkedIn"><FaLinkedin /></a>
+              <a href="#" className="icon" title="Instagram"><FaInstagram /></a>
+              <a href="#" className="icon" title="X"><FaXTwitter /></a>
+              <a href="#" className="icon" title="TikTok"><FaTiktok /></a>
+            </div>
           </div>
         </div>
+      </footer>
     </div>
-  </footer>
- </div>
   );
 }
