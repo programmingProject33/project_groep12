@@ -82,4 +82,4 @@ Voor vragen, feedback of samenwerking:
     * npm install
 - Start de dev-server:
     * npm run dev
-    *   http://localhost:5173/ 
+    *    http://localhost:5173/
