@@ -70,7 +70,7 @@ De organisatoren hebben toegang tot een aparte beheerpagina waarop ze:
   
 ## 📩 Contact
 Voor vragen, feedback of samenwerking:
-📧 pp-test@ehb.be
+📧 support-careerlaunch@ehb.be
 📍 Nijverheidskaai 170, 1070 Anderlecht. 
 📱 Volg ons op Instagram & LinkedIn @careerlaunch
 
