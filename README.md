@@ -71,7 +71,7 @@ De organisatoren hebben toegang tot een aparte beheerpagina waarop ze:
 ## 📩 Contact
 Voor vragen, feedback of samenwerking:
 📧 pp-test@ehb.be
-📍 Quai de l'Industrie 170, 1070 Anderlecht
+📍 Nijverheidskaai 170, 1070 Anderlecht. 
 📱 Volg ons op Instagram & LinkedIn @careerlaunch
 
 
