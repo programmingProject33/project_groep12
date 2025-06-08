@@ -4,24 +4,24 @@ import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
-  const navigate = useNavigate();  // Binnen de component!
+  const navigate = useNavigate();
 
   return (
     <div>
       {/* NAVIGATIEBALK */}
       <nav className="navbar">
-        <div className="navbar-logo">
+        <div className="navbar-logo" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
           <span className="navbar-title">Careerlaunch</span>
         </div>
         <ul className="navbar-links">
-          <li><a href="#">Home</a></li>
+          <li><a href="#" onClick={() => navigate("/")}>Home</a></li>
           <li><a href="#">Bedrijven</a></li>
           <li><a href="#">Contact</a></li>
           <li>
-            <button className="navbar-btn register">Registreer</button>
+            <button className="navbar-btn register" onClick={() => navigate("/studenten/nieuw")}>Registreer</button>
           </li>
           <li>
-            <button className="navbar-btn login">Login</button>
+            <button className="navbar-btn login" onClick={() => navigate("/login")}>Login</button>
           </li>
         </ul>
       </nav>
@@ -36,14 +36,13 @@ export default function Home() {
             Het doel van dit evenement is om studenten te helpen bij het vinden van stages en jobs, en bedrijven de kans te geven getalenteerde en gemotiveerde studenten te leren kennen.
           </p>
           <div className="hero-btns">
-            <button className="btn primary">Registreer als bedrijf</button>
+            <button className="btn primary" onClick={() => alert("Bedrijven registratie nog niet geïmplementeerd")}>Registreer als bedrijf</button>
             <button
-  className="btn secondary"
-  onClick={() => navigate("/studenten/nieuw")}
->
-  Registreer als student
-</button>
-
+              className="btn secondary"
+              onClick={() => navigate("/studenten/nieuw")}
+            >
+              Registreer als student
+            </button>
           </div>
         </div>
         <div className="hero-img" />
@@ -80,10 +79,10 @@ export default function Home() {
           </div>
           <div className="footer-col middle">
             <ul className="footer-menu">
-              <li>Home</li>
+              <li onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Home</li>
               <li>Inschrijving</li>
               <li>Contact</li>
-              <li>Login</li>
+              <li onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>Login</li>
             </ul>
           </div>
           <div className="footer-col right">

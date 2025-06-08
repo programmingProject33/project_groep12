@@ -10,6 +10,14 @@ export default function RegisterStudent() {
     navigate("/");
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Hier kun je formulier validatie en verwerking doen
+
+    // Na 'verzenden' navigeren we naar login
+    navigate("/login");
+  };
+
   return (
     <div>
       {/* NAVIGATIE */}
@@ -22,29 +30,29 @@ export default function RegisterStudent() {
           <li><a href="#">Bedrijven</a></li>
           <li><a href="#">Contact</a></li>
           <li><button className="navbar-btn register">Registreer</button></li>
-          <li><button className="navbar-btn login">Login</button></li>
+          <li><button className="navbar-btn login" onClick={() => navigate("/login")}>Login</button></li>
         </ul>
       </nav>
 
       {/* FORMULIER VOOR STUDENT REGISTRATIE */}
       <main className="register-container">
         <h2>Registreer als Student</h2>
-        <form className="register-form">
+        <form className="register-form" onSubmit={handleSubmit}>
           <label>
             Voornaam:
-            <input type="text" placeholder="Voornaam" />
+            <input type="text" placeholder="Voornaam" required />
           </label>
           <label>
             Achternaam:
-            <input type="text" placeholder="Achternaam" />
+            <input type="text" placeholder="Achternaam" required />
           </label>
           <label>
             E-mailadres:
-            <input type="email" placeholder="voorbeeld@ehb.be" />
+            <input type="email" placeholder="voorbeeld@ehb.be" required />
           </label>
           <label>
             Studie:
-            <input type="text" placeholder="Toegepaste Informatica..." />
+            <input type="text" placeholder="Toegepaste Informatica..." required />
           </label>
           <button type="submit" className="btn primary">Verzenden</button>
         </form>
@@ -65,7 +73,7 @@ export default function RegisterStudent() {
               <li onClick={goToHome} style={{ cursor: "pointer" }}>Home</li>
               <li>Inschrijving</li>
               <li>Contact</li>
-              <li>Login</li>
+              <li onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>Login</li>
             </ul>
           </div>
           <div className="footer-col right">
