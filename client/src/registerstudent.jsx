@@ -56,14 +56,14 @@ export default function RegisterStudent() {
           <div className="footer-col left">
             <div className="footer-logo-box"></div>
             <div className="footer-mail">
-              E-mailadres: pp-test@ehb.be<br />
-              +32 494 77 08 550
+              E-mailadres: support-careerlaunch@ehb.be<br />
+              Telefoonnummer: +32 494 77 08 550
             </div>
           </div>
           <div className="footer-col middle">
             <ul className="footer-menu">
               <li onClick={goToHome} style={{ cursor: "pointer" }}>Home</li>
-              <li>Inschrijving</li>
+              <li>Registreer</li>
               <li>Contact</li>
               <li>Login</li>
             </ul>

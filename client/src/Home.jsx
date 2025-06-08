@@ -16,7 +16,7 @@ export default function Home() {
         <ul className="navbar-links">
           <li><a href="#">Home</a></li>
           <li><a href="#">Bedrijven</a></li>
-          <li><a href="#">Contact</a></li>
+          <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>Contact</li>
           <li>
             <button className="navbar-btn register">Registreer</button>
           </li>
@@ -74,15 +74,15 @@ export default function Home() {
           <div className="footer-col left">
             <div className="footer-logo-box"></div>
             <div className="footer-mail">
-              E-mailadres: pp-test@ehb.be<br />
-              +32 494 77 08 550
+              E-mailadres: support-careerlaunch@ehb.be<br />
+              Telefoonnummer: +32 494 77 08 550
             </div>
           </div>
           <div className="footer-col middle">
             <ul className="footer-menu">
               <li>Home</li>
-              <li>Inschrijving</li>
-              <li>Contact</li>
+              <li>Registreer</li>
+               <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>Contact</li>
               <li>Login</li>
             </ul>
           </div>
