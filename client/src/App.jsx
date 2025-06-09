@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./home.jsx";
+import Home from "./Home.jsx";
 import RegisterStudent from "./registerstudent.jsx";
 import Contact from "./contactNavbalk.jsx";
 

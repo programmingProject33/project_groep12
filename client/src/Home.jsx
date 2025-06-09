@@ -35,16 +35,7 @@ export default function Home() {
             Tijdens de Career Launch kunnen studenten deelnemen aan groepsessies, speeddates en netwerkmomenten met vertegenwoordigers van diverse bedrijven. Organisaties zoals Accenture, Capgemini, Colruyt Group en vele anderen zijn aanwezig om hun werking toe te lichten en potentiële kandidaten te ontmoeten.
             Het doel van dit evenement is om studenten te helpen bij het vinden van stages en jobs, en bedrijven de kans te geven getalenteerde en gemotiveerde studenten te leren kennen.
           </p>
-          <div className="hero-btns">
-            <button className="btn primary">Registreer als bedrijf</button>
-            <button
-  className="btn secondary"
-  onClick={() => navigate("/studenten/nieuw")}
->
-  Registreer als student
-</button>
-
-          </div>
+          {/* Knoppen verwijderd */}
         </div>
         <div className="hero-img" />
       </header>
@@ -82,7 +73,7 @@ export default function Home() {
             <ul className="footer-menu">
               <li>Home</li>
               <li>Registreer</li>
-               <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>Contact</li>
+              <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>Contact</li>
               <li>Login</li>
             </ul>
           </div>
