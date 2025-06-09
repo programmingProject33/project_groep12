@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Home.jsx";
 import RegisterStudent from "./registerstudent.jsx";
+import Contact from "./contactNavbalk.jsx";
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/studenten/nieuw" element={<RegisterStudent />} />
+        <Route path="/contactNavbalk" element= {<Contact />}></Route>
       </Routes>
     </Router>
   );

@@ -16,7 +16,7 @@ export default function Home() {
         <ul className="navbar-links">
           <li><a href="#">Home</a></li>
           <li><a href="#">Bedrijven</a></li>
-          <li><a href="#">Contact</a></li>
+          <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>Contact</li>
           <li>
             <button className="navbar-btn register">Registreer</button>
           </li>
@@ -35,16 +35,7 @@ export default function Home() {
             Tijdens de Career Launch kunnen studenten deelnemen aan groepsessies, speeddates en netwerkmomenten met vertegenwoordigers van diverse bedrijven. Organisaties zoals Accenture, Capgemini, Colruyt Group en vele anderen zijn aanwezig om hun werking toe te lichten en potentiële kandidaten te ontmoeten.
             Het doel van dit evenement is om studenten te helpen bij het vinden van stages en jobs, en bedrijven de kans te geven getalenteerde en gemotiveerde studenten te leren kennen.
           </p>
-          <div className="hero-btns">
-            <button className="btn primary">Registreer als bedrijf</button>
-            <button
-  className="btn secondary"
-  onClick={() => navigate("/studenten/nieuw")}
->
-  Registreer als student
-</button>
-
-          </div>
+          {/* Knoppen verwijderd */}
         </div>
         <div className="hero-img" />
       </header>
@@ -74,15 +65,15 @@ export default function Home() {
           <div className="footer-col left">
             <div className="footer-logo-box"></div>
             <div className="footer-mail">
-              E-mailadres: pp-test@ehb.be<br />
-              +32 494 77 08 550
+              E-mailadres: support-careerlaunch@ehb.be<br />
+              Telefoonnummer: +32 494 77 08 550
             </div>
           </div>
           <div className="footer-col middle">
             <ul className="footer-menu">
               <li>Home</li>
-              <li>Inschrijving</li>
-              <li>Contact</li>
+              <li>Registreer</li>
+              <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>Contact</li>
               <li>Login</li>
             </ul>
           </div>
