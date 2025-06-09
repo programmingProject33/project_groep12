@@ -3,14 +3,17 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Home.jsx";
 import RegisterStudent from "./registerstudent.jsx";
 import Contact from "./contactNavbalk.jsx";
+import Login from "./login.jsx";
 
 function App() {
   return (
     <Router>
+      {/* Navigatie is hier verwijderd */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/studenten/nieuw" element={<RegisterStudent />} />
-        <Route path="/contactNavbalk" element= {<Contact />}></Route>
+        <Route path="/contactNavbalk" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );
