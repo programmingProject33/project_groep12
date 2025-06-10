@@ -104,7 +104,7 @@ export default function Registreer()   // Dit is een functionele component in Re
               {/* Knop om het formulier te versturen */}
             </form>
           )}
-
+ 
           {activeTab === "bedrijf" && (
             <form className="registerbedrijf-form">
               {/* Formulier voor bedrijf registratie */}

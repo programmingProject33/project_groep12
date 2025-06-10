@@ -1,9 +1,12 @@
 import React from "react";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Home.jsx";
 import Registreer from "./registreer.jsx";
 import Contact from "./contactNavbalk.jsx";
 import Login from "./login.jsx";
+import Bedrijven from "./bedrijven.jsx";
+
 
 function App() {
   return (
@@ -13,6 +16,7 @@ function App() {
         <Route path="/registreer" element={<Registreer />} />
         <Route path="/contactNavbalk" element={<Contact />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/bedrijven" element={<Bedrijven />} />
       </Routes>
     </Router>
   );
