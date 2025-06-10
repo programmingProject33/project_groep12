@@ -75,7 +75,7 @@ export default function Registreer() {
               <button type="submit" className="registerstudent-btn student-btn">Account maken</button>
             </form>
           )}
-
+ 
           {activeTab === "bedrijf" && (
             <form className="registerbedrijf-form">
               <h1 className="registerbedrijf-title">Account maken als Bedrijf</h1>

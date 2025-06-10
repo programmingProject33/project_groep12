@@ -12,7 +12,7 @@ export default function Contact() {
         </div>
         <ul className="navbar-links">
           <li><a href="/">Home</a></li>
-          <li><a href="#">Bedrijven</a></li>
+          <li><a href="/">Bedrijven</a></li>
           <li><a href="#">Contact</a></li>
           <li><button className="navbar-btn register">Registreer</button></li>
           <li><button className="navbar-btn login">Login</button></li>

@@ -15,7 +15,7 @@ export default function Home() {
         </div>
         <ul className="navbar-links">
           <li><a onClick={() => navigate("/")}>Home</a></li>
-          <li><a>Bedrijven</a></li>
+          <li onClick = {() => navigate("/bedrijven" )}>Bedrijven</li>
           <li onClick={() => navigate("/contactNavbalk")}>Contact</li>
           <li>
             <button className="navbar-btn register" onClick={() => navigate("/registreer")}>Registreer</button>
