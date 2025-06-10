@@ -1,21 +1,42 @@
 import React from "react";
+import { useNavigate, Link } from "react-router-dom";
 import "./contactNavbalk.css";
 import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 
 export default function Contact() {
+  const navigate = useNavigate();
+
   return (
     <div>
       {/* navigatiebalk */}
       <nav className="navbar">
-        <div className="navbar-logo">
+        <div className="navbar-logo" onClick={() => navigate("/")}>
           <span className="navbar-title">Careerlaunch</span>
         </div>
         <ul className="navbar-links">
-          <li><a href="/">Home</a></li>
-          <li><a href="/">Bedrijven</a></li>
-          <li><a href="#">Contact</a></li>
-          <li><button className="navbar-btn register">Registreer</button></li>
-          <li><button className="navbar-btn login">Login</button></li>
+          <li>
+            <Link className="nav-link" to="/">
+              Home
+            </Link>
+          </li>
+          <li>
+            Bedrijven
+          </li>
+          <li>
+            <Link className="nav-link" to="/contactNavbalk">
+              Contact
+            </Link>
+          </li>
+          <li>
+            <button className="navbar-btn register" onClick={() => navigate("/registreer")}>
+              Registreer
+            </button>
+          </li>
+          <li>
+            <button className="navbar-btn login" onClick={() => navigate("/login")}>
+              Login
+            </button>
+          </li>
         </ul>
       </nav>
 
@@ -38,7 +59,7 @@ export default function Contact() {
             </div>
             <div>
               <span>Adres</span>
-              <span>Nijverheidskaai 170, 1070 Anderlecht. </span>
+              <span>Nijverheidskaai 170, 1070 Anderlecht.</span>
             </div>
           </div>
         </section>
@@ -60,9 +81,11 @@ export default function Contact() {
             </label>
             <label>
               Message
-              <textarea placeholder="Enter your message" rows="5" required />
+              <textarea placeholder="Enter your message" rows={5} required />
             </label>
-            <button type="submit" className="contact-btn">Verzenden</button>
+            <button type="submit" className="contact-btn">
+              Verzenden
+            </button>
           </form>
         </section>
       </main>
@@ -73,24 +96,65 @@ export default function Contact() {
           <div className="footer-col left">
             <div className="footer-logo-box"></div>
             <div className="footer-mail">
-              E-mailadres: support-careerlaunch@ehb.be<br />
+              E-mailadres: support-careerlaunch@ehb.be
+              <br />
               Telefoonnummer: +32 494 77 08 550
             </div>
           </div>
           <div className="footer-col middle">
             <ul className="footer-menu">
-              <li><a href="/">Home</a></li>
-              <li>Inschrijving</li>
-              <li>Contact</li>
-              <li>Login</li>
+              <li onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+                Home
+              </li>
+              <li onClick={() => navigate("/registreer")} style={{ cursor: "pointer" }}>
+                Registreer
+              </li>
+              <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>
+                Contact
+              </li>
+              <li onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>
+                Login
+              </li>
             </ul>
           </div>
           <div className="footer-col right">
             <div className="footer-socials">
-              <a href="#" className="icon" title="LinkedIn"><FaLinkedin /></a>
-              <a href="#" className="icon" title="Instagram"><FaInstagram /></a>
-              <a href="#" className="icon" title="X"><FaXTwitter /></a>
-              <a href="#" className="icon" title="TikTok"><FaTiktok /></a>
+              <a
+                href="https://www.linkedin.com/company/meterasmusplus/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon"
+                title="LinkedIn"
+              >
+                <FaLinkedin />
+              </a>
+              <a
+                href="https://www.instagram.com/erasmushogeschool/?hl=en"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon"
+                title="Instagram"
+              >
+                <FaInstagram />
+              </a>
+              <a
+                href="https://x.com/EUErasmusPlus?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon"
+                title="X"
+              >
+                <FaXTwitter />
+              </a>
+              <a
+                href="https://www.tiktok.com/@erasmushogeschool"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon"
+                title="TikTok"
+              >
+                <FaTiktok />
+              </a>
             </div>
           </div>
         </div>
