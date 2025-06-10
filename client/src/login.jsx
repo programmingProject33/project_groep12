@@ -14,7 +14,7 @@ function Navigation({ onLoginClick }) {
         <li><a onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Home</a></li>
         <li><a href="#">Bedrijven</a></li>
         <li><a href="#">Contact</a></li>
-        <li><button className="navbar-btn register" onClick={() => navigate("/studenten/nieuw")}>Registreer</button></li>
+        <li><button className="navbar-btn register" onClick={() => navigate("/registreer")}>Registreer</button></li>
         <li><button className="navbar-btn login" onClick={() => navigate("/login")}>Login</button></li>
       </ul>
     </nav>
@@ -113,7 +113,7 @@ const Login = () => {
           <button type="submit" className="btn primary">Inloggen</button>
 
           <p className="register-link">
-            Nog geen account? <Link to="/studenten/nieuw">Registreer hier</Link>
+            Nog geen account? <Link to="/registreer">Registreer hier</Link>
           </p>
         </form>
       </div>

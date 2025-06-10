@@ -10,15 +10,15 @@ export default function Home() {
     <div>
       {/* NAVIGATIEBALK */}
       <nav className="navbar">
-        <div className="navbar-logo" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+        <div className="navbar-logo" onClick={() => navigate("/")}>
           <span className="navbar-title">Careerlaunch</span>
         </div>
         <ul className="navbar-links">
           <li><a onClick={() => navigate("/")}>Home</a></li>
           <li><a>Bedrijven</a></li>
-          <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>Contact</li>
+          <li onClick={() => navigate("/contactNavbalk")}>Contact</li>
           <li>
-            <button className="navbar-btn register" onClick={() => navigate("/studenten/nieuw")}>Registreer</button>
+            <button className="navbar-btn register" onClick={() => navigate("/registreer")}>Registreer</button>
           </li>
           <li>
             <button className="navbar-btn login" onClick={() => navigate("/login")}>Login</button>
@@ -34,11 +34,7 @@ export default function Home() {
             Het evenement Career Launch '24-'25 aan de Erasmus Hogeschool Brussel biedt studenten van de EHB de kans om in contact te komen met bedrijven die op zoek zijn naar stagiairs en werknemers. Het richt zich op studenten van de opleidingen Toegepaste Informatica, Multimedia & Creative Technologies, Programmeren, Systeem- en Netwerkbeheer, en Internet of Things. 
             Tijdens de Career Launch kunnen studenten deelnemen aan groepsessies, speeddates en netwerkmomenten met vertegenwoordigers van diverse bedrijven. Organisaties zoals Accenture, Capgemini, Colruyt Group en vele anderen zijn aanwezig om hun werking toe te lichten en potentiële kandidaten te ontmoeten.
             Het doel van dit evenement is om studenten te helpen bij het vinden van stages en jobs, en bedrijven de kans te geven getalenteerde en gemotiveerde studenten te leren kennen.
-          </p>
-          <div className="hero-btns">
-            <button className="btn primary" onClick={() => alert("Bedrijven registratie nog niet geïmplementeerd")}>Registreer als bedrijf</button>
-            <button className="btn secondary" onClick={() => navigate("/studenten/nieuw")}>Registreer als student</button>
-          </div>
+          </p> 
         </div>
         <div className="hero-img" />
       </header>
@@ -75,7 +71,7 @@ export default function Home() {
           <div className="footer-col middle">
             <ul className="footer-menu">
               <li onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Home</li>
-              <li onClick={() => navigate("/studenten/nieuw")} style={{ cursor: "pointer" }}>Registreer</li>
+              <li onClick={() => navigate("/registreer")} style={{ cursor: "pointer" }}>Registreer</li>
               <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>Contact</li>
               <li onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>Login</li>
             </ul>
