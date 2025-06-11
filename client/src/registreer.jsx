@@ -17,6 +17,126 @@ export default function Registreer()   // Dit is een functionele component in Re
   // als je deze functie gebruikt. 'navigate' is een manier om van pagina te veranderen 
   // binnen je app zonder dat je de hele website opnieuw hoeft te laden.
 
+  // State for student form
+  const [studentForm, setStudentForm] = useState({
+    voornaam: '',
+    naam: '',
+    email: '',
+    gebruikersnaam: '',
+    wachtwoord: '',
+    wachtwoord2: '',
+    opleiding: '',
+    opleiding_jaar: ''
+  });
+
+  // State for company form
+  const [companyForm, setCompanyForm] = useState({
+    bedrijfsnaam: '',
+    kvk: '',
+    btw: '',
+    straat: '',
+    gemeente: '',
+    telbedrijf: '',
+    emailbedrijf: '',
+    voornaam_contact: '',
+    naam_contact: '',
+    specialisatie: '',
+    email_contact: '',
+    tel_contact: '',
+    gebruikersnaam_bedrijf: '',
+    wachtwoord_bedrijf: '',
+    wachtwoord2_bedrijf: ''
+  });
+
+  // Error state
+  const [error, setError] = useState('');
+
+  const handleStudentChange = (e) => {
+    setStudentForm({
+      ...studentForm,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleCompanyChange = (e) => {
+    setCompanyForm({
+      ...companyForm,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleStudentSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Validate passwords match
+    if (studentForm.wachtwoord !== studentForm.wachtwoord2) {
+      setError('Wachtwoorden komen niet overeen');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'student',
+          ...studentForm
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Er is iets misgegaan');
+      }
+
+      // Registration successful
+      alert('Account succesvol aangemaakt!');
+      navigate('/login');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleCompanySubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Validate passwords match
+    if (companyForm.wachtwoord_bedrijf !== companyForm.wachtwoord2_bedrijf) {
+      setError('Wachtwoorden komen niet overeen');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'bedrijf',
+          ...companyForm
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Er is iets misgegaan');
+      }
+
+      // Registration successful
+      alert('Bedrijfsaccount succesvol aangemaakt!');
+      navigate('/login');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <div>
       {/* Bovenste navigatiebalk met logo en knoppen */}
@@ -64,39 +184,96 @@ export default function Registreer()   // Dit is een functionele component in Re
           </button>
         </div>
 
+        {error && <div className="error-message">{error}</div>}
+
         <div className="registerstudent-content">
           {/* Dit stukje toont een formulier afhankelijk van welke tab actief is */}
 
           {activeTab === "student" && (
-            <form className="registerstudent-form">
+            <form className="registerstudent-form" onSubmit={handleStudentSubmit}>
               {/* Formulier voor studenten registratie */}
               <h1 className="registerstudent-title">Account maken als Student</h1>
               <label>
                 Voornaam:
-                <input type="text" name="voornaam" />
-                {/* Invulveld voor voornaam */}
+                <input 
+                  type="text" 
+                  name="voornaam" 
+                  value={studentForm.voornaam}
+                  onChange={handleStudentChange}
+                  required
+                />
               </label>
               <label>
                 Naam:
-                <input type="text" name="naam" />
+                <input 
+                  type="text" 
+                  name="naam" 
+                  value={studentForm.naam}
+                  onChange={handleStudentChange}
+                  required
+                />
               </label>
               <label>
                 E-mailadres:
-                <input type="email" name="email" />
-                {/* Email invoerveld */}
+                <input 
+                  type="email" 
+                  name="email" 
+                  value={studentForm.email}
+                  onChange={handleStudentChange}
+                  required
+                />
               </label>
               <label>
                 Gebruikersnaam:
-                <input type="text" name="gebruikersnaam" />
+                <input 
+                  type="text" 
+                  name="gebruikersnaam" 
+                  value={studentForm.gebruikersnaam}
+                  onChange={handleStudentChange}
+                  required
+                />
+              </label>
+              <label>
+                Opleiding:
+                <input 
+                  type="text" 
+                  name="opleiding" 
+                  value={studentForm.opleiding}
+                  onChange={handleStudentChange}
+                  required
+                />
+              </label>
+              <label>
+                Opleiding Jaar:
+                <input 
+                  type="number" 
+                  name="opleiding_jaar" 
+                  value={studentForm.opleiding_jaar}
+                  onChange={handleStudentChange}
+                  min="1"
+                  max="4"
+                  required
+                />
               </label>
               <label>
                 Wachtwoord:
-                <input type="password" name="wachtwoord" />
-                {/* Wachtwoord wordt niet zichtbaar ingevoerd */}
+                <input 
+                  type="password" 
+                  name="wachtwoord" 
+                  value={studentForm.wachtwoord}
+                  onChange={handleStudentChange}
+                  required
+                />
               </label>
               <label>
                 Wachtwoord bevestiging:
-                <input type="password" name="wachtwoord2" />
+                <input 
+                  type="password" 
+                  name="wachtwoord2" 
+                  value={studentForm.wachtwoord2}
+                  onChange={handleStudentChange}
+                  required
+                />
               </label>
               <button type="submit" className="registerstudent-btn student-btn">
                 Account maken
@@ -106,76 +283,166 @@ export default function Registreer()   // Dit is een functionele component in Re
           )}
  
           {activeTab === "bedrijf" && (
-            <form className="registerbedrijf-form">
+            <form className="registerbedrijf-form" onSubmit={handleCompanySubmit}>
               {/* Formulier voor bedrijf registratie */}
               <h1 className="registerbedrijf-title">Account maken als Bedrijf</h1>
 
               <h2 className="registerbedrijf-section-title">Bedrijfsgegevens:</h2>
               <label>
                 Bedrijfsnaam:
-                <input type="text" name="bedrijfsnaam" />
+                <input 
+                  type="text" 
+                  name="bedrijfsnaam" 
+                  value={companyForm.bedrijfsnaam}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
               <label>
                 KVK-nummer:
-                <input type="text" name="kvk" />
+                <input 
+                  type="text" 
+                  name="kvk" 
+                  value={companyForm.kvk}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
               <label>
                 BTW-nummer:
-                <input type="text" name="btw" />
+                <input 
+                  type="text" 
+                  name="btw" 
+                  value={companyForm.btw}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
               <div className="registerbedrijf-address-row">
                 <label>
                   Straatnaam en huisnummer:
-                  <input type="text" name="straat" />
+                  <input 
+                    type="text" 
+                    name="straat" 
+                    value={companyForm.straat}
+                    onChange={handleCompanyChange}
+                    required
+                  />
                 </label>
                 <label>
                   Gemeente en postcode:
-                  <input type="text" name="gemeente" />
+                  <input 
+                    type="text" 
+                    name="gemeente" 
+                    value={companyForm.gemeente}
+                    onChange={handleCompanyChange}
+                    required
+                  />
                 </label>
               </div>
               <label>
                 Telefoonnummer:
-                <input type="text" name="telbedrijf" />
+                <input 
+                  type="text" 
+                  name="telbedrijf" 
+                  value={companyForm.telbedrijf}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
               <label>
                 Bedrijf e-mailadres:
-                <input type="email" name="emailbedrijf" />
+                <input 
+                  type="email" 
+                  name="emailbedrijf" 
+                  value={companyForm.emailbedrijf}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
 
               <h2 className="registerbedrijf-section-title">Contactpersoon:</h2>
               <label>
                 Voornaam:
-                <input type="text" name="voornaam_contact" />
+                <input 
+                  type="text" 
+                  name="voornaam_contact" 
+                  value={companyForm.voornaam_contact}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
               <label>
                 Naam:
-                <input type="text" name="naam_contact" />
+                <input 
+                  type="text" 
+                  name="naam_contact" 
+                  value={companyForm.naam_contact}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
               <label>
                 Specialisatie:
-                <input type="text" name="specialisatie" />
+                <input 
+                  type="text" 
+                  name="specialisatie" 
+                  value={companyForm.specialisatie}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
               <label>
                 E-mailadres:
-                <input type="email" name="email_contact" />
+                <input 
+                  type="email" 
+                  name="email_contact" 
+                  value={companyForm.email_contact}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
               <label>
                 Telefoonnummer:
-                <input type="text" name="tel_contact" />
+                <input 
+                  type="text" 
+                  name="tel_contact" 
+                  value={companyForm.tel_contact}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
 
               <h2 className="registerbedrijf-section-title">Accountgegevens</h2>
               <label>
                 Gebruikersnaam:
-                <input type="text" name="gebruikersnaam_bedrijf" />
+                <input 
+                  type="text" 
+                  name="gebruikersnaam_bedrijf" 
+                  value={companyForm.gebruikersnaam_bedrijf}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
               <label>
                 Wachtwoord:
-                <input type="password" name="wachtwoord_bedrijf" />
+                <input 
+                  type="password" 
+                  name="wachtwoord_bedrijf" 
+                  value={companyForm.wachtwoord_bedrijf}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
               <label>
                 Wachtwoord bevestiging:
-                <input type="password" name="wachtwoord2_bedrijf" />
+                <input 
+                  type="password" 
+                  name="wachtwoord2_bedrijf" 
+                  value={companyForm.wachtwoord2_bedrijf}
+                  onChange={handleCompanyChange}
+                  required
+                />
               </label>
 
               <button type="submit" className="registerbedrijf-btn bedrijf-btn">

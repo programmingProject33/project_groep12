@@ -52,75 +52,96 @@ function Footer() {
             </li>
           </ul>
         </div>
-         <div className="footer-col right">
-                    <div className="footer-socials">
-                      <a
-                        href="https://www.linkedin.com/company/meterasmusplus/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="icon"
-                        title="LinkedIn"
-                      >
-                        <FaLinkedin />
-                      </a>
-                      <a
-                        href="https://www.instagram.com/erasmushogeschool/?hl=en"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="icon"
-                        title="Instagram"
-                      >
-                        <FaInstagram />
-                      </a>
-                      <a
-                        href="https://x.com/EUErasmusPlus?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="icon"
-                        title="X"
-                      >
-                        <FaXTwitter />
-                      </a>
-                      <a
-                        href="https://www.tiktok.com/@erasmushogeschool"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="icon"
-                        title="TikTok"
-                      >
-                        <FaTiktok />
-                      </a>
-                    </div>
-                  </div>
+        <div className="footer-col right">
+          <div className="footer-socials">
+            <a
+              href="https://www.linkedin.com/company/meterasmusplus/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="icon"
+              title="LinkedIn"
+            >
+              <FaLinkedin />
+            </a>
+            <a
+              href="https://www.instagram.com/erasmushogeschool/?hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="icon"
+              title="Instagram"
+            >
+              <FaInstagram />
+            </a>
+            <a
+              href="https://x.com/EUErasmusPlus?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="icon"
+              title="X"
+            >
+              <FaXTwitter />
+            </a>
+            <a
+              href="https://www.tiktok.com/@erasmushogeschool"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="icon"
+              title="TikTok"
+            >
+              <FaTiktok />
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   );
 }
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [gebruikersnaam, setGebruikersnaam] = useState("");
   const [wachtwoord, setWachtwoord] = useState("");
+  const [type, setType] = useState("student");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    if (!email || !wachtwoord) {
+    if (!gebruikersnaam || !wachtwoord) {
       return setError("Alle velden zijn verplicht.");
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return setError("Voer een geldig e-mailadres in.");
-    }
+    try {
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          gebruikersnaam,
+          wachtwoord,
+          type
+        }),
+      });
 
-    // Fake login check
-    if (email === "student@ehb.be" && wachtwoord === "test123") {
-      setError("");
-      navigate("/dashboard");
-    } else {
-      setError("Ongeldige logingegevens.");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Er is iets misgegaan');
+      }
+
+      // Store user data in localStorage
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Redirect based on user type
+      if (data.user.type === 'student') {
+        navigate('/student-dashboard');
+      } else {
+        navigate('/bedrijf-dashboard');
+      }
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -130,14 +151,31 @@ const Login = () => {
       <div className="login-container">
         <h2>Login</h2>
         <form onSubmit={handleSubmit} className="login-form">
+          <div className="login-type-selector">
+            <button
+              type="button"
+              className={`type-btn ${type === 'student' ? 'active' : ''}`}
+              onClick={() => setType('student')}
+            >
+              Student
+            </button>
+            <button
+              type="button"
+              className={`type-btn ${type === 'bedrijf' ? 'active' : ''}`}
+              onClick={() => setType('bedrijf')}
+            >
+              Bedrijf
+            </button>
+          </div>
+
           <label>
-            E-mailadres:
+            Gebruikersnaam:
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={gebruikersnaam}
+              onChange={(e) => setGebruikersnaam(e.target.value)}
               required
-              placeholder="voorbeeld@ehb.be"
+              placeholder="Voer je gebruikersnaam in"
             />
           </label>
 

@@ -6,6 +6,7 @@ import Registreer from "./registreer.jsx";
 import Contact from "./contactNavbalk.jsx";
 import Login from "./login.jsx";
 import Bedrijven from "./bedrijven.jsx";
+import StudentDashboard from "./StudentDashboard.jsx";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/contactNavbalk" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/bedrijven" element={<Bedrijven />} />
+        <Route path="/student-dashboard" element={<StudentDashboard />} />
       </Routes>
     </Router>
   );
