@@ -16,7 +16,7 @@ function Bedrijven() {
       <ul>
         {bedrijven.map((bedrijf) => (
           <li key={bedrijf.id}>
-            {bedrijf.naam} - {bedrijf.sector}
+            {bedrijf.naam} - {bedrijf.bedrijf_URL}
           </li>
         ))}
       </ul>
