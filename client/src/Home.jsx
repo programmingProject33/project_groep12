@@ -15,7 +15,7 @@ export default function Home() {
         </div>
         <ul className="navbar-links">
           <li><a onClick={() => navigate("/")}>Home</a></li>
-          <li onClick = {() => navigate("/bedrijven" )}>Bedrijven</li>
+          <li onClick={() => navigate("/bedrijven")}>Bedrijven</li>
           <li onClick={() => navigate("/contactNavbalk")}>Contact</li>
           <li>
             <button className="navbar-btn register" onClick={() => navigate("/registreer")}>Registreer</button>
@@ -36,7 +36,9 @@ export default function Home() {
             Het doel van dit evenement is om studenten te helpen bij het vinden van stages en jobs, en bedrijven de kans te geven getalenteerde en gemotiveerde studenten te leren kennen.
           </p> 
         </div>
-        <div className="hero-img" />
+
+        {/* Replace the empty div with an image */}
+        <img src="/image.png" alt="Career Launch visual" className="hero-img" />
       </header>
 
       {/* INFO CARDS SECTION */}
@@ -76,46 +78,46 @@ export default function Home() {
               <li onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>Login</li>
             </ul>
           </div>
-           <div className="footer-col right">
-                      <div className="footer-socials">
-                        <a
-                          href="https://www.linkedin.com/company/meterasmusplus/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="icon"
-                          title="LinkedIn"
-                        >
-                          <FaLinkedin />
-                        </a>
-                        <a
-                          href="https://www.instagram.com/erasmushogeschool/?hl=en"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="icon"
-                          title="Instagram"
-                        >
-                          <FaInstagram />
-                        </a>
-                        <a
-                          href="https://x.com/EUErasmusPlus?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="icon"
-                          title="X"
-                        >
-                          <FaXTwitter />
-                        </a>
-                        <a
-                          href="https://www.tiktok.com/@erasmushogeschool"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="icon"
-                          title="TikTok"
-                        >
-                          <FaTiktok />
-                        </a>
-                      </div>
-                    </div>
+          <div className="footer-col right">
+            <div className="footer-socials">
+              <a
+                href="https://www.linkedin.com/company/meterasmusplus/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon"
+                title="LinkedIn"
+              >
+                <FaLinkedin />
+              </a>
+              <a
+                href="https://www.instagram.com/erasmushogeschool/?hl=en"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon"
+                title="Instagram"
+              >
+                <FaInstagram />
+              </a>
+              <a
+                href="https://x.com/EUErasmusPlus?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon"
+                title="X"
+              >
+                <FaXTwitter />
+              </a>
+              <a
+                href="https://www.tiktok.com/@erasmushogeschool"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon"
+                title="TikTok"
+              >
+                <FaTiktok />
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
