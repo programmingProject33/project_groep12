@@ -28,7 +28,7 @@ export default function Registreer()   // Dit is een functionele component in Re
         <ul className="navbar-links">
           <li><a onClick={() => navigate("/")}>Home</a></li> 
           {/* Home knop, brengt naar startpagina */}
-          <li><a>Bedrijven</a></li> 
+          <li onClick={() => navigate("/bedrijven")}>Bedrijven</li>
           {/* Deze knop doet nu nog niks (kan later worden toegevoegd) */}
           <li onClick={() => navigate("/contactNavbalk")}>Contact</li> 
           {/* Contact knop navigeert naar contactpagina */}
@@ -200,21 +200,52 @@ export default function Registreer()   // Dit is een functionele component in Re
           <div className="footer-col middle">
             <ul className="footer-menu">
               <li onClick={goToHome} style={{ cursor: "pointer" }}>Home</li>
-              <li>Registreer</li>
-              <li>Contact</li>
+              <li onClick={() => navigate("/registreer")} style={{ cursor: "pointer" }}>Registreer</li>
+              <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>Contact</li>
               <li onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>Login</li>
             </ul>
           </div>
 
-          <div className="footer-col right">
-            <div className="footer-socials">
-              {/* Links naar sociale media met iconen */}
-              <a href="#" className="icon" title="LinkedIn"><FaLinkedin /></a>
-              <a href="#" className="icon" title="Instagram"><FaInstagram /></a>
-              <a href="#" className="icon" title="X"><FaXTwitter /></a>
-              <a href="#" className="icon" title="TikTok"><FaTiktok /></a>
-            </div>
-          </div>
+           <div className="footer-col right">
+                      <div className="footer-socials">
+                        <a
+                          href="https://www.linkedin.com/company/meterasmusplus/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="icon"
+                          title="LinkedIn"
+                        >
+                          <FaLinkedin />
+                        </a>
+                        <a
+                          href="https://www.instagram.com/erasmushogeschool/?hl=en"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="icon"
+                          title="Instagram"
+                        >
+                          <FaInstagram />
+                        </a>
+                        <a
+                          href="https://x.com/EUErasmusPlus?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="icon"
+                          title="X"
+                        >
+                          <FaXTwitter />
+                        </a>
+                        <a
+                          href="https://www.tiktok.com/@erasmushogeschool"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="icon"
+                          title="TikTok"
+                        >
+                          <FaTiktok />
+                        </a>
+                      </div>
+                    </div>
         </div>
       </footer>
     </div>

@@ -12,8 +12,10 @@ function Navigation({ onLoginClick }) {
       </div>
       <ul className="navbar-links">
         <li><a onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Home</a></li>
-        <li><a href="#">Bedrijven</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a onClick={() => navigate("/bedrijven")} style={{ cursor: "pointer" }}>Bedrijven</a></li>
+        <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>
+          Contact
+        </li>
         <li><button className="navbar-btn register" onClick={() => navigate("/registreer")}>Registreer</button></li>
         <li><button className="navbar-btn login" onClick={() => navigate("/login")}>Login</button></li>
       </ul>
@@ -22,6 +24,8 @@ function Navigation({ onLoginClick }) {
 }
 
 function Footer() {
+  const navigate = useNavigate();
+  
   return (
     <footer className="footer">
       <div className="footer-row">
@@ -34,20 +38,60 @@ function Footer() {
         </div>
         <div className="footer-col middle">
           <ul className="footer-menu">
-            <li>Home</li>
-            <li>Inschrijving</li>
-            <li>Contact</li>
-            <li>Login</li>
+            <li onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+              Home
+            </li>
+            <li onClick={() => navigate("/registreer")} style={{ cursor: "pointer" }}>
+              Registreer
+            </li>
+            <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>
+              Contact
+            </li>
+            <li onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>
+              Login
+            </li>
           </ul>
         </div>
-        <div className="footer-col right">
-          <div className="footer-socials">
-            <a href="#" className="icon" title="LinkedIn"><FaLinkedin /></a>
-            <a href="#" className="icon" title="Instagram"><FaInstagram /></a>
-            <a href="#" className="icon" title="X"><FaXTwitter /></a>
-            <a href="#" className="icon" title="TikTok"><FaTiktok /></a>
-          </div>
-        </div>
+         <div className="footer-col right">
+                    <div className="footer-socials">
+                      <a
+                        href="https://www.linkedin.com/company/meterasmusplus/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="icon"
+                        title="LinkedIn"
+                      >
+                        <FaLinkedin />
+                      </a>
+                      <a
+                        href="https://www.instagram.com/erasmushogeschool/?hl=en"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="icon"
+                        title="Instagram"
+                      >
+                        <FaInstagram />
+                      </a>
+                      <a
+                        href="https://x.com/EUErasmusPlus?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="icon"
+                        title="X"
+                      >
+                        <FaXTwitter />
+                      </a>
+                      <a
+                        href="https://www.tiktok.com/@erasmushogeschool"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="icon"
+                        title="TikTok"
+                      >
+                        <FaTiktok />
+                      </a>
+                    </div>
+                  </div>
       </div>
     </footer>
   );
