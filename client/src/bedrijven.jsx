@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
-import "./contactNavbalk.css"; // or create Bedrijven.css if needed
+import "./contactNavbalk.css";
 
 function Bedrijven() {
   const [bedrijven, setBedrijven] = useState([]);
@@ -15,20 +15,16 @@ function Bedrijven() {
   }, []);
 
   return (
-    <div>
+    <div className="page-container">
       {/* NAVIGATIEBALK */}
       <nav className="navbar">
         <div className="navbar-logo" onClick={() => navigate("/")}>
           <span className="navbar-title">Careerlaunch</span>
         </div>
         <ul className="navbar-links">
-          <li>
-            <Link className="nav-link" to="/">Home</Link>
-          </li>
+          <li><Link className="nav-link" to="/">Home</Link></li>
           <li>Bedrijven</li>
-          <li>
-            <Link className="nav-link" to="/contactNavbalk">Contact</Link>
-          </li>
+          <li><Link className="nav-link" to="/contactNavbalk">Contact</Link></li>
           <li>
             <button className="navbar-btn register" onClick={() => navigate("/registreer")}>
               Registreer
@@ -42,8 +38,8 @@ function Bedrijven() {
         </ul>
       </nav>
 
-      {/* BEDRIJVEN LIST */}
-      <main className="bedrijven-container" style={{ padding: "2rem" }}>
+      {/* MAIN CONTENT */}
+      <main className="content-wrap bedrijven-container" style={{ padding: "2rem" }}>
         <h1>Bedrijven Lijst</h1>
         <ul>
           {bedrijven.map((bedrijf) => (

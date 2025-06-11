@@ -20,7 +20,7 @@ export default function Contact() {
             </Link>
           </li>
           <li>
-            Bedrijven
+            <li onClick={() => navigate("/bedrijven")}>Bedrijven</li>
           </li>
           <li>
             <Link className="nav-link" to="/contactNavbalk">

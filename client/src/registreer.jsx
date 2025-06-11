@@ -28,7 +28,7 @@ export default function Registreer()   // Dit is een functionele component in Re
         <ul className="navbar-links">
           <li><a onClick={() => navigate("/")}>Home</a></li> 
           {/* Home knop, brengt naar startpagina */}
-          <li><a>Bedrijven</a></li> 
+          <li onClick={() => navigate("/bedrijven")}>Bedrijven</li>
           {/* Deze knop doet nu nog niks (kan later worden toegevoegd) */}
           <li onClick={() => navigate("/contactNavbalk")}>Contact</li> 
           {/* Contact knop navigeert naar contactpagina */}
