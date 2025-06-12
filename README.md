@@ -144,6 +144,7 @@ Voor vragen, feedback of samenwerking:
   - npm install --save-dev nodemon om server doorlopend starten 
   - server 1 keer starten: cd server dan node server.js
   - server doorlopend starten: cd server dan npm run server
+  - server draait op: http://localhost:5000/
  
 ## Database tabellen aanmaken en aansluiten met server
   - cd server
