@@ -32,7 +32,7 @@ function Bedrijven() {
           </li>
           <li>
             <button className="navbar-btn login" onClick={() => navigate("/login")}>
-              Login
+              Login 
             </button>
           </li>
         </ul>
