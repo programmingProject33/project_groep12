@@ -137,3 +137,21 @@ Voor vragen, feedback of samenwerking:
 - Start de dev-server:
     * npm run dev
     *    http://localhost:5173/
+- Express.js dependencies instaleren
+  - cd server
+  - npm init -y
+  - npm install express 
+  - npm install --save-dev nodemon om server doorlopend starten 
+  - server 1 keer starten: cd server dan node server.js
+  - server doorlopend starten: cd server dan npm run server
+ 
+## Database tabellen aanmaken en aansluiten met server
+  - cd server
+  - npm install mysql2 dotenv
+  - .env file in .gitignore zetten om database gegevens locaal ta houden 
+  - Bron: https://claude.ai/share/8460215f-3971-40be-8093-66eb1bc768df
+### Database tabellen aanmaken en json data erin opslaan
+  - Bron: https://chatgpt.com/share/684b5156-105c-800a-b4c9-b220a4afa83a
+  - Data van json file in database opslaan via een script in server.js
+
+
