@@ -13,21 +13,6 @@ export default function StudentDashboard() {
 
   return (
     <div className="student-dashboard">
-      <nav className="navbar">
-        <div className="navbar-logo" onClick={() => navigate("/")}> 
-          <span className="navbar-title">Careerlaunch</span>
-        </div>
-        <ul className="navbar-links">
-          <li onClick={() => navigate("/")}>Home</li>
-          <li onClick={() => navigate("/bedrijven")}>Bedrijven</li>
-          <li onClick={() => navigate("/contactNavbalk")}>Contact</li>
-          <li>
-            <button className="navbar-btn logout" onClick={handleLogout}>
-              Uitloggen
-            </button>
-          </li>
-        </ul>
-      </nav>
       <main className="dashboard-main">
         <h1>Welkom, {user?.voornaam}!</h1>
         <p>

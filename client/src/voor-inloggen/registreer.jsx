@@ -139,30 +139,6 @@ export default function Registreer()   // Dit is een functionele component in Re
 
   return (
     <div>
-      {/* Bovenste navigatiebalk met logo en knoppen */}
-      <nav className="navbar">
-        <div className="navbar-logo" onClick={() => navigate("/")}>
-          {/* Klikbaar logo dat naar home navigeert */}
-          <span className="navbar-title">Careerlaunch</span>
-        </div>
-        <ul className="navbar-links">
-          <li><a onClick={() => navigate("/")}>Home</a></li> 
-          {/* Home knop, brengt naar startpagina */}
-          <li onClick={() => navigate("/bedrijven")}>Bedrijven</li>
-          {/* Deze knop doet nu nog niks (kan later worden toegevoegd) */}
-          <li onClick={() => navigate("/contactNavbalk")}>Contact</li> 
-          {/* Contact knop navigeert naar contactpagina */}
-          <li>
-            <button className="navbar-btn register" onClick={() => navigate("/registreer")}>Registreer</button>
-            {/* Knop om naar registreerpagina te gaan */}
-          </li>
-          <li>
-            <button className="navbar-btn login" onClick={() => navigate("/login")}>Login</button>
-            {/* Knop om naar loginpagina te gaan */}
-          </li>
-        </ul>
-      </nav>
-
       {/* Hoofdinhoud van de registratiepagina */}
       <main className="registreer-main">
         <div className="registreer-tabs">

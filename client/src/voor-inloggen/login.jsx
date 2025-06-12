@@ -3,26 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 import "./Login.css";
 
-function Navigation({ onLoginClick }) {
-  const navigate = useNavigate();
-  return (
-    <nav className="navbar">
-      <div className="navbar-logo" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-        <span className="navbar-title">Careerlaunch</span>
-      </div>
-      <ul className="navbar-links">
-        <li><a onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Home</a></li>
-        <li><a onClick={() => navigate("/bedrijven")} style={{ cursor: "pointer" }}>Bedrijven</a></li>
-        <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>
-          Contact
-        </li>
-        <li><button className="navbar-btn register" onClick={() => navigate("/registreer")}>Registreer</button></li>
-        <li><button className="navbar-btn login" onClick={() => navigate("/login")}>Login</button></li>
-      </ul>
-    </nav>
-  );
-}
-
 function Footer() {
   const navigate = useNavigate();
   
@@ -147,7 +127,6 @@ const Login = () => {
 
   return (
     <>
-      <Navigation />
       <div className="login-container">
         <h2>Login</h2>
         <form onSubmit={handleSubmit} className="login-form">

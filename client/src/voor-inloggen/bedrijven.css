@@ -1,0 +1,62 @@
+.bedrijven-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.bedrijven-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.bedrijf-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.2s ease-in-out;
+}
+
+.bedrijf-card:hover {
+  transform: translateY(-5px);
+}
+
+.bedrijf-naam {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.bedrijf-info {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.bedrijf-info strong {
+  color: #333;
+}
+
+.bedrijf-beschrijving {
+  margin-top: 1rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.bedrijven-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.bedrijven-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.bedrijven-header p {
+  color: #666;
+  font-size: 1.1rem;
+} 
