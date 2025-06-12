@@ -14,9 +14,11 @@ import Reservaties from "./inloggen-student/Reservaties";
 import Profiel from "./inloggen-student/Profiel";
 import Contact from "./inloggen-student/Contact";
 import ContactNavbalk from "./voor-inloggen/contactNavbalk";
+import { useAuth } from "./AuthContext.jsx";
 
 function App() {
-  console.log("App rendering, checking localStorage:", localStorage.getItem("user"));
+  const { user } = useAuth();
+  // console.log("App rendering, checking localStorage:", localStorage.getItem("user"));
   
   return (
     <Router>
@@ -60,7 +62,7 @@ function App() {
 
         {/* Bedrijven route - toegankelijk voor zowel ingelogde als niet-ingelogde gebruikers */}
         <Route path="/bedrijven" element={
-          localStorage.getItem("user") ? <UserLayout /> : <GuestLayout />
+          user ? <UserLayout /> : <GuestLayout />
         }>
           <Route index element={<Bedrijven />} />
         </Route>

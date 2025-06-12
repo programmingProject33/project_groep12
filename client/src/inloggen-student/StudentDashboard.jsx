@@ -1,13 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./StudentDashboard.css";
+import { useAuth } from "../AuthContext.jsx";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user, setUser } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    setUser(null);
     navigate("/login");
   };
 

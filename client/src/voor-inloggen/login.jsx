@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 import "./Login.css";
+import { useAuth } from "../AuthContext.jsx";
 
 function Footer() {
   const navigate = useNavigate();
@@ -83,13 +84,20 @@ const Login = () => {
   const [type, setType] = useState("student");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    if (!gebruikersnaam || !wachtwoord) {
-      return setError("Alle velden zijn verplicht.");
+  
+  if(!gebruikersnaam && ! wachtwoord) {
+      return setError("gebruikersnaam en wachtwoord verplicht")
+    }
+    if(!gebruikersnaam) {
+      return setError("gebruikersnaam verplicnt!")
+    }
+    if(!wachtwoord) {
+      return setError("wachtwoord is verplicht")
     }
 
     try {
@@ -111,8 +119,8 @@ const Login = () => {
         throw new Error(data.error || 'Er is iets misgegaan');
       }
 
-      // Store user data in localStorage
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Store user data using context
+      setUser(data.user);
       
       // Redirect based on user type
       if (data.user.type === 'student') {

@@ -1,8 +1,9 @@
 import React from "react";
 import "./Profiel.css";
+import { useAuth } from "../AuthContext.jsx";
 
 export default function Profiel() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user, setUser } = useAuth();
   return (
     <div className="profiel-page">
       <main className="profiel-main">
@@ -27,7 +28,7 @@ export default function Profiel() {
             transition: "background 0.2s"
           }}
           onClick={() => {
-            localStorage.removeItem("user");
+            setUser(null);
             window.location.href = "/login";
           }}
         >
