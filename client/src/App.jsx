@@ -15,6 +15,7 @@ import Profiel from "./inloggen-student/Profiel";
 import Contact from "./inloggen-student/Contact";
 import ContactNavbalk from "./voor-inloggen/contactNavbalk";
 import { useAuth } from "./AuthContext.jsx";
+import SpeeddatePage from "./voor-inloggen/SpeeddatePage";
 
 function App() {
   const { user } = useAuth();
@@ -66,6 +67,8 @@ function App() {
         }>
           <Route index element={<Bedrijven />} />
         </Route>
+        {/* Add speeddate page route */}
+        <Route path="/speeddate/:bedrijfId" element={<SpeeddatePage />} />
       </Routes>
     </Router>
   );

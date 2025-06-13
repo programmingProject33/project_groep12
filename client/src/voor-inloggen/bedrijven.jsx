@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "./bedrijven.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Bedrijven() {
   const [bedrijven, setBedrijven] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("http://localhost:5000/api/bedrijven")
@@ -43,6 +45,9 @@ export default function Bedrijven() {
                   {bedrijf.bedrijf_URL}
                 </a></p>
               </div>
+              <button className="reserveer-btn" onClick={() => navigate(`/speeddate/${bedrijf.bedrijf_id}`)}>
+                Reserveer speeddate
+              </button>
             </div>
           ))
         )}

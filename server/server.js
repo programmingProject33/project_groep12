@@ -207,6 +207,34 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// Reserve a speeddate
+app.post('/api/speeddate', async (req, res) => {
+  try {
+    const { user_id, bedrijf_id, starttijd, eindtijd } = req.body;
+    if (!user_id || !bedrijf_id) {
+      return res.status(400).json({ error: 'user_id en bedrijf_id zijn verplicht' });
+    }
+    // Find a free slot for this bedrijf
+    const [slots] = await db.promise().query(
+      'SELECT * FROM speeddates WHERE bedrijf_id = ? AND is_bezet = 0 LIMIT 1',
+      [bedrijf_id]
+    );
+    if (slots.length === 0) {
+      return res.status(400).json({ error: 'Geen vrije tijdsloten beschikbaar voor dit bedrijf' });
+    }
+    const slot = slots[0];
+    // Reserve the slot
+    await db.promise().query(
+      'UPDATE speeddates SET is_bezet = 1, user_id = ? WHERE speed_id = ?',
+      [user_id, slot.speed_id]
+    );
+    res.json({ message: 'Speeddate succesvol gereserveerd', speed_id: slot.speed_id });
+  } catch (err) {
+    console.error('Error reserving speeddate:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
