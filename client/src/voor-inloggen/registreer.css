@@ -283,3 +283,13 @@ main.registreer-main {
 .footer-socials a:hover {
   color: #dbeafe;
 }
+
+.error-message {
+  color: #ff0000;
+  background-color: #ffe6e6;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+}

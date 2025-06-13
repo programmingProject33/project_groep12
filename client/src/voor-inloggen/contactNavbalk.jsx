@@ -8,38 +8,6 @@ export default function Contact() {
 
   return (
     <div>
-      {/* navigatiebalk */}
-      <nav className="navbar">
-        <div className="navbar-logo" onClick={() => navigate("/")}>
-          <span className="navbar-title">Careerlaunch</span>
-        </div>
-        <ul className="navbar-links">
-          <li>
-            <Link className="nav-link" to="/">
-              Home
-            </Link>
-          </li>
-          <li>
-            <li onClick={() => navigate("/bedrijven")}>Bedrijven</li>
-          </li>
-          <li>
-            <Link className="nav-link" to="/contactNavbalk">
-              Contact
-            </Link>
-          </li>
-          <li>
-            <button className="navbar-btn register" onClick={() => navigate("/registreer")}>
-              Registreer
-            </button>
-          </li>
-          <li>
-            <button className="navbar-btn login" onClick={() => navigate("/login")}>
-              Login
-            </button>
-          </li>
-        </ul>
-      </nav>
-
       {/* body van contact */}
       <main className="contact-container">
         <h1>Contact Us</h1>

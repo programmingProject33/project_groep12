@@ -39,13 +39,41 @@ body {
   color: #222;
 }
 
+/* Login type selector */
+.login-type-selector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.type-btn {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #3884ff;
+  background: transparent;
+  color: #3884ff;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.type-btn.active {
+  background: #3884ff;
+  color: white;
+}
+
+.type-btn:hover:not(.active) {
+  background: #e0e7ff;
+}
+
 .login-form label {
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #475569;
 }
 
-.login-form input[type="email"],
+.login-form input[type="text"],
 .login-form input[type="password"] {
   padding: 0.75rem 1rem;
   margin-bottom: 1.75rem;
@@ -55,7 +83,7 @@ body {
   transition: border-color 0.2s;
 }
 
-.login-form input[type="email"]:focus,
+.login-form input[type="text"]:focus,
 .login-form input[type="password"]:focus {
   outline: none;
   border-color: #3884ff;
@@ -78,9 +106,33 @@ body {
   background: #2367d2;
 }
 
+/* Error message */
+.error {
+  color: #dc2626;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Register link */
+.register-link {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: #475569;
+}
+
+.register-link a {
+  color: #3884ff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
 /* Footer - no space below */
 .footer {
-  background:  light;
+  background: light;
   color: white;
   padding: 1.5rem 0;
   width: 100%;

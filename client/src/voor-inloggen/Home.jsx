@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Home.css";
 import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
@@ -6,26 +6,16 @@ import { useNavigate } from "react-router-dom";
 export default function Home() {
   const navigate = useNavigate();
 
+  // Redirect direct bij elke render als user is ingelogd
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      navigate("/student-dashboard", { replace: true });
+    }
+  });
+
   return (
     <div>
-      {/* NAVIGATIEBALK */}
-      <nav className="navbar">
-        <div className="navbar-logo" onClick={() => navigate("/")}>
-          <span className="navbar-title">Careerlaunch</span>
-        </div>
-        <ul className="navbar-links">
-          <li><a onClick={() => navigate("/")}>Home</a></li>
-          <li onClick={() => navigate("/bedrijven")}>Bedrijven</li>
-          <li onClick={() => navigate("/contactNavbalk")}>Contact</li>
-          <li>
-            <button className="navbar-btn register" onClick={() => navigate("/registreer")}>Registreer</button>
-          </li>
-          <li>
-            <button className="navbar-btn login" onClick={() => navigate("/login")}>Login</button>
-          </li>
-        </ul>
-      </nav>
-
       {/* HERO SECTION */}
       <header className="hero">
         <div className="hero-content">
