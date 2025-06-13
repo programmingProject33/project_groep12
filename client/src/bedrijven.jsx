@@ -15,19 +15,10 @@ function Bedrijven() {
   }, []);
 
   return (
-
-    <div>
-      <h1>Bedrijven Lijst</h1>
-      <ul>
-        {bedrijven.map((bedrijf) => (
-          <li key={bedrijf.id}>
-            {bedrijf.naam} - {bedrijf.bedrijf_URL}
-            
-    
     <div className="page-container">
       {/* NAVIGATIEBALK */}
       <nav className="navbar">
-        <div className="navbar-logo" onClick={() => navigate("/")}>
+        <div className="navbar-logo" onClick={() => navigate("/")}> 
           <span className="navbar-title">Careerlaunch</span>
         </div>
         <ul className="navbar-links">
@@ -35,15 +26,10 @@ function Bedrijven() {
           <li>Bedrijven</li>
           <li><Link className="nav-link" to="/contactNavbalk">Contact</Link></li>
           <li>
-            <button className="navbar-btn register" onClick={() => navigate("/registreer")}>
-              Registreer
-            </button>
-
+            <button className="navbar-btn register" onClick={() => navigate("/registreer")}>Registreer</button>
           </li>
           <li>
-            <button className="navbar-btn login" onClick={() => navigate("/login")}>
-              Login
-            </button>
+            <button className="navbar-btn login" onClick={() => navigate("/login")}>Login</button>
           </li>
         </ul>
       </nav>
@@ -54,7 +40,7 @@ function Bedrijven() {
         <ul>
           {bedrijven.map((bedrijf) => (
             <li key={bedrijf.id}>
-              {bedrijf.naam} – {bedrijf.sector}
+              {bedrijf.naam} – {bedrijf.sector} – {bedrijf.bedrijf_URL}
             </li>
           ))}
         </ul>
