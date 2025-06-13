@@ -9,9 +9,7 @@ export default function UserLayout() {
       <main className="user-main">
         <Outlet />
       </main>
-      <footer className="footer user-footer">
-        <div>Support: support-careerlaunch@ehb.be | +32 494 77 08 550</div>
-      </footer>
+      
     </div>
   );
 } 
