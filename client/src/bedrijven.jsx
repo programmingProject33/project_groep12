@@ -69,7 +69,6 @@ function Bedrijven() {
             <div className="footer-socials">
               <a href="https://www.linkedin.com/company/meterasmusplus/" target="_blank" rel="noopener noreferrer" className="icon" title="LinkedIn"><FaLinkedin /></a>
               <a href="https://www.instagram.com/erasmushogeschool/?hl=en" target="_blank" rel="noopener noreferrer" className="icon" title="Instagram"><FaInstagram /></a>
-              <a href="https://x.com/EUErasmusPlus" target="_blank" rel="noopener noreferrer" className="icon" title="X"><FaXTwitter /></a>
               <a href="https://www.tiktok.com/@erasmushogeschool" target="_blank" rel="noopener noreferrer" className="icon" title="TikTok"><FaTiktok /></a>
             </div>
           </div>

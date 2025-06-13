@@ -105,15 +105,7 @@ export default function Contact() {
               >
                 <FaInstagram />
               </a>
-              <a
-                href="https://x.com/EUErasmusPlus?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="icon"
-                title="X"
-              >
-                <FaXTwitter />
-              </a>
+              
               <a
                 href="https://www.tiktok.com/@erasmushogeschool"
                 target="_blank"
