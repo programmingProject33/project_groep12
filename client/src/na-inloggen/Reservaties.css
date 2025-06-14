@@ -151,4 +151,42 @@
     padding: 0.7rem 0.3rem;
     font-size: 0.95rem;
   }
-} 
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reservatie-item {
+  opacity: 0;
+  animation: fadeSlideUp 0.15s ease forwards;
+}
+
+/* Snelle opeenvolgende animaties voor elke reservatie */
+.reservatie-item:nth-child(1) { animation-delay: 0.02s; }
+.reservatie-item:nth-child(2) { animation-delay: 0.04s; }
+.reservatie-item:nth-child(3) { animation-delay: 0.06s; }
+.reservatie-item:nth-child(4) { animation-delay: 0.08s; }
+.reservatie-item:nth-child(5) { animation-delay: 0.1s; }
+.reservatie-item:nth-child(6) { animation-delay: 0.12s; }
+.reservatie-item:nth-child(7) { animation-delay: 0.14s; }
+.reservatie-item:nth-child(8) { animation-delay: 0.16s; }
+.reservatie-item:nth-child(9) { animation-delay: 0.18s; }
+.reservatie-item:nth-child(10) { animation-delay: 0.2s; }
+.reservatie-item:nth-child(11) { animation-delay: 0.22s; }
+.reservatie-item:nth-child(12) { animation-delay: 0.24s; }
+.reservatie-item:nth-child(13) { animation-delay: 0.26s; }
+.reservatie-item:nth-child(14) { animation-delay: 0.28s; }
+.reservatie-item:nth-child(15) { animation-delay: 0.3s; }
+.reservatie-item:nth-child(16) { animation-delay: 0.32s; }
+.reservatie-item:nth-child(17) { animation-delay: 0.34s; }
+.reservatie-item:nth-child(18) { animation-delay: 0.36s; }
+.reservatie-item:nth-child(19) { animation-delay: 0.38s; }
+.reservatie-item:nth-child(20) { animation-delay: 0.4s; } 

@@ -1,62 +1,273 @@
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.content-wrap {
+  flex: 1;
+  background-color: #f5f7fa;
+  padding: 2rem 1rem;
+}
+
 .bedrijven-container {
-  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.bedrijven-title {
+  text-align: center;
+  color: #1a365d;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  font-weight: 600;
 }
 
 .bedrijven-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
-  margin-top: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .bedrijven-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .bedrijf-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  transition: transform 0.2s ease-in-out;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease forwards, float 3s ease-in-out infinite;
+  animation-delay: calc(var(--animation-order) * 0.1s), 0s;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .bedrijf-card:hover {
-  transform: translateY(-5px);
+  transform: scale(1.02);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+  animation-play-state: paused;
 }
 
 .bedrijf-naam {
+  color: #1a365d;
   font-size: 1.5rem;
-  font-weight: bold;
   margin-bottom: 1rem;
-  color: #333;
 }
 
-.bedrijf-info {
-  color: #666;
-  margin-bottom: 0.5rem;
+.bedrijf-naam a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.bedrijf-info strong {
-  color: #333;
+.bedrijf-naam a:hover {
+  color: #2563eb;
 }
 
-.bedrijf-beschrijving {
-  margin-top: 1rem;
-  color: #666;
+.bedrijf-sector {
+  color: #4a5568;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.bedrijf-details {
+  margin-bottom: 1.5rem;
+}
+
+.bedrijf-details p {
+  margin: 0.5rem 0;
+  color: #4a5568;
+  font-size: 0.95rem;
   line-height: 1.5;
 }
 
-.bedrijven-header {
-  text-align: center;
-  margin-bottom: 2rem;
+.bedrijf-details a {
+  color: #2563eb;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.bedrijven-header h1 {
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 1rem;
+.bedrijf-details a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
 }
 
-.bedrijven-header p {
-  color: #666;
-  font-size: 1.1rem;
+.reserveer-btn {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.reserveer-btn:hover {
+  background-color: #1d4ed8;
+  transform: scale(1.05);
+}
+
+.navbar {
+  background-color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-logo {
+  cursor: pointer;
+}
+
+.navbar-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a365d;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: #4a5568;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #2563eb;
+}
+
+.navbar-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navbar-btn.register {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+}
+
+.navbar-btn.register:hover {
+  background-color: #1d4ed8;
+}
+
+.navbar-btn.login {
+  background-color: transparent;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.navbar-btn.login:hover {
+  background-color: #f0f7ff;
+}
+
+.footer {
+  background-color: #1a365d;
+  color: white;
+  padding: 2rem 0;
+  margin-top: auto;
+}
+
+.footer-row {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+.footer-col {
+  flex: 1;
+}
+
+.footer-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-menu li {
+  margin: 0.5rem 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.footer-menu li:hover {
+  color: #93c5fd;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 1rem;
+}
+
+.footer-socials .icon {
+  color: white;
+  font-size: 1.5rem;
+  transition: color 0.2s ease;
+}
+
+.footer-socials .icon:hover {
+  color: #93c5fd;
+}
+
+@media (max-width: 768px) {
+  .bedrijven-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-row {
+    flex-direction: column;
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .footer-socials {
+    justify-content: center;
+  }
+
+  .navbar-links {
+    display: none;
+  }
 } 
