@@ -1,0 +1,108 @@
+/* SpeeddatePage.css */
+
+.speeddate-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1rem 0 1rem;
+}
+
+.speeddate-header {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+
+.speeddate-labels {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+.speeddate-label {
+  background: #ededed;
+  color: #222;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 500;
+  font-size: 1.05rem;
+  border: none;
+}
+
+.speeddate-box {
+  background: #ededed;
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 4px #e5e7eb;
+}
+.speeddate-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.7rem;
+}
+.speeddate-list {
+  margin-left: 1.2rem;
+  margin-bottom: 0.7rem;
+}
+
+.speeddate-reserveer-btn {
+  display: block;
+  margin: 1.5rem auto 0 auto;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.9rem 2.2rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  box-shadow: 0 1px 4px #e0e7ef;
+}
+.speeddate-reserveer-btn:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+}
+
+.speeddate-slots-box {
+  background: #ededed;
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 1px 4px #e5e7eb;
+}
+.speeddate-slots-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+}
+.speeddate-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.7rem;
+}
+.speeddate-slot-btn {
+  padding: 1rem 0.2rem;
+  background: #fca5a5;
+  color: #222;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+}
+.speeddate-slot-btn.selected {
+  background: #b91c1c;
+  color: #fff;
+  border: 2px solid #b91c1c;
+}
+.speeddate-slot-btn.reserved {
+  background: #bdbdbd;
+  color: #888;
+  border: 1.5px solid #bdbdbd;
+  cursor: not-allowed;
+  opacity: 0.7;
+  text-decoration: line-through;
+} 

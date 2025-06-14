@@ -9,8 +9,18 @@ export default function Bedrijven() {
   useEffect(() => {
     fetch("http://localhost:5000/api/bedrijven")
       .then((res) => res.json())
-      .then((data) => setBedrijven(data))
-      .catch((error) => console.error("Error fetching bedrijven:", error));
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setBedrijven(data);
+        } else {
+          setBedrijven([]);
+          console.error("API /api/bedrijven did not return an array:", data);
+        }
+      })
+      .catch((error) => {
+        setBedrijven([]);
+        console.error("Error fetching bedrijven:", error);
+      });
   }, []);
 
   return (

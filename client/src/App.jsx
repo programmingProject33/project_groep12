@@ -10,7 +10,7 @@ import Login from "./voor-inloggen/login";
 import Registreer from "./voor-inloggen/registreer";
 import Bedrijven from "./voor-inloggen/bedrijven";
 import StudentDashboard from "./inloggen-student/StudentDashboard";
-import Reservaties from "./inloggen-student/Reservaties";
+import Reservaties from "./na-inloggen/Reservaties";
 import Profiel from "./inloggen-student/Profiel";
 import Contact from "./inloggen-student/Contact";
 import ContactNavbalk from "./voor-inloggen/contactNavbalk";
@@ -67,8 +67,12 @@ function App() {
         }>
           <Route index element={<Bedrijven />} />
         </Route>
-        {/* Add speeddate page route */}
-        <Route path="/speeddate/:bedrijfId" element={<SpeeddatePage />} />
+        {/* Speeddate page route - toegankelijk voor zowel ingelogde als niet-ingelogde gebruikers */}
+        <Route path="/speeddate/:bedrijfId" element={
+          user ? <UserLayout /> : <GuestLayout />
+        }>
+          <Route index element={<SpeeddatePage />} />
+        </Route>
       </Routes>
     </Router>
   );

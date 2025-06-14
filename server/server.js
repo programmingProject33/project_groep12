@@ -121,14 +121,11 @@ app.get('/api/structure', (req, res) => {
 app.post('/api/register', async (req, res) => {
   console.log('Received registration request:', req.body);
   const { type, ...userData } = req.body;
+
   
   if (type === 'student') {
     try {
       const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar } = userData;
-      
-      // First check table structure
-      const [structure] = await db.promise().query('DESCRIBE gebruikers');
-      console.log('Table structure:', structure);
 
       // Check if user exists
       const [existingUsers] = await db.promise().query(
@@ -159,15 +156,33 @@ app.post('/api/register', async (req, res) => {
       });
     }
   } else if (type === 'bedrijf') {
-    const { 
+    const {
       bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
       voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
-      gebruikersnaam_bedrijf, wachtwoord_bedrijf 
+      gebruikersnaam_bedrijf, wachtwoord_bedrijf, sector, beschrijving, zoeken_we
     } = userData;
-    
+
+    // Map frontend fields to database columns
+    const bedrijf_URL = ""; // Not provided by frontend
+    const naam = bedrijfsnaam;
+    const BTW_nr = btw;
+    const huis_nr = ""; // Not provided by frontend
+    const bus_nr = ""; // Not provided by frontend
+    const contact_email = email_contact;
+    const contact_naam = naam_contact;
+    const contact_specialisatie = specialisatie;
+    const contact_telefoon = tel_contact;
+    const contact_voornaam = voornaam_contact;
+    const email = emailbedrijf;
+    const gebruikersnaam = gebruikersnaam_bedrijf;
+    const telefoon_nr = telbedrijf;
+    const wachtwoord = wachtwoord_bedrijf;
+    const straatnaam = straat;
+    const postcode = ""; // Not provided by frontend
+
     // Check if company already exists
-    db.query('SELECT * FROM bedrijven WHERE emailbedrijf = ? OR gebruikersnaam = ?', 
-      [emailbedrijf, gebruikersnaam_bedrijf], 
+    db.query('SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?',
+      [email, gebruikersnaam],
       (err, results) => {
         if (err) {
           console.error('Database error checking existing company:', err);
@@ -176,30 +191,44 @@ app.post('/api/register', async (req, res) => {
         if (results.length > 0) {
           return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
         }
-        
+
         // Insert new company
         const query = `INSERT INTO bedrijven (
-          bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
-          voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
-          gebruikersnaam, wachtwoord
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        
+          bedrijf_URL, beschrijving, BTW_nr, bus_nr, contact_email, contact_naam, contact_specialisatie, contact_telefoon, contact_voornaam, email, gebruikersnaam, gemeente, huis_nr, naam, postcode, sector, straatnaam, telefoon_nr, wachtwoord, zoeken_we
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
         const values = [
-          bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
-          voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
-          gebruikersnaam_bedrijf, wachtwoord_bedrijf
+          bedrijf_URL, beschrijving, BTW_nr, bus_nr, contact_email, contact_naam, contact_specialisatie, contact_telefoon, contact_voornaam, email, gebruikersnaam, gemeente, huis_nr, naam, postcode, sector, straatnaam, telefoon_nr, wachtwoord, zoeken_we
         ];
         
         console.log('Executing query:', query);
         console.log('With values:', values);
         
-        db.query(query, values, (err, result) => {
+        db.query(query, values, async (err, result) => {
           if (err) {
             console.error('Database error creating company:', err);
             return res.status(500).json({ error: 'Database error', details: err.message });
           }
           console.log('Company created successfully:', result);
-          res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt' });
+          // Create timeslots for this bedrijf
+          const bedrijf_id = result.insertId;
+          const date = new Date();
+          date.setHours(10, 0, 0, 0); // 10:00
+          const slots = [];
+          for (let i = 0; i < 8 * 6; i++) { // 8 hours * 6 slots per hour = 48 slots
+            const start = new Date(date.getTime() + i * 10 * 60000);
+            const end = new Date(start.getTime() + 10 * 60000);
+            slots.push([start, end, 0, null, bedrijf_id]);
+          }
+          try {
+            await db.promise().query(
+              'INSERT INTO speeddates (starttijd, eindtijd, is_bezet, user_id, bedrijf_id) VALUES ?',[slots]
+            );
+            res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt en timeslots aangemaakt' });
+          } catch (err2) {
+            console.error('Error creating timeslots:', err2);
+            res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt, maar timeslots NIET aangemaakt', error: err2.message });
+          }
         });
       }
     );
@@ -211,27 +240,83 @@ app.post('/api/register', async (req, res) => {
 // Reserve a speeddate
 app.post('/api/speeddate', async (req, res) => {
   try {
-    const { user_id, bedrijf_id, starttijd, eindtijd } = req.body;
-    if (!user_id || !bedrijf_id) {
-      return res.status(400).json({ error: 'user_id en bedrijf_id zijn verplicht' });
+    const { user_id, bedrijf_id, speed_id } = req.body;
+    if (!user_id || !bedrijf_id || !speed_id) {
+      return res.status(400).json({ error: 'user_id, bedrijf_id en speed_id zijn verplicht' });
     }
-    // Find a free slot for this bedrijf
+
+    // Find the exact slot by speed_id
     const [slots] = await db.promise().query(
-      'SELECT * FROM speeddates WHERE bedrijf_id = ? AND is_bezet = 0 LIMIT 1',
-      [bedrijf_id]
+      'SELECT * FROM speeddates WHERE speed_id = ? AND bedrijf_id = ? AND is_bezet = 0',
+      [speed_id, bedrijf_id]
     );
+
     if (slots.length === 0) {
-      return res.status(400).json({ error: 'Geen vrije tijdsloten beschikbaar voor dit bedrijf' });
+      return res.status(400).json({ error: 'Dit tijdslot is niet meer beschikbaar' });
     }
+
     const slot = slots[0];
-    // Reserve the slot
+    // Reserve the exact slot
     await db.promise().query(
       'UPDATE speeddates SET is_bezet = 1, user_id = ? WHERE speed_id = ?',
-      [user_id, slot.speed_id]
+      [user_id, speed_id]
     );
     res.json({ message: 'Speeddate succesvol gereserveerd', speed_id: slot.speed_id });
   } catch (err) {
     console.error('Error reserving speeddate:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Get all timeslots for a specific bedrijf
+app.get('/api/speeddates/:bedrijfId', async (req, res) => {
+  try {
+    const { bedrijfId } = req.params;
+    const [slots] = await db.promise().query(
+      'SELECT * FROM speeddates WHERE bedrijf_id = ? ORDER BY starttijd',
+      [bedrijfId]
+    );
+    console.log("bedrijfId", bedrijfId);
+    res.json(slots);
+  } catch (err) {
+    console.error('Error fetching speeddates:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Get user's reservations
+app.get('/api/reservations/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const [reservations] = await db.promise().query(
+      `SELECT s.*, b.naam as bedrijfsnaam, b.sector, b.beschrijving 
+       FROM speeddates s 
+       JOIN bedrijven b ON s.bedrijf_id = b.bedrijf_id 
+       WHERE s.user_id = ? AND s.is_bezet = 1 
+       ORDER BY s.starttijd`,
+      [userId]
+    );
+    res.json(reservations);
+  } catch (err) {
+    console.error('Error fetching user reservations:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Annuleer een reservering
+app.delete('/api/reservations/:speed_id', async (req, res) => {
+  try {
+    const { speed_id } = req.params;
+    const [result] = await db.promise().query(
+      'UPDATE speeddates SET is_bezet = 0, user_id = NULL WHERE speed_id = ?',
+      [speed_id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Reservering niet gevonden.' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error annuleer reservering:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });

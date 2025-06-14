@@ -45,7 +45,10 @@ export default function Registreer()   // Dit is een functionele component in Re
     tel_contact: '',
     gebruikersnaam_bedrijf: '',
     wachtwoord_bedrijf: '',
-    wachtwoord2_bedrijf: ''
+    wachtwoord2_bedrijf: '',
+    sector: '',
+    beschrijving: '',
+    zoeken_we: ''
   });
 
   // Error state
@@ -111,6 +114,9 @@ export default function Registreer()   // Dit is een functionele component in Re
       return;
     }
 
+    // Always use gebruikersnaam from localStorage if available
+    const gebruikersnaam = localStorage.getItem('gebruikersnaam') || companyForm.gebruikersnaam;
+
     try {
       const response = await fetch('http://localhost:5000/api/register', {
         method: 'POST',
@@ -119,7 +125,8 @@ export default function Registreer()   // Dit is een functionele component in Re
         },
         body: JSON.stringify({
           type: 'bedrijf',
-          ...companyForm
+          ...companyForm,
+          gebruikersnaam // override or add
         }),
       });
 
@@ -270,6 +277,34 @@ export default function Registreer()   // Dit is een functionele component in Re
                   type="text" 
                   name="bedrijfsnaam" 
                   value={companyForm.bedrijfsnaam}
+                  onChange={handleCompanyChange}
+                  required
+                />
+              </label>
+              <label>
+                Sector:
+                <input
+                  type="text"
+                  name="sector"
+                  value={companyForm.sector}
+                  onChange={handleCompanyChange}
+                  required
+                />
+              </label>
+              <label>
+                Wie zijn we:
+                <textarea
+                  name="beschrijving"
+                  value={companyForm.beschrijving}
+                  onChange={handleCompanyChange}
+                  required
+                />
+              </label>
+              <label>
+                Dit zoeken we:
+                <textarea
+                  name="zoeken_we"
+                  value={companyForm.zoeken_we}
                   onChange={handleCompanyChange}
                   required
                 />
