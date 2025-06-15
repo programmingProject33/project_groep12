@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Reservaties.css';
 
+const MAX_DESC = 80;
+
 const Reservaties = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -71,6 +74,10 @@ const Reservaties = () => {
     }
   };
 
+  const toggleExpand = (id) => {
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   if (loading) {
     return (
       <div className="reservaties-container">
@@ -97,6 +104,9 @@ const Reservaties = () => {
     <div className="reservaties-container">
       <div className="reservaties-content">
         <h1>Mijn Reserveringen</h1>
+        <div className="reservaties-intro">
+          <span role="img" aria-label="calendar">📅</span> Hier vind je een overzicht van je geplande speeddates. Je kunt ook eenvoudig annuleren indien nodig.
+        </div>
         {reservations.length === 0 ? (
           <p>Je hebt nog geen reserveringen.</p>
         ) : (
@@ -104,29 +114,54 @@ const Reservaties = () => {
             <table className="reservations-table">
               <thead>
                 <tr>
-                  <th>Bedrijf</th>
-                  <th>Sector</th>
-                  <th>Datum</th>
-                  <th>Tijd</th>
-                  <th>Beschrijving</th>
-                  <th>Actie</th>
+                  <th><span role="img" aria-label="bedrijf">🏢</span> Bedrijf</th>
+                  <th><span role="img" aria-label="sector">🏷️</span> Sector</th>
+                  <th><span role="img" aria-label="datum">📅</span> Datum</th>
+                  <th><span role="img" aria-label="tijd">🕓</span> Tijd</th>
+                  <th><span role="img" aria-label="beschrijving">📝</span> Beschrijving</th>
+                  <th><span role="img" aria-label="actie">🗑️</span></th>
                 </tr>
               </thead>
               <tbody>
-                {reservations.map((reservation) => (
-                  <tr key={reservation.speed_id}>
-                    <td>{reservation.bedrijfsnaam}</td>
-                    <td>{reservation.sector}</td>
-                    <td>{formatDate(reservation.starttijd)}</td>
-                    <td>{formatTime(reservation.starttijd)} - {formatTime(reservation.eindtijd)}</td>
-                    <td>{reservation.beschrijving}</td>
-                    <td>
-                      <button className="annuleer-btn" onClick={() => handleAnnuleer(reservation.speed_id)}>
-                        Annuleer
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {reservations.map((reservation) => {
+                  const desc = reservation.beschrijving || "";
+                  const isLong = desc.length > MAX_DESC;
+                  const isExpanded = expanded[reservation.speed_id];
+                  return (
+                    <tr key={reservation.speed_id} className="reservatie-item">
+                      <td>{reservation.bedrijfsnaam}</td>
+                      <td>{reservation.sector}</td>
+                      <td>{formatDate(reservation.starttijd)}</td>
+                      <td>{formatTime(reservation.starttijd)} - {formatTime(reservation.eindtijd)}</td>
+                      <td>
+                        <div className={`desc-wrapper${isExpanded ? ' expanded' : ''}`}>
+                          {isLong && !isExpanded ? (
+                            <>
+                              {desc.slice(0, MAX_DESC)}...{' '}
+                              <button className="meer-lezen-btn" onClick={() => toggleExpand(reservation.speed_id)}>
+                                meer lezen
+                              </button>
+                            </>
+                          ) : isLong && isExpanded ? (
+                            <>
+                              {desc}
+                              <button className="meer-lezen-btn" onClick={() => toggleExpand(reservation.speed_id)}>
+                                minder
+                              </button>
+                            </>
+                          ) : (
+                            desc
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <button className="annuleer-btn" onClick={() => handleAnnuleer(reservation.speed_id)}>
+                          <span role="img" aria-label="verwijder">🗑️</span>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

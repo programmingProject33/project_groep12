@@ -1,6 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaCalendarAlt, FaBuilding, FaHeartbeat, FaTools, FaChalkboardTeacher, FaBullhorn, FaMoneyBillWave } from "react-icons/fa";
 import "./bedrijven.css";
+
+// Accentkleuren per sector (of afwisselend)
+const sectorColors = [
+  "#3b82f6", // blauw
+  "#22c55e", // groen
+  "#a78bfa", // paars
+  "#f59e42", // oranje
+  "#f43f5e", // rood
+  "#06b6d4", // cyaan
+];
+const sectorIcons = {
+  IT: <FaBuilding />,
+  Zorg: <FaHeartbeat />,
+  Bouw: <FaTools />,
+  Onderwijs: <FaChalkboardTeacher />,
+  Marketing: <FaBullhorn />,
+  Finance: <FaMoneyBillWave />,
+  default: <FaBuilding />
+};
+
+function getSectorColor(index, sector) {
+  // Je kunt ook per sector kleuren kiezen, nu afwisselend
+  return sectorColors[index % sectorColors.length];
+}
+function getSectorIcon(sector) {
+  if (!sector) return sectorIcons.default;
+  const key = Object.keys(sectorIcons).find(k => sector.toLowerCase().includes(k.toLowerCase()));
+  return key ? sectorIcons[key] : sectorIcons.default;
+}
 
 function Bedrijven() {
   const [bedrijven, setBedrijven] = useState([]);
@@ -14,51 +44,52 @@ function Bedrijven() {
   }, []);
 
   return (
-    <div className="page-container">
-      {/* MAIN CONTENT */}
+    <div className="page-container bedrijven-modern-bg">
+      {/* Hero golfvorm bovenaan */}
+      <div className="bedrijven-hero-wave">
+        <svg viewBox="0 0 1440 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#f0f9ff" d="M0,80 C320,180 1120,0 1440,100 L1440,0 L0,0 Z" />
+        </svg>
+      </div>
       <main className="content-wrap">
         <div className="bedrijven-container">
-          <h1 className="bedrijven-title">Ontdek Onze Partnerbedrijven</h1>
+          <h1 className="bedrijven-title">🔍 Ontdek onze partnerbedrijven</h1>
+          <p className="bedrijven-subtitle">Kies je favoriet en plan je speeddates</p>
           <div className="bedrijven-grid">
-            {bedrijven.map((bedrijf, index) => (
-              <div 
-                key={bedrijf.bedrijf_id} 
-                className="bedrijf-card"
-                style={{ 
-                  '--animation-order': index,
-                  animationDelay: `${index * 0.1}s`
-                }}
-              >
-                <h2 className="bedrijf-naam">
-                  <a href={bedrijf.bedrijf_URL.startsWith('http') ? bedrijf.bedrijf_URL : `https://${bedrijf.bedrijf_URL}`} 
-                     target="_blank" 
-                     rel="noopener noreferrer">
-                    {bedrijf.naam}
-                  </a>
-                </h2>
-                <div className="bedrijf-info">
-                  <p className="bedrijf-sector">{bedrijf.sector}</p>
-                  <div className="bedrijf-details">
-                    <p><strong>BTW-nummer:</strong> {bedrijf.BTW_nr}</p>
-                    <p><strong>Adres:</strong> {bedrijf.straatnaam} {bedrijf.huis_nr}
-                      {bedrijf.bus_nr && ` bus ${bedrijf.bus_nr}`}, {bedrijf.postcode} {bedrijf.gemeente}</p>
-                    <p><strong>Telefoon:</strong> {bedrijf.telefoon_nr}</p>
-                    <p><strong>Email:</strong> <a href={`mailto:${bedrijf.email}`}>{bedrijf.email}</a></p>
-                    <p><strong>Website:</strong> <a href={bedrijf.bedrijf_URL.startsWith('http') ? bedrijf.bedrijf_URL : `https://${bedrijf.bedrijf_URL}`} 
-                       target="_blank" 
-                       rel="noopener noreferrer">
-                      {bedrijf.bedrijf_URL}
-                    </a></p>
+            {bedrijven.map((bedrijf, index) => {
+              const accentColor = getSectorColor(index, bedrijf.sector);
+              const icon = getSectorIcon(bedrijf.sector);
+              return (
+                <div
+                  key={bedrijf.bedrijf_id}
+                  className="bedrijf-card modern no-bg"
+                  style={{
+                    '--accent-color': accentColor,
+                    '--animation-order': index,
+                    animationDelay: `${index * 0.1}s`
+                  }}
+                >
+                  <div className="bedrijf-card-accent"></div>
+                  <div className="bedrijf-card-content">
+                    <div className="bedrijf-card-icon">{icon}</div>
+                    <h2 className="bedrijf-naam">{bedrijf.naam}</h2>
+                    <div className="bedrijf-info">
+                      <div className="bedrijf-details">
+                        <p><span role="img" aria-label="adres">📍</span> {bedrijf.straatnaam} {bedrijf.huis_nr}{bedrijf.bus_nr && ` bus ${bedrijf.bus_nr}`}, {bedrijf.postcode} {bedrijf.gemeente}</p>
+                        <p><span role="img" aria-label="email">📧</span> <a href={`mailto:${bedrijf.email}`}>{bedrijf.email}</a></p>
+                        <p><span role="img" aria-label="website">🌐</span> <a href={bedrijf.bedrijf_URL.startsWith('http') ? bedrijf.bedrijf_URL : `https://${bedrijf.bedrijf_URL}`} target="_blank" rel="noopener noreferrer">{bedrijf.bedrijf_URL}</a></p>
+                      </div>
+                      <button
+                        className="reserveer-btn modern"
+                        onClick={() => navigate(`/speeddate/${bedrijf.bedrijf_id}`)}
+                      >
+                        <FaCalendarAlt className="btn-icon" style={{ marginRight: 8 }} /> Reserveer speeddate
+                      </button>
+                    </div>
                   </div>
-                  <button 
-                    className="reserveer-btn"
-                    onClick={() => navigate(`/speeddate/${bedrijf.bedrijf_id}`)}
-                  >
-                    Reserveer speeddate
-                  </button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </main>

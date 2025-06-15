@@ -9,6 +9,7 @@ export default function SpeeddatePage() {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [loading, setLoading] = useState(false);
   const [timeslots, setTimeslots] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -23,18 +24,25 @@ export default function SpeeddatePage() {
   }, [bedrijfId]);
 
   useEffect(() => {
-    // Fetch timeslots for this bedrijf
-    fetch(`http://localhost:5000/api/speeddates/${bedrijfId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setTimeslots(data);
-      });
-  }, [bedrijfId]);
+    // Alleen tijdsloten ophalen als de gebruiker is ingelogd
+    if (user) {
+      fetch(`http://localhost:5000/api/speeddates/${bedrijfId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          setTimeslots(data);
+        });
+    }
+  }, [bedrijfId, user]);
 
   const handleReserve = async () => {
-    if (!user || !user.id || !bedrijfId || !selectedSlot) return;
+    if (!user || !user.id) {
+      navigate('/login');
+      return;
+    }
+    if (!bedrijfId || !selectedSlot) return;
     setLoading(true);
+    setErrorMessage("");
     try {
       const res = await fetch("http://localhost:5000/api/speeddate", {
         method: "POST",
@@ -50,10 +58,10 @@ export default function SpeeddatePage() {
         alert("Reservering bevestigd!");
         navigate("/");
       } else {
-        alert(data.error || "Er is een fout opgetreden bij het reserveren.");
+        setErrorMessage(data.error || "Er is een fout opgetreden bij het reserveren.");
       }
     } catch (err) {
-      alert("Er is een fout opgetreden bij het reserveren.");
+      setErrorMessage("Er is een fout opgetreden bij het reserveren.");
     } finally {
       setLoading(false);
     }
@@ -63,6 +71,15 @@ export default function SpeeddatePage() {
   function formatTime(isoString) {
     const date = new Date(isoString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  }
+
+  // Filter timeslots: geen slots tussen 13:00 en 14:00
+  function isNotPauseSlot(slot) {
+    const start = new Date(slot.starttijd);
+    const hour = start.getHours();
+    const min = start.getMinutes();
+    // 13:00:00 t.e.m. 13:59:59
+    return !(hour === 13);
   }
 
   return (
@@ -79,40 +96,71 @@ export default function SpeeddatePage() {
             <div className="speeddate-title">Wie zijn we:</div>
             <div style={{ marginBottom: 12 }}>{bedrijf.beschrijving || "Welkom bij ICT-Talents, waar we de toekomst van technologie vormgeven door middel van innovatie en talent! Bij ons geen on-the-job, maar een duurzame relatie die langdurig meegaat en een eindeloze loop in je code. Wij zijn op zoek naar een enthousiaste .NET Developer om ons dynamisch team te versterken."}</div>
             <div className="speeddate-title">Dit zoeken we:</div>
-            <ul className="speeddate-list">
-              <li>Je beheerst Nederlands, hebt kennis Engels.</li>
-              <li>Affiniteit met .NET, C#, SQL, Azure is een mooie extra!</li>
-            </ul>
+            {bedrijf.zoeken_we ? (
+              <ul className="speeddate-list">
+                {bedrijf.zoeken_we.split(/\r?\n|\r|•|\*/)
+                  .map(line => line.trim())
+                  .filter(line => line.length > 0)
+                  .map((line, idx) => (
+                    <li key={idx}>{line}</li>
+                  ))}
+              </ul>
+            ) : (
+              <ul className="speeddate-list">
+                <li>Je beheerst Nederlands, hebt kennis Engels.</li>
+                <li>Affiniteit met .NET, C#, SQL, Azure is een mooie extra!</li>
+              </ul>
+            )}
           </div>
 
           <div className="speeddate-slots-box">
+            {errorMessage && (
+              <div style={{ color: 'red', marginBottom: 16, fontWeight: 500 }}>
+                {errorMessage}
+              </div>
+            )}
             <div className="speeddate-slots-title">Reserveer een speeddate</div>
-            <div className="speeddate-slots-grid">
-              {timeslots.map((slot) => (
-                <button
-                  key={slot.speed_id}
-                  className={`speeddate-slot-btn${slot.is_bezet ? " reserved" : ""}${selectedSlot && selectedSlot.speed_id === slot.speed_id ? " selected" : ""}`}
-                  onClick={() => !slot.is_bezet && setSelectedSlot(slot)}
-                  type="button"
-                  disabled={slot.is_bezet}
+            
+            {!user ? (
+              <div className="login-prompt">
+                <p>Log in om beschikbare tijdsloten te zien en een speeddate te reserveren.</p>
+                <button 
+                  className="login-button"
+                  onClick={() => navigate('/login')}
                 >
-                  {formatTime(slot.starttijd)} - {formatTime(slot.eindtijd)}
+                  Inloggen
                 </button>
-              ))}
-            </div>
-            {selectedSlot && (
+              </div>
+            ) : (
               <>
-                <div style={{ marginTop: 24, fontSize: "1.1rem" }}>
-                  Geselecteerd tijdslot: <b>{formatTime(selectedSlot.starttijd)} - {formatTime(selectedSlot.eindtijd)}</b>
+                <div className="speeddate-slots-grid">
+                  {timeslots.filter(isNotPauseSlot).map((slot) => (
+                    <button
+                      key={slot.speed_id}
+                      className={`speeddate-slot-btn${slot.is_bezet ? " reserved" : ""}${selectedSlot && selectedSlot.speed_id === slot.speed_id ? " selected" : ""}`}
+                      onClick={() => !slot.is_bezet && setSelectedSlot(slot)}
+                      type="button"
+                      disabled={slot.is_bezet}
+                    >
+                      {formatTime(slot.starttijd)} - {formatTime(slot.eindtijd)}
+                    </button>
+                  ))}
                 </div>
-                <button
-                  className="speeddate-reserveer-btn"
-                  style={{ marginTop: 18 }}
-                  disabled={loading}
-                  onClick={handleReserve}
-                >
-                  {loading ? 'Reserveren...' : 'Bevestig reservering'}
-                </button>
+                {selectedSlot && (
+                  <>
+                    <div style={{ marginTop: 24, fontSize: "1.1rem" }}>
+                      Geselecteerd tijdslot: <b>{formatTime(selectedSlot.starttijd)} - {formatTime(selectedSlot.eindtijd)}</b>
+                    </div>
+                    <button
+                      className="speeddate-reserveer-btn"
+                      style={{ marginTop: 18 }}
+                      disabled={loading}
+                      onClick={handleReserve}
+                    >
+                      {loading ? 'Reserveren...' : 'Bevestig reservering'}
+                    </button>
+                  </>
+                )}
               </>
             )}
           </div>

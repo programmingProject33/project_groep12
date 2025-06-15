@@ -78,4 +78,744 @@
 .navbar-btn.logout:hover {
   background: #dc2626;
   color: #fff;
+}
+
+.dashboard-main.modern {
+  max-width: 480px;
+  margin: 4rem auto 2rem auto;
+  border-radius: 2rem;
+  box-shadow: 0 6px 32px rgba(30,41,59,0.13);
+  padding: 2.7rem 2.2rem 2.2rem 2.2rem;
+  background: #fff;
+  position: relative;
+}
+
+.dashboard-header-row {
+  display: flex;
+  align-items: center;
+  gap: 1.3rem;
+  margin-bottom: 1.2rem;
+  justify-content: center;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c7d2fe 0%, #e0e7ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.3rem;
+  color: #4338ca;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.08);
+}
+
+.dashboard-header-text h1 {
+  font-size: 2.1rem;
+  color: #2563eb;
+  margin: 0 0 0.2rem 0;
+}
+.last-activity {
+  color: #64748b;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.dashboard-actions.modern {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  margin-bottom: 2.2rem;
+  flex-wrap: wrap;
+}
+.dashboard-actions.modern button {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 1.1rem;
+  padding: 1rem 1.7rem;
+  box-shadow: 0 2px 12px rgba(59,130,246,0.07);
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+}
+.bedrijven-btn {
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  color: #fff;
+}
+.bedrijven-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 18px rgba(59,130,246,0.13);
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+}
+.reservaties-btn {
+  background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
+  color: #fff;
+}
+.reservaties-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 18px rgba(16,185,129,0.13);
+  background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+}
+.btn-icon {
+  font-size: 1.25em;
+}
+
+.dashboard-info.modern-gradient {
+  background: linear-gradient(120deg, #e0e7ff 0%, #f0fdfa 100%);
+  border-radius: 1.2rem;
+  padding: 1.7rem 1.2rem 1.2rem 1.2rem;
+  margin-top: 1.7rem;
+  text-align: left;
+  box-shadow: 0 1px 8px rgba(59,130,246,0.06);
+}
+.dashboard-info.modern-gradient h2 {
+  color: #222;
+  margin-bottom: 1.1rem;
+}
+.dashboard-info.modern-gradient ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.dashboard-info.modern-gradient li {
+  font-size: 1.08rem;
+  color: #334155;
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+@media (max-width: 600px) {
+  .dashboard-main.modern {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  .dashboard-header-row {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .dashboard-actions.modern {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .dashboard-info.modern-gradient {
+    padding: 1.1rem 0.5rem 1rem 0.5rem;
+  }
+}
+
+/* Minimalistische, luchtige dashboard zonder kaart of blok */
+.student-dashboard.minimal {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 2.5rem 1rem 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dashboard-header-minimal {
+  display: flex;
+  align-items: center;
+  gap: 1.3rem;
+  margin-bottom: 1.7rem;
+  width: 100%;
+  max-width: 520px;
+}
+.avatar-minimal {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #dbeafe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.3rem;
+  color: #2563eb;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.dashboard-header-text-minimal h1 {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 0.3rem 0;
+  letter-spacing: -1px;
+}
+.last-activity-minimal {
+  color: #64748b;
+  font-size: 1.05rem;
+  margin-bottom: 0.2rem;
+}
+
+.dashboard-actions-minimal {
+  display: flex;
+  gap: 1.1rem;
+  margin-bottom: 2.2rem;
+  width: 100%;
+  max-width: 520px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.bedrijven-btn-minimal, .reservaties-btn-minimal {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 1.1rem;
+  padding: 1rem 1.7rem;
+  background: #e0e7ff;
+  color: #2563eb;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.06);
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+}
+.bedrijven-btn-minimal {
+  background: #e0e7ff;
+  color: #2563eb;
+}
+.bedrijven-btn-minimal:hover {
+  background: #3b82f6;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 18px rgba(59,130,246,0.13);
+}
+.reservaties-btn-minimal {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.reservaties-btn-minimal:hover {
+  background: #22c55e;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 18px rgba(16,185,129,0.13);
+}
+.btn-icon-minimal {
+  font-size: 1.25em;
+}
+
+.dashboard-tips-minimal {
+  width: 100%;
+  max-width: 520px;
+  margin-top: 1.5rem;
+}
+.dashboard-tips-minimal ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.dashboard-tips-minimal li {
+  font-size: 1.13rem;
+  color: #334155;
+  margin-bottom: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .dashboard-header-minimal {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.7rem;
+    text-align: center;
+  }
+  .dashboard-actions-minimal {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: stretch;
+    justify-content: center;
+  }
+  .dashboard-tips-minimal {
+    margin-top: 1.2rem;
+  }
+}
+
+.dashboard-hero-svg {
+  width: 100vw;
+  min-width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  height: 110px;
+  overflow: hidden;
+}
+.dashboard-hero-svg svg {
+  width: 100vw;
+  min-width: 100%;
+  height: 110px;
+  display: block;
+}
+
+.dashboard-hero-shape {
+  background: linear-gradient(120deg, #eef2ff 60%, #f0f9ff 100%);
+  border-radius: 2.5rem 2.5rem 2.5rem 2.5rem / 3.5rem 3.5rem 2.2rem 2.2rem;
+  padding: 2.7rem 2.2rem 2.2rem 2.2rem;
+  margin-top: 60px;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 540px;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-shadow: none;
+}
+
+@media (max-width: 700px) {
+  .dashboard-hero-shape {
+    border-radius: 1.5rem 1.5rem 1.5rem 1.5rem / 2.2rem 2.2rem 1.2rem 1.2rem;
+    padding: 1.5rem 0.7rem 1.2rem 0.7rem;
+    margin-top: 40px;
+    max-width: 98vw;
+  }
+  .dashboard-hero-svg {
+    height: 60px;
+  }
+  .dashboard-hero-svg svg {
+    height: 60px;
+  }
+}
+
+@media (max-width: 500px) {
+  .dashboard-hero-shape {
+    border-radius: 0.7rem;
+    padding: 1.1rem 0.2rem 0.7rem 0.2rem;
+    margin-top: 20px;
+  }
+  .dashboard-hero-svg {
+    height: 30px;
+  }
+  .dashboard-hero-svg svg {
+    height: 30px;
+  }
+}
+
+/* Avatar zweef animatie wordt door Framer Motion gedaan */
+
+/* Zorg dat de rest van de minimal styles intact blijven */
+
+/* Hero blob achtergrond */
+.hero-blob-bg {
+  width: 100vw;
+  min-width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  height: 260px;
+  overflow: hidden;
+}
+.hero-blob-bg svg {
+  width: 100vw;
+  min-width: 100%;
+  height: 260px;
+  display: block;
+}
+
+.student-dashboard.clean-hero {
+  min-height: 100vh;
+  /* background: #f8fafc; */
+  padding: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: 60px;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3.5rem 2rem 2.5rem 2rem;
+  background: transparent;
+}
+.hero-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 2.2rem;
+}
+.avatar-hero {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c7d2fe 0%, #e0e7ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  color: #4338ca;
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(59,130,246,0.08);
+}
+.hero-texts h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 0.3rem 0;
+  letter-spacing: -1px;
+  text-align: center;
+}
+.hero-sub {
+  color: #64748b;
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: 400;
+}
+.hero-actions {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 2.2rem;
+  justify-content: center;
+}
+.hero-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.18rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 1.3rem;
+  padding: 1.2rem 2.5rem;
+  box-shadow: 0 4px 24px rgba(59,130,246,0.10);
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+  min-width: 210px;
+  justify-content: center;
+  animation: float-btn 2.2s ease-in-out infinite;
+}
+.hero-btn.bedrijven {
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  color: #fff;
+}
+.hero-btn.bedrijven:hover {
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+  transform: scale(1.06);
+  box-shadow: 0 8px 32px rgba(59,130,246,0.18);
+}
+.hero-btn.reservaties {
+  background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
+  color: #fff;
+}
+.hero-btn.reservaties:hover {
+  background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
+  transform: scale(1.06);
+  box-shadow: 0 8px 32px rgba(16,185,129,0.18);
+}
+.btn-icon {
+  font-size: 1.35em;
+}
+
+.events-section, .tips-section {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 2.5rem auto;
+  padding: 0 1.2rem;
+}
+.events-section h2, .tips-section h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 1.3rem;
+}
+.events-list, .tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem;
+}
+.event-item, .tip-item {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border-radius: 1.2rem;
+  padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+  box-shadow: none;
+  gap: 2.2rem;
+  min-height: 120px;
+}
+.event-info, .tip-info {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.event-time {
+  color: #64748b;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+.event-title {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+.event-desc {
+  color: #334155;
+  font-size: 1.08rem;
+}
+.event-img, .tip-img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(59,130,246,0.07);
+}
+.tip-title {
+  font-size: 1.13rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+.tip-desc {
+  color: #334155;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 900px) {
+  .hero-content, .events-section, .tips-section {
+    max-width: 98vw;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+@media (max-width: 700px) {
+  .hero-content {
+    padding: 2.2rem 0.5rem 1.2rem 0.5rem;
+    margin-top: 30px;
+  }
+  .hero-row {
+    gap: 0.7rem;
+  }
+  .hero-btn {
+    min-width: 140px;
+    font-size: 1rem;
+    padding: 1rem 1.2rem;
+  }
+  .event-img, .tip-img {
+    width: 80px;
+    height: 60px;
+  }
+}
+@media (max-width: 600px) {
+  .hero-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.7rem;
+    text-align: center;
+  }
+  .hero-actions {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: stretch;
+    justify-content: center;
+    width: 100%;
+  }
+  .event-item, .tip-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.1rem;
+    min-height: unset;
+  }
+  .event-img, .tip-img {
+    width: 100%;
+    height: 120px;
+    border-radius: 1rem;
+    object-fit: cover;
+    margin-top: 0.5rem;
+  }
+}
+
+.career-tips-block {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto 2.5rem auto;
+  padding: 0 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.career-tips-block h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 1.3rem;
+  text-align: center;
+}
+.career-tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2.1rem;
+}
+.career-tips-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+  font-size: 1.13rem;
+  color: #334155;
+  line-height: 1.6;
+  background: transparent;
+  margin: 0;
+}
+.tip-emoji {
+  font-size: 2.1rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+.career-tips-list strong {
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 1.13rem;
+}
+@media (max-width: 700px) {
+  .career-tips-block {
+    max-width: 98vw;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .career-tips-list {
+    gap: 1.2rem;
+  }
+  .tip-emoji {
+    font-size: 1.5rem;
+  }
+}
+
+/* Verwijder achtergrondfoto en overlay styles */
+/* ... rest van de bestaande CSS blijft ongewijzigd ... */
+
+/* Hero golfvorm bovenaan */
+.hero-wave-bg {
+  width: 100vw;
+  min-width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  height: 180px;
+  overflow: hidden;
+}
+.hero-wave-bg svg {
+  width: 100vw;
+  min-width: 100%;
+  height: 180px;
+  display: block;
+}
+
+/* Carrière tips met afbeeldingen */
+.career-tips-list.with-images {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem;
+}
+.career-tip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.2rem;
+  background: transparent;
+  min-height: 120px;
+}
+.career-tip-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+  font-size: 1.13rem;
+  color: #334155;
+  line-height: 1.6;
+  flex: 1 1 0%;
+}
+.career-tip-img-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.career-tip-img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(59,130,246,0.07);
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1), box-shadow 0.3s cubic-bezier(.4,0,.2,1);
+}
+.career-tip-img:hover {
+  transform: scale(1.05) translateY(-4px);
+  box-shadow: 0 8px 32px rgba(59,130,246,0.18);
+}
+@media (max-width: 900px) {
+  .career-tip-img {
+    width: 90px;
+    height: 60px;
+  }
+}
+@media (max-width: 700px) {
+  .hero-wave-bg, .hero-wave-bg svg {
+    height: 90px;
+  }
+  .career-tip-row {
+    gap: 1.1rem;
+  }
+  .career-tip-img {
+    width: 70px;
+    height: 50px;
+  }
+}
+@media (max-width: 600px) {
+  .career-tip-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+    min-height: unset;
+  }
+  .career-tip-img-wrap {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  .career-tip-img {
+    width: 100%;
+    height: 120px;
+    border-radius: 1rem;
+    object-fit: cover;
+  }
+}
+
+@keyframes float-btn {
+  0% {
+    transform: translateY(0px);
+    box-shadow: 0 4px 24px rgba(59,130,246,0.10);
+  }
+  50% {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 32px rgba(59,130,246,0.18);
+  }
+  100% {
+    transform: translateY(0px);
+    box-shadow: 0 4px 24px rgba(59,130,246,0.10);
+  }
 } 

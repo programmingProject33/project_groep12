@@ -21,7 +21,6 @@ app.post('/api/login', async (req, res) => {
 
     // Determine which table to query based on user type
     const table = type === 'student' ? 'gebruikers' : 'bedrijven';
-    
     // Query the appropriate table
     const [users] = await db.promise().query(
       `SELECT * FROM ${table} WHERE gebruikersnaam = ? AND wachtwoord = ?`,
@@ -30,9 +29,17 @@ app.post('/api/login', async (req, res) => {
 
     if (users.length > 0) {
       const user = users[0];
-      // Remove sensitive information
       delete user.wachtwoord;
-      
+      // Parse dienstverbanden als JSON-array
+      if (user.dienstverbanden) {
+        try {
+          user.dienstverbanden = JSON.parse(user.dienstverbanden);
+        } catch (e) {
+          user.dienstverbanden = [];
+        }
+      } else {
+        user.dienstverbanden = [];
+      }
       res.json({
         message: 'Login succesvol',
         user: {
@@ -122,27 +129,23 @@ app.post('/api/register', async (req, res) => {
   console.log('Received registration request:', req.body);
   const { type, ...userData } = req.body;
 
-  
   if (type === 'student') {
     try {
-      const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar } = userData;
-
+      const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden } = userData;
+      const dienstverbandenStr = dienstverbanden ? JSON.stringify(dienstverbanden) : null;
       // Check if user exists
       const [existingUsers] = await db.promise().query(
         'SELECT * FROM gebruikers WHERE email = ? OR gebruikersnaam = ?',
         [email, gebruikersnaam]
       );
-
       if (existingUsers.length > 0) {
         return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
       }
-
       // Insert new user
       const [result] = await db.promise().query(
-        'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar]
+        'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbandenStr]
       );
-
       console.log('User created successfully:', result);
       res.status(201).json({ message: 'Account succesvol aangemaakt' });
     } catch (err) {
@@ -161,7 +164,6 @@ app.post('/api/register', async (req, res) => {
       voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
       gebruikersnaam_bedrijf, wachtwoord_bedrijf, sector, beschrijving, zoeken_we
     } = userData;
-
     // Map frontend fields to database columns
     const bedrijf_URL = ""; // Not provided by frontend
     const naam = bedrijfsnaam;
@@ -179,7 +181,6 @@ app.post('/api/register', async (req, res) => {
     const wachtwoord = wachtwoord_bedrijf;
     const straatnaam = straat;
     const postcode = ""; // Not provided by frontend
-
     // Check if company already exists
     db.query('SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?',
       [email, gebruikersnaam],
@@ -191,19 +192,13 @@ app.post('/api/register', async (req, res) => {
         if (results.length > 0) {
           return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
         }
-
         // Insert new company
         const query = `INSERT INTO bedrijven (
           bedrijf_URL, beschrijving, BTW_nr, bus_nr, contact_email, contact_naam, contact_specialisatie, contact_telefoon, contact_voornaam, email, gebruikersnaam, gemeente, huis_nr, naam, postcode, sector, straatnaam, telefoon_nr, wachtwoord, zoeken_we
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
         const values = [
           bedrijf_URL, beschrijving, BTW_nr, bus_nr, contact_email, contact_naam, contact_specialisatie, contact_telefoon, contact_voornaam, email, gebruikersnaam, gemeente, huis_nr, naam, postcode, sector, straatnaam, telefoon_nr, wachtwoord, zoeken_we
         ];
-        
-        console.log('Executing query:', query);
-        console.log('With values:', values);
-        
         db.query(query, values, async (err, result) => {
           if (err) {
             console.error('Database error creating company:', err);
@@ -243,6 +238,15 @@ app.post('/api/speeddate', async (req, res) => {
     const { user_id, bedrijf_id, speed_id } = req.body;
     if (!user_id || !bedrijf_id || !speed_id) {
       return res.status(400).json({ error: 'user_id, bedrijf_id en speed_id zijn verplicht' });
+    }
+
+    // Controleer of de student al een actieve reservatie heeft bij dit bedrijf
+    const [existing] = await db.promise().query(
+      'SELECT * FROM speeddates WHERE user_id = ? AND bedrijf_id = ? AND is_bezet = 1',
+      [user_id, bedrijf_id]
+    );
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'Je hebt al een reservatie bij dit bedrijf. Annuleer eerst je bestaande reservatie om een nieuwe te maken.' });
     }
 
     // Find the exact slot by speed_id
@@ -317,6 +321,54 @@ app.delete('/api/reservations/:speed_id', async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Error annuleer reservering:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Profiel updaten (student)
+app.patch('/api/profiel/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { voornaam, naam, email, opleiding, opleiding_jaar, dienstverbanden } = req.body;
+    // dienstverbanden als JSON-string opslaan
+    const dienstverbandenStr = dienstverbanden ? JSON.stringify(dienstverbanden) : null;
+    const [result] = await db.promise().query(
+      `UPDATE gebruikers SET voornaam = ?, naam = ?, email = ?, opleiding = ?, opleiding_jaar = ?, dienstverbanden = ? WHERE id = ?`,
+      [voornaam, naam, email, opleiding, opleiding_jaar, dienstverbandenStr, id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Gebruiker niet gevonden.' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error profiel updaten:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Profiel ophalen (student)
+app.get('/api/profiel/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.promise().query('SELECT * FROM gebruikers WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Gebruiker niet gevonden.' });
+    }
+    const user = rows[0];
+    // Parse dienstverbanden als JSON-array
+    if (user.dienstverbanden) {
+      try {
+        user.dienstverbanden = JSON.parse(user.dienstverbanden);
+      } catch (e) {
+        user.dienstverbanden = [];
+      }
+    } else {
+      user.dienstverbanden = [];
+    }
+    delete user.wachtwoord;
+    res.json(user);
+  } catch (err) {
+    console.error('Error profiel ophalen:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
