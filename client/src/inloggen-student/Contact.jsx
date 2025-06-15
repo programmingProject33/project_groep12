@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Contact.css";
 
 export default function Contact() {
   const navigate = useNavigate();
+  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -11,6 +12,11 @@ export default function Contact() {
       navigate("/login", { replace: true });
     }
   }, [navigate]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSent(true);
+  };
 
   return (
     <div className="contact-page">
@@ -22,7 +28,7 @@ export default function Contact() {
           <p><b>Telefoon:</b> +32 494 77 08 550</p>
           <p><b>Adres:</b> Nijverheidskaai 170, 1070 Anderlecht</p>
         </div>
-        <form className="contact-form">
+        <form className="contact-form" onSubmit={handleSubmit}>
           <label>
             Naam:
             <input type="text" required />
@@ -36,6 +42,11 @@ export default function Contact() {
             <textarea rows={4} required />
           </label>
           <button type="submit">Verzenden</button>
+          {sent && (
+            <div style={{ color: "green", marginTop: "1rem", fontWeight: 600 }}>
+              Je bericht werd goed verstuurd!
+            </div>
+          )}
         </form>
       </main>
     </div>

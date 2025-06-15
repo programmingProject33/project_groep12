@@ -1,21 +1,33 @@
 import React from "react";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+// Guest/Public Components
 import GuestLayout from "./voor-inloggen/GuestLayout";
-import UserLayout from "./inloggen-student/UserLayout";
-import ProtectedRoute from "./inloggen-student/ProtectedRoute";
 import GuestRoute from "./voor-inloggen/GuestRoute";
 import Home from "./voor-inloggen/Home";
 import Login from "./voor-inloggen/login";
 import Registreer from "./voor-inloggen/registreer";
 import Bedrijven from "./voor-inloggen/bedrijven";
+import ContactNavbalk from "./voor-inloggen/contactNavbalk";
+import SpeeddatePage from "./voor-inloggen/SpeeddatePage.jsx";
+
+// Student Components
+import UserLayout from "./inloggen-student/UserLayout";
+import ProtectedRoute from "./inloggen-student/ProtectedRoute";
 import StudentDashboard from "./inloggen-student/StudentDashboard";
 import Reservaties from "./inloggen-student/Reservaties";
 import Profiel from "./inloggen-student/Profiel";
 import Contact from "./inloggen-student/Contact";
-import ContactNavbalk from "./voor-inloggen/contactNavbalk";
+
+// Company Components
+import BedrijfHome from "./inloggen-bedrijf/homeBedrijf.jsx";
+import BedrijfStudenten from "./inloggen-bedrijf/Studenten.jsx";
+import BedrijfReservaties from "./inloggen-bedrijf/reservatieBedrijf.jsx";
+import BedrijfContact from "./inloggen-bedrijf/contactBedrijf.jsx";
+import BedrijfProfiel from "./inloggen-bedrijf/profielBedrijf.jsx";
+
+// Context
 import { useAuth } from "./AuthContext.jsx";
-import SpeeddatePage from "./voor-inloggen/SpeeddatePage";
 
 function App() {
   const { user } = useAuth();
@@ -32,7 +44,54 @@ function App() {
           <Route path="contactNavbalk" element={<ContactNavbalk />} />
         </Route>
 
-        {/* Beschermde routes */}
+        {/* Bedrijfspagina's met eigen prefix */}
+        <Route path="/bedrijf/home" element={
+          <ProtectedRoute>
+            {user && user.type === 'bedrijf' ? (
+              <BedrijfHome />
+            ) : (
+              <div>Geen toegang</div>
+            )}
+          </ProtectedRoute>
+        } />
+        <Route path="/bedrijf/studenten" element={
+          <ProtectedRoute>
+            {user && user.type === 'bedrijf' ? (
+              <BedrijfStudenten />
+            ) : (
+              <div>Geen toegang</div>
+            )}
+          </ProtectedRoute>
+        } />
+        <Route path="/bedrijf/reservaties" element={
+          <ProtectedRoute>
+            {user && user.type === 'bedrijf' ? (
+              <BedrijfReservaties />
+            ) : (
+              <div>Geen toegang</div>
+            )}
+          </ProtectedRoute>
+        } />
+        <Route path="/bedrijf/contact" element={
+          <ProtectedRoute>
+            {user && user.type === 'bedrijf' ? (
+              <BedrijfContact />
+            ) : (
+              <div>Geen toegang</div>
+            )}
+          </ProtectedRoute>
+        } />
+        <Route path="/bedrijf/profiel" element={
+          <ProtectedRoute>
+            {user && user.type === 'bedrijf' ? (
+              <BedrijfProfiel />
+            ) : (
+              <div>Geen toegang</div>
+            )}
+          </ProtectedRoute>
+        } />
+
+        {/* Student-routes */}
         <Route path="/" element={<UserLayout />}>
           <Route path="student-dashboard" element={
             <ProtectedRoute>

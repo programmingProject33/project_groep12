@@ -1,0 +1,109 @@
+.profielbedrijf-main {
+  max-width: 900px;
+  margin: 3rem auto 2rem auto;
+  background: #fff;
+  border-radius: 1.1rem;
+  box-shadow: 0 1px 6px rgba(30,41,59,0.07);
+  padding: 2.5rem 2.5rem 2.2rem 2.5rem;
+  min-height: 430px;
+}
+
+.profielbedrijf-logout-btn {
+  margin-top: 2rem;
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.profielbedrijf-logout-btn:hover {
+  background: #fecaca;
+}
+
+.profielbedrijf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 2rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.profielbedrijf-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #222;
+  gap: 6px;
+}
+
+.profielbedrijf-form input,
+.profielbedrijf-form textarea {
+  padding: 10px 12px;
+  border: 1px solid #bdbdbd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fafbfc;
+  transition: border 0.2s;
+}
+.profielbedrijf-form input:focus,
+.profielbedrijf-form textarea:focus {
+  border: 1.5px solid #2563eb;
+  outline: none;
+}
+.profielbedrijf-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.profielbedrijf-edit-btn,
+.profielbedrijf-save-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+.profielbedrijf-edit-btn:hover,
+.profielbedrijf-save-btn:hover {
+  background: #1d4ed8;
+}
+
+.profielbedrijf-success {
+  color: #2e7d32;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  text-align: center;
+}
+.profielbedrijf-error {
+  color: #c62828;
+  background: #ffebee;
+  border: 1px solid #ef9a9a;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .profielbedrijf-main {
+    padding: 1.2rem 0.7rem;
+  }
+  .profielbedrijf-form {
+    max-width: 100%;
+  }
+}

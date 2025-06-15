@@ -1,0 +1,101 @@
+.hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2rem;
+    margin: 3rem auto 2rem;
+    max-width: 1100px;
+    padding: 2.5rem;
+    background: #eaf1fb;
+    border-radius: 1.25rem;
+  }
+  
+  .hero-content {
+    flex: 2;
+  }
+  
+  .hero-content h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
+  }
+  
+  .hero-content p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    color: #475569;
+  }
+  
+  /* Hero afbeelding (placeholder) */
+  .hero-img {
+    flex: 1;
+    min-width: 300px;
+    min-height: 180px;
+    border-radius: 1rem;
+    background: #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .hero-info {
+    padding: 1.2rem;
+  }
+  
+  .hero-info-item {
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+  }
+  
+  .hero-info-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Info Cards section */
+  .info-section {
+    max-width: 1100px;
+    margin: 2.5rem auto 0;
+    padding: 0 2rem;
+  }
+  
+  .info-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+  }
+  
+  .cards {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding: 1rem;
+  }
+  
+  .card {
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(20,23,31,0.05);
+    border-radius: 1rem;
+    padding: 2rem;
+    flex: 1 1 250px;
+    min-width: 260px;
+    max-width: 320px;
+  }
+  
+  .card h3 {
+    font-size: 1.18rem;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+  }
+  
+  .card p {
+    font-size: 1rem;
+    color: #64748b;
+  }
+  
+  @media (max-width: 900px) {
+    .hero {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }

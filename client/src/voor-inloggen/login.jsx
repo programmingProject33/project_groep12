@@ -115,6 +115,8 @@ const Login = () => {
 
       const data = await response.json();
 
+      console.log("Login response user:", data.user);
+
       if (!response.ok) {
         throw new Error(data.error || 'Er is iets misgegaan');
       }
@@ -126,7 +128,7 @@ const Login = () => {
       if (data.user.type === 'student') {
         navigate('/student-dashboard');
       } else {
-        navigate('/bedrijf-dashboard');
+        navigate('/bedrijf/home');
       }
     } catch (err) {
       setError(err.message);
