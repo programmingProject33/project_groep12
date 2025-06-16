@@ -8,6 +8,8 @@ app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
+// === Initialisatie bedrijven-tabel verwijderd ===
+
 // Root route
 app.get('/', (req, res) => {
   res.json({ message: 'CareerLaunch API is running' });
@@ -15,12 +17,14 @@ app.get('/', (req, res) => {
 
 // Login endpoint
 app.post('/api/login', async (req, res) => {
+  console.log('Login endpoint aangeroepen met body:', req.body); // Debug log
   try {
     const { gebruikersnaam, wachtwoord, type } = req.body;
     console.log('Login attempt:', { gebruikersnaam, type });
 
     // Determine which table to query based on user type
     const table = type === 'student' ? 'gebruikers' : 'bedrijven';
+    
     // Query the appropriate table
     const [users] = await db.promise().query(
       `SELECT * FROM ${table} WHERE gebruikersnaam = ? AND wachtwoord = ?`,
@@ -29,17 +33,9 @@ app.post('/api/login', async (req, res) => {
 
     if (users.length > 0) {
       const user = users[0];
+      // Remove sensitive information
       delete user.wachtwoord;
-      // Parse dienstverbanden als JSON-array
-      if (user.dienstverbanden) {
-        try {
-          user.dienstverbanden = JSON.parse(user.dienstverbanden);
-        } catch (e) {
-          user.dienstverbanden = [];
-        }
-      } else {
-        user.dienstverbanden = [];
-      }
+      
       res.json({
         message: 'Login succesvol',
         user: {
@@ -51,7 +47,7 @@ app.post('/api/login', async (req, res) => {
       res.status(401).json({ error: 'Ongeldige gebruikersnaam of wachtwoord' });
     }
   } catch (err) {
-    console.error('Login error:', err);
+    console.error('Login error:', err); // Log de error
     res.status(500).json({ 
       error: 'Database error', 
       details: err.message 
@@ -126,7 +122,6 @@ app.get('/api/structure', (req, res) => {
 
 // User registration endpoint
 app.post('/api/register', async (req, res) => {
-  console.log('Received registration request:', req.body);
   const { type, ...userData } = req.body;
 
   if (type === 'student') {
@@ -159,31 +154,15 @@ app.post('/api/register', async (req, res) => {
       });
     }
   } else if (type === 'bedrijf') {
-    const {
+    const { 
       bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
       voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
-      gebruikersnaam_bedrijf, wachtwoord_bedrijf, sector, beschrijving, zoeken_we
+      gebruikersnaam_bedrijf, wachtwoord_bedrijf 
     } = userData;
-    // Map frontend fields to database columns
-    const bedrijf_URL = ""; // Not provided by frontend
-    const naam = bedrijfsnaam;
-    const BTW_nr = btw;
-    const huis_nr = ""; // Not provided by frontend
-    const bus_nr = ""; // Not provided by frontend
-    const contact_email = email_contact;
-    const contact_naam = naam_contact;
-    const contact_specialisatie = specialisatie;
-    const contact_telefoon = tel_contact;
-    const contact_voornaam = voornaam_contact;
-    const email = emailbedrijf;
-    const gebruikersnaam = gebruikersnaam_bedrijf;
-    const telefoon_nr = telbedrijf;
-    const wachtwoord = wachtwoord_bedrijf;
-    const straatnaam = straat;
-    const postcode = ""; // Not provided by frontend
+    
     // Check if company already exists
-    db.query('SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?',
-      [email, gebruikersnaam],
+    db.query('SELECT * FROM bedrijven WHERE emailbedrijf = ? OR gebruikersnaam = ?', 
+      [emailbedrijf, gebruikersnaam_bedrijf], 
       (err, results) => {
         if (err) {
           console.error('Database error checking existing company:', err);
@@ -192,38 +171,30 @@ app.post('/api/register', async (req, res) => {
         if (results.length > 0) {
           return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
         }
+        
         // Insert new company
         const query = `INSERT INTO bedrijven (
-          bedrijf_URL, beschrijving, BTW_nr, bus_nr, contact_email, contact_naam, contact_specialisatie, contact_telefoon, contact_voornaam, email, gebruikersnaam, gemeente, huis_nr, naam, postcode, sector, straatnaam, telefoon_nr, wachtwoord, zoeken_we
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+          bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
+          voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
+          gebruikersnaam, wachtwoord
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        
         const values = [
-          bedrijf_URL, beschrijving, BTW_nr, bus_nr, contact_email, contact_naam, contact_specialisatie, contact_telefoon, contact_voornaam, email, gebruikersnaam, gemeente, huis_nr, naam, postcode, sector, straatnaam, telefoon_nr, wachtwoord, zoeken_we
+          bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
+          voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
+          gebruikersnaam_bedrijf, wachtwoord_bedrijf
         ];
-        db.query(query, values, async (err, result) => {
+        
+        console.log('Executing query:', query);
+        console.log('With values:', values);
+        
+        db.query(query, values, (err, result) => {
           if (err) {
             console.error('Database error creating company:', err);
             return res.status(500).json({ error: 'Database error', details: err.message });
           }
           console.log('Company created successfully:', result);
-          // Create timeslots for this bedrijf
-          const bedrijf_id = result.insertId;
-          const date = new Date();
-          date.setHours(10, 0, 0, 0); // 10:00
-          const slots = [];
-          for (let i = 0; i < 8 * 6; i++) { // 8 hours * 6 slots per hour = 48 slots
-            const start = new Date(date.getTime() + i * 10 * 60000);
-            const end = new Date(start.getTime() + 10 * 60000);
-            slots.push([start, end, 0, null, bedrijf_id]);
-          }
-          try {
-            await db.promise().query(
-              'INSERT INTO speeddates (starttijd, eindtijd, is_bezet, user_id, bedrijf_id) VALUES ?',[slots]
-            );
-            res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt en timeslots aangemaakt' });
-          } catch (err2) {
-            console.error('Error creating timeslots:', err2);
-            res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt, maar timeslots NIET aangemaakt', error: err2.message });
-          }
+          res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt' });
         });
       }
     );
@@ -373,25 +344,38 @@ app.get('/api/profiel/:id', async (req, res) => {
   }
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+// Get all students
+app.get('/api/studenten', async (req, res) => {
+  try {
+    const [studenten] = await db.promise().query('SELECT * FROM gebruikers');
+    res.json(studenten);
+  } catch (err) {
+    console.error('Error fetching students:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
 });
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).json({ 
-    error: 'Internal server error', 
-    details: err.message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-  });
-});
+// Get single student profile
+app.get('/api/studenten/:studentId', async (req, res) => {
+  try {
+    const [studenten] = await db.promise().query(
+      'SELECT * FROM gebruikers WHERE id = ?',
+      [req.params.studentId]
+    );
+    
+    if (studenten.length === 0) {
+      return res.status(404).json({ error: 'Student niet gevonden' });
+    }
 
-app.listen(PORT, () => {
-  console.log(`Server draait op http://localhost:${PORT}`);
+    const student = studenten[0];
+    delete student.wachtwoord; // Remove password from response
+    
+    res.json(student);
+  } catch (err) {
+    console.error('Error fetching student profile:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
 });
-
 
 //    Opmerking verwijder niet deze script want ik gaan dat later hergebruiken
 
@@ -444,3 +428,44 @@ data.forEach(bedrijf => {
 console.log(`ingevoegd: ${name}`);
 });
 */
+
+// Profiel van bedrijf updaten
+app.post('/api/bedrijf/update', async (req, res) => {
+  console.log('Ontvangen body voor update:', req.body); // Debug log
+  const { id, naam, email, gebruikersnaam, beschrijving, bedrijf_URL } = req.body;
+  if (!id) {
+    return res.status(400).json({ error: 'Bedrijf ID ontbreekt' });
+  }
+  try {
+    await db.promise().query(
+      `UPDATE bedrijven SET naam = ?, email = ?, gebruikersnaam = ?, beschrijving = ?, bedrijf_URL = ? WHERE bedrijf_id = ?`,
+      [naam, email, gebruikersnaam, beschrijving, bedrijf_URL, id]
+    );
+    res.json({ message: 'Profiel succesvol bijgewerkt' });
+  } catch (err) {
+    console.error('Fout bij updaten profiel:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Get reservations for a company
+app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
+  try {
+    const [reservaties] = await db.promise().query(
+      `SELECT s.*, g.voornaam, g.naam, g.gebruikersnaam, g.email 
+       FROM speeddates s 
+       JOIN gebruikers g ON s.user_id = g.id 
+       WHERE s.bedrijf_id = ? AND s.is_bezet = 1 
+       ORDER BY s.starttijd ASC`,
+      [req.params.bedrijfId]
+    );
+    res.json(reservaties);
+  } catch (err) {
+    console.error('Error fetching company reservations:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

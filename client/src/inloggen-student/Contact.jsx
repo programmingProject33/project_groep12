@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 import { IoSend } from "react-icons/io5";
@@ -6,6 +6,7 @@ import "./Contact.css";
 
 export default function Contact() {
   const navigate = useNavigate();
+  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -13,6 +14,11 @@ export default function Contact() {
       navigate("/login", { replace: true });
     }
   }, [navigate]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSent(true);
+  };
 
   return (
     <div className="contact-page">
@@ -51,8 +57,7 @@ export default function Contact() {
             <p>Nijverheidskaai 170, 1070 Anderlecht</p>
           </div>
         </div>
-
-        <form className="contact-form">
+        <form className="contact-form" onSubmit={handleSubmit}>
           <label>
             Naam
             <input type="text" required placeholder="Jouw naam" />

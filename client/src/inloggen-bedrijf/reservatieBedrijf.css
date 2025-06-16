@@ -1,0 +1,91 @@
+.reservatiebedrijf-main {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  background: #fff;
+  border-radius: 1.1rem;
+  box-shadow: 0 1px 6px rgba(30,41,59,0.07);
+  min-height: 430px;
+}
+
+.reservatiebedrijf-main h1 {
+  color: #2563eb;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.filter-container {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-container label {
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.filter-container input[type="date"] {
+  padding: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+.clear-filter {
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  color: #4b5563;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-filter:hover {
+  background-color: #e5e7eb;
+}
+
+.reservaties-table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.reservaties-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.reservaties-table th,
+.reservaties-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.reservaties-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.reservaties-table tr:last-child td {
+  border-bottom: none;
+}
+
+.reservaties-table tr:hover {
+  background-color: #f8fafc;
+}
+
+.error-message {
+  color: #dc2626;
+  padding: 1rem;
+  background-color: #fee2e2;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+}

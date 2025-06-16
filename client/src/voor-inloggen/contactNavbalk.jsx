@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./contactNavbalk.css";
 import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 
 export default function Contact() {
   const navigate = useNavigate();
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSent(true);
+  };
 
   return (
     <div>
@@ -34,7 +40,7 @@ export default function Contact() {
 
         <section className="contact-form-section">
           <h2>Send us a Message</h2>
-          <form className="contact-form">
+          <form className="contact-form" onSubmit={handleSubmit}>
             <label>
               Voornaam + Achternaam
               <input type="text" placeholder="Enter your name" required />
@@ -54,6 +60,11 @@ export default function Contact() {
             <button type="submit" className="contact-btn">
               Verzenden
             </button>
+            {sent && (
+              <div style={{ color: "green", marginTop: "1rem", fontWeight: 600 }}>
+                Je bericht werd goed verstuurd!
+              </div>
+            )}
           </form>
         </section>
       </main>
