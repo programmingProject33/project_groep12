@@ -24,6 +24,7 @@ export default function Reservaties() {
           throw new Error('Fout bij het ophalen van de reservaties');
         }
         const data = await response.json();
+        console.log('API reservaties response:', data);
         setReservaties(data);
       } catch (err) {
         setError(err.message);
@@ -116,7 +117,6 @@ export default function Reservaties() {
                       <th>Datum</th>
                       <th>Tijdstip</th>
                       <th>LinkedIn</th>
-                      <th>Acties</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -133,14 +133,6 @@ export default function Reservaties() {
                           ) : (
                             <span style={{ color: '#aaa', fontStyle: 'italic' }}>Geen profiel beschikbaar</span>
                           )}
-                        </td>
-                        <td>
-                          <button 
-                            className="studenten-action-btn"
-                            onClick={() => fetchStudent(reservatie.student_id)}
-                          >
-                            Bekijk Profiel
-                          </button>
                         </td>
                       </tr>
                     ))}

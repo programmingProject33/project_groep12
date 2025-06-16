@@ -124,6 +124,7 @@ const Reservaties = () => {
               </thead>
               <tbody>
                 {reservations.map((reservation) => {
+                  console.log('student_id in row:', reservation.student_id);
                   const desc = reservation.beschrijving || "";
                   const isLong = desc.length > MAX_DESC;
                   const isExpanded = expanded[reservation.speed_id];

@@ -218,6 +218,25 @@ app.post('/api/speeddate', async (req, res) => {
       return res.status(400).json({ error: 'Je hebt al een reservatie bij dit bedrijf. Annuleer eerst je bestaande reservatie om een nieuwe te maken.' });
     }
 
+    // Haal het tijdstip van het gewenste slot op
+    const [slotRows] = await db.promise().query(
+      'SELECT starttijd FROM speeddates WHERE speed_id = ?',
+      [speed_id]
+    );
+    if (slotRows.length === 0) {
+      return res.status(400).json({ error: 'Tijdslot niet gevonden.' });
+    }
+    const { starttijd } = slotRows[0];
+
+    // Controleer of de student op dit tijdstip al ergens anders een reservatie heeft
+    const [conflict] = await db.promise().query(
+      'SELECT * FROM speeddates WHERE user_id = ? AND starttijd = ? AND is_bezet = 1',
+      [user_id, starttijd]
+    );
+    if (conflict.length > 0) {
+      return res.status(400).json({ error: 'Je hebt al een reservatie bij een ander bedrijf op dit tijdstip.' });
+    }
+
     // Find the exact slot by speed_id
     const [slots] = await db.promise().query(
       'SELECT * FROM speeddates WHERE speed_id = ? AND bedrijf_id = ? AND is_bezet = 0',
