@@ -5,6 +5,14 @@ import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 // useNavigate is een hook (speciale functie) die je gebruikt om te navigeren (pagina veranderen) zonder dat de pagina helemaal opnieuw laadt.
 
+const STUDIE_OPLEIDINGEN = [
+  "Bachelor Toegepaste Informatica",
+  "Internet of Things",
+  "Toegepaste Artificiële Intelligentie",
+  "Multimedia & Creatieve Technologie",
+  "Elektromechanische Systemen"
+];
+
 export default function Registreer()   // Dit is een functionele component in React. Het maakt de registratiepagina.
  {
    const [activeTab, setActiveTab] = useState("student");  // Hier gebruiken we een hook (useState) om bij te houden welke tab actief is (student of bedrijf).
@@ -223,25 +231,32 @@ export default function Registreer()   // Dit is een functionele component in Re
               </label>
               <label>
                 Opleiding:
-                <input 
-                  type="text" 
+                <select 
                   name="opleiding" 
                   value={studentForm.opleiding}
                   onChange={handleStudentChange}
                   required
-                />
+                  className="registerstudent-form select"
+                >
+                  {STUDIE_OPLEIDINGEN.map((opleiding) => (
+                    <option key={opleiding} value={opleiding}>
+                      {opleiding}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label>
                 Opleiding Jaar:
-                <input 
-                  type="number" 
+                <select 
                   name="opleiding_jaar" 
                   value={studentForm.opleiding_jaar}
                   onChange={handleStudentChange}
-                  min="1"
-                  max="4"
                   required
-                />
+                  className="registerstudent-form select"
+                >
+                  <option value="2">Jaar 2</option>
+                  <option value="3">Jaar 3</option>
+                </select>
               </label>
               <label>
                 Wachtwoord:
