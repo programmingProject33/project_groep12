@@ -107,3 +107,204 @@
     max-width: 100%;
   }
 }
+
+.bedrijfprofiel-bg {
+  min-height: 100vh;
+  background: #f9fbff;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.bedrijfprofiel-card {
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(30,41,59,0.10);
+  padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+  max-width: 540px;
+  width: 100%;
+  margin: 2.5rem auto 2.5rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  animation: fadein 0.7s cubic-bezier(.4,0,.2,1);
+}
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bedrijfprofiel-avatar-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.bedrijfprofiel-avatar-letter {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.7rem;
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(59,130,246,0.13);
+  border: 3px solid #e0e7ff;
+  margin-bottom: 0.2rem;
+}
+
+.bedrijfprofiel-title {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.2rem;
+  text-align: center;
+}
+.bedrijfprofiel-sub {
+  color: #64748b;
+  font-size: 1.05rem;
+  margin-bottom: 0.7rem;
+  text-align: center;
+}
+.bedrijfprofiel-success {
+  width: 100%;
+  margin-bottom: 0.7rem;
+  color: #15803d;
+  background: #bbf7d0;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1.1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 1.05rem;
+  animation: fadein 0.5s;
+}
+.bedrijfprofiel-error {
+  width: 100%;
+  margin-bottom: 0.7rem;
+  color: #b91c1c;
+  background: #fee2e2;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1.1rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 1.05rem;
+  animation: fadein 0.5s;
+}
+.bedrijfprofiel-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-top: 0.2rem;
+}
+.bedrijfprofiel-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.bedrijfprofiel-field label {
+  font-size: 1.01rem;
+  color: #2563eb;
+  font-weight: 600;
+  margin-bottom: 0.1rem;
+}
+.bedrijfprofiel-input {
+  font-size: 1.08rem;
+  color: #1e293b;
+  font-weight: 500;
+  background: #f3f4f6;
+  border-radius: 0.7rem;
+  border: 1.5px solid #e0e7ef;
+  padding: 0.7rem 1.1rem;
+  transition: box-shadow 0.18s, border 0.18s, background 0.18s;
+  outline: none;
+  margin-bottom: 0.1rem;
+}
+.bedrijfprofiel-input:focus {
+  border: 1.5px solid #3b82f6;
+  box-shadow: 0 0 0 3px #dbeafe;
+  background: #fff;
+}
+.bedrijfprofiel-input.editable {
+  background: #fff !important;
+  border: 1.5px solid #3b82f6 !important;
+  color: #1e293b;
+  cursor: text;
+  box-shadow: 0 0 0 3px #dbeafe;
+  transition: box-shadow 0.18s, border 0.18s, background 0.18s;
+}
+.bedrijfprofiel-input.editable:hover {
+  box-shadow: 0 2px 12px rgba(59,130,246,0.13), 0 0 0 3px #dbeafe;
+  background: #fff;
+  border: 1.5px solid #2563eb;
+}
+.bedrijfprofiel-input[disabled] {
+  opacity: 0.7;
+  background: #f3f4f6 !important;
+  color: #64748b;
+  cursor: not-allowed;
+}
+.bedrijfprofiel-error-msg {
+  color: #dc2626;
+  font-size: 0.93rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+  font-weight: 500;
+}
+.bedrijfprofiel-btn-row {
+  display: flex;
+  gap: 1.1rem;
+  margin-top: 0.7rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.bedrijfprofiel-btn {
+  border: none;
+  border-radius: 0.7rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+  padding: 0.7rem 1.7rem;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.07);
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+  margin-bottom: 0.1rem;
+}
+.bedrijfprofiel-btn.primary {
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  color: #fff;
+}
+.bedrijfprofiel-btn.primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 18px rgba(59,130,246,0.13);
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+}
+.bedrijfprofiel-btn.logout {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.bedrijfprofiel-btn.logout:hover {
+  background: #fecaca;
+  color: #b91c1c;
+  transform: scale(1.05);
+}
+@media (max-width: 700px) {
+  .bedrijfprofiel-card {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  .bedrijfprofiel-avatar-letter {
+    width: 70px;
+    height: 70px;
+    font-size: 2rem;
+  }
+  .bedrijfprofiel-btn-row {
+    flex-direction: column;
+    gap: 0.7rem;
+    align-items: stretch;
+  }
+}

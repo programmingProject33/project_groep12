@@ -3,8 +3,10 @@ import BedrijfNavbar from "./BedrijfNavbar";
 import BedrijfFooter from "./bedrijfFooter";
 import "./Studenten.css";
 import { FaLinkedin } from "react-icons/fa";
+import { useAuth } from "../AuthContext.jsx";
 
 export default function Studenten() {
+  const { user, isAuthLoading } = useAuth();
   const [studenten, setStudenten] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -16,6 +18,8 @@ export default function Studenten() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentLoading, setStudentLoading] = useState(false);
   const [studentError, setStudentError] = useState("");
+
+  if (isAuthLoading) return null;
 
   useEffect(() => {
     const fetchStudenten = async () => {
@@ -53,7 +57,27 @@ export default function Studenten() {
     }
   };
 
+  const normalizeDienstverband = (val) => {
+    if (!val) return [];
+    let arr = val;
+    if (typeof arr === 'string') {
+      try {
+        arr = JSON.parse(arr);
+      } catch {
+        arr = arr.replace(/\\/g, '').replace(/\[|\]|"/g, '').split(',').map(d => d.trim()).filter(Boolean);
+      }
+    }
+    if (!Array.isArray(arr)) arr = [String(arr)];
+    const norm = arr.map(d => d.replace(/\\/g, '').replace(/"/g, '').trim().toLowerCase());
+    return norm;
+  };
+
   const filteredStudenten = studenten.filter(student => {
+    const dienstverbandRaw = student.dienstverbanden || student.dienstverband || '';
+    const dienstverbandArr = normalizeDienstverband(dienstverbandRaw);
+    console.log('Student:', student.naam, '| Origineel:', dienstverbandRaw, '| Genormaliseerd:', dienstverbandArr);
+    const filterDienstverbandNorm = filterDienstverband.toLowerCase();
+
     const matchesSearch = 
       student.naam.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.opleiding.toLowerCase().includes(searchTerm.toLowerCase());
@@ -63,8 +87,8 @@ export default function Studenten() {
       student.opleiding.toLowerCase() === filterOpleiding.toLowerCase();
 
     const matchesDienstverband =
-      filterDienstverband === "alle" ||
-      (student.dienstverband && student.dienstverband.toLowerCase() === filterDienstverband.toLowerCase());
+      filterDienstverbandNorm === "alle" ||
+      dienstverbandArr.includes(filterDienstverbandNorm);
 
     return matchesSearch && matchesOpleiding && matchesDienstverband;
   });
@@ -151,7 +175,6 @@ export default function Studenten() {
               <option value="desc">Aflopend (Z-A / Laatste)</option>
             </select>
           </div>
-          
           <div className="filter-container">
             <select
               value={filterOpleiding}
@@ -161,19 +184,6 @@ export default function Studenten() {
               {opleidingen.map(opleiding => (
                 <option key={opleiding} value={opleiding}>
                   {opleiding === "alle" ? "Alle opleidingen" : opleiding}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="filter-container">
-            <select
-              value={filterDienstverband}
-              onChange={(e) => setFilterDienstverband(e.target.value)}
-              className="studenten-filter"
-            >
-              {dienstverbanden.map(dienstverband => (
-                <option key={dienstverband} value={dienstverband}>
-                  {dienstverband === "alle" ? "Alle dienstverbanden" : dienstverband}
                 </option>
               ))}
             </select>
@@ -197,15 +207,9 @@ export default function Studenten() {
                   <td>{student.opleiding}</td>
                   <td>{
                     (() => {
-                      if (!student.dienstverbanden) return <span style={{color:'#aaa'}}>Niet opgegeven</span>;
-                      if (Array.isArray(student.dienstverbanden)) return student.dienstverbanden.join(', ');
-                      try {
-                        const arr = JSON.parse(student.dienstverbanden);
-                        if (Array.isArray(arr)) return arr.map(d => d.trim()).join(', ');
-                        return String(student.dienstverbanden).replace(/\[|\]|"/g, '');
-                      } catch {
-                        return String(student.dienstverbanden).replace(/\[|\]|"/g, '').split(',').map(d => d.trim()).filter(Boolean).join(', ');
-                      }
+                      const dienstverbandRaw = student.dienstverbanden || student.dienstverband || '';
+                      const arr = normalizeDienstverband(dienstverbandRaw);
+                      return arr.length ? arr.join(', ') : <span style={{color:'#aaa'}}>Niet opgegeven</span>;
                     })()
                   }</td>
                   <td>

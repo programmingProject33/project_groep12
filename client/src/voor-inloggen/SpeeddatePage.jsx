@@ -13,6 +13,20 @@ export default function SpeeddatePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const fetchTimeslots = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/speeddates/${bedrijfId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch timeslots');
+      }
+      const data = await response.json();
+      setTimeslots(data);
+    } catch (err) {
+      console.error('Error fetching timeslots:', err);
+      setErrorMessage('Er is een fout opgetreden bij het ophalen van de tijdsloten.');
+    }
+  };
+
   useEffect(() => {
     // Fetch bedrijf details by ID
     fetch("http://localhost:5000/api/bedrijven")
@@ -26,14 +40,21 @@ export default function SpeeddatePage() {
   useEffect(() => {
     // Alleen tijdsloten ophalen als de gebruiker is ingelogd
     if (user) {
-      fetch(`http://localhost:5000/api/speeddates/${bedrijfId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          setTimeslots(data);
-        });
+      fetchTimeslots();
     }
   }, [bedrijfId, user]);
+
+  // Luister naar het 'reservationCancelled' event
+  useEffect(() => {
+    const handleReservationCancelled = () => {
+      fetchTimeslots();
+    };
+
+    window.addEventListener('reservationCancelled', handleReservationCancelled);
+    return () => {
+      window.removeEventListener('reservationCancelled', handleReservationCancelled);
+    };
+  }, []);
 
   const handleReserve = async () => {
     if (!user || !user.id) {

@@ -7,7 +7,7 @@ import "./Studenten.css";
 import { FaLinkedin } from "react-icons/fa";
 
 export default function Reservaties() {
-  const { user } = useAuth();
+  const { user, isAuthLoading } = useAuth();
   const [reservaties, setReservaties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,6 +15,8 @@ export default function Reservaties() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentLoading, setStudentLoading] = useState(false);
   const [studentError, setStudentError] = useState("");
+
+  if (isAuthLoading) return null;
 
   useEffect(() => {
     const fetchReservaties = async () => {

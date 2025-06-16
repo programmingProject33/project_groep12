@@ -48,8 +48,9 @@ const tips = [
 ];
 
 export default function StudentDashboard() {
-  const { user } = useAuth();
+  const { user, isAuthLoading } = useAuth();
   const navigate = useNavigate();
+  if (isAuthLoading) return null;
   const voornaam = user?.voornaam || "Student";
   const initiaal = voornaam[0]?.toUpperCase() || "S";
 

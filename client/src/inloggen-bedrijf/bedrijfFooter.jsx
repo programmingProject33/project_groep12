@@ -6,7 +6,8 @@ import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 
 export default function BedrijfFooter() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isAuthLoading } = useAuth();
+  if (isAuthLoading) return null;
   if (!user || user.type !== 'bedrijf') return null;
 
   return (

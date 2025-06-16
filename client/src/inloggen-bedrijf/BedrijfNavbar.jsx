@@ -5,8 +5,12 @@ import { useAuth } from "../AuthContext.jsx";
 
 export default function BedrijfNavbar() {
   const location = useLocation();
-  const { user } = useAuth();
-  if (!user || user.type !== 'bedrijf') return null;
+  const { user, isAuthLoading } = useAuth();
+  if (isAuthLoading) return null;
+  if (!user || user.type !== 'bedrijf') {
+    return null;
+  }
+
   return (
     <nav className="navbar bedrijf-navbar">
       <div className="navbar-logo">
@@ -20,11 +24,11 @@ export default function BedrijfNavbar() {
         <li className={location.pathname === "/bedrijf/studenten" ? "active" : ""}>
           <Link to="/bedrijf/studenten">Studenten</Link>
         </li>
-        <li className={location.pathname === "/bedrijf/contact" ? "active" : ""}>
-          <Link to="/bedrijf/contact">Contact</Link>
-        </li>
         <li className={location.pathname === "/bedrijf/reservaties" ? "active" : ""}>
           <Link to="/bedrijf/reservaties">Reservaties</Link>
+        </li>
+        <li className={location.pathname === "/bedrijf/contact" ? "active" : ""}>
+          <Link to="/bedrijf/contact">Contact</Link>
         </li>
       </ul>
       <Link to="/bedrijf/profiel" className="navbar-icon" aria-label="Profiel">

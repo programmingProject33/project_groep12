@@ -69,6 +69,9 @@ const Reservaties = () => {
         throw new Error('Annuleren mislukt');
       }
       setReservations((prev) => prev.filter((r) => r.speed_id !== speed_id));
+      
+      // Trigger het event om de tijdsloten te updaten
+      window.dispatchEvent(new Event('reservationCancelled'));
     } catch (err) {
       alert('Er is een fout opgetreden bij het annuleren.');
     }

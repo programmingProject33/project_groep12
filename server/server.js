@@ -437,11 +437,29 @@ app.post('/api/bedrijf/update', async (req, res) => {
     return res.status(400).json({ error: 'Bedrijf ID ontbreekt' });
   }
   try {
+    // Eerst updaten
     await db.promise().query(
       `UPDATE bedrijven SET naam = ?, email = ?, gebruikersnaam = ?, beschrijving = ?, bedrijf_URL = ? WHERE bedrijf_id = ?`,
       [naam, email, gebruikersnaam, beschrijving, bedrijf_URL, id]
     );
-    res.json({ message: 'Profiel succesvol bijgewerkt' });
+    
+    // Dan de volledige geüpdatete data ophalen
+    const [updatedBedrijf] = await db.promise().query(
+      'SELECT * FROM bedrijven WHERE bedrijf_id = ?',
+      [id]
+    );
+    
+    if (updatedBedrijf.length === 0) {
+      return res.status(404).json({ error: 'Bedrijf niet gevonden na update' });
+    }
+    
+    const user = updatedBedrijf[0];
+    delete user.wachtwoord; // Verwijder wachtwoord uit response
+    
+    res.json({
+      message: 'Profiel succesvol bijgewerkt',
+      user: user
+    });
   } catch (err) {
     console.error('Fout bij updaten profiel:', err);
     res.status(500).json({ error: 'Database error', details: err.message });

@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaCalendarAlt, FaBuilding, FaHeartbeat, FaTools, FaChalkboardTeacher, FaBullhorn, FaMoneyBillWave } from "react-icons/fa";
-import "./bedrijven.css";
+import "../voor-inloggen/bedrijven.css";
 import { useAuth } from "../AuthContext.jsx";
 
-// Accentkleuren per sector (of afwisselend)
 const sectorColors = [
-  "#3b82f6", // blauw
-  "#22c55e", // groen
-  "#a78bfa", // paars
-  "#f59e42", // oranje
-  "#f43f5e", // rood
-  "#06b6d4", // cyaan
+  "#3b82f6", "#22c55e", "#a78bfa", "#f59e42", "#f43f5e", "#06b6d4"
 ];
 const sectorIcons = {
   IT: <FaBuilding />,
@@ -22,9 +16,7 @@ const sectorIcons = {
   Finance: <FaMoneyBillWave />,
   default: <FaBuilding />
 };
-
 function getSectorColor(index, sector) {
-  // Je kunt ook per sector kleuren kiezen, nu afwisselend
   return sectorColors[index % sectorColors.length];
 }
 function getSectorIcon(sector) {
@@ -33,13 +25,14 @@ function getSectorIcon(sector) {
   return key ? sectorIcons[key] : sectorIcons.default;
 }
 
-function Bedrijven() {
+function StudentBedrijven() {
+  const { user, isAuthLoading } = useAuth();
   const [bedrijven, setBedrijven] = useState([]);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  console.log('user:', user, 'isAuthLoading:', isAuthLoading);
 
   useEffect(() => {
-    fetch("/api/bedrijven")
+    fetch("http://localhost:5000/api/bedrijven")
       .then((res) => res.json())
       .then((data) => setBedrijven(data))
       .catch((err) => console.error("Fout bij ophalen:", err));
@@ -47,7 +40,6 @@ function Bedrijven() {
 
   return (
     <div className="page-container bedrijven-modern-bg">
-      {/* Hero golfvorm bovenaan */}
       <div className="bedrijven-hero-wave">
         <svg viewBox="0 0 1440 180" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path fill="#f0f9ff" d="M0,80 C320,180 1120,0 1440,100 L1440,0 L0,0 Z" />
@@ -55,10 +47,10 @@ function Bedrijven() {
       </div>
       <main className="content-wrap">
         <div className="bedrijven-container">
-          <h1 className="bedrijven-title"><span dangerouslySetInnerHTML={{__html: "&#128269;"}} /> Ontdek onze partnerbedrijven</h1>
+          <h1 className="bedrijven-title"><span role="img" aria-label="zoek" dangerouslySetInnerHTML={{__html: "&#128269;"}} /> Ontdek onze partnerbedrijven</h1>
           <p className="bedrijven-subtitle">Kies je favoriet en plan je speeddates</p>
           <div className="bedrijven-grid">
-            {bedrijven.map((bedrijf, index) => {
+            {Array.isArray(bedrijven) && bedrijven.map((bedrijf, index) => {
               const accentColor = getSectorColor(index, bedrijf.sector);
               const icon = getSectorIcon(bedrijf.sector);
               return (
@@ -79,7 +71,7 @@ function Bedrijven() {
                       <div className="bedrijf-details">
                         <p><span role="img" aria-label="adres" dangerouslySetInnerHTML={{__html: "&#128205;"}} /> {bedrijf.straatnaam} {bedrijf.huis_nr}{bedrijf.bus_nr && ` bus ${bedrijf.bus_nr}`}, {bedrijf.postcode} {bedrijf.gemeente}</p>
                         <p><span role="img" aria-label="email" dangerouslySetInnerHTML={{__html: "&#128231;"}} /> <a href={`mailto:${bedrijf.email}`}>{bedrijf.email}</a></p>
-                        <p><span role="img" aria-label="website" dangerouslySetInnerHTML={{__html: "&#127760;"}} /> <a href={bedrijf.bedrijf_URL && bedrijf.bedrijf_URL.startsWith('http') ? bedrijf.bedrijf_URL : `https://${bedrijf.bedrijf_URL}`} target="_blank" rel="noopener noreferrer">{bedrijf.bedrijf_URL}</a></p>
+                        <p><span role="img" aria-label="website" dangerouslySetInnerHTML={{__html: "&#127760;"}} /> <a href={bedrijf.bedrijf_URL.startsWith('http') ? bedrijf.bedrijf_URL : `https://${bedrijf.bedrijf_URL}`} target="_blank" rel="noopener noreferrer">{bedrijf.bedrijf_URL}</a></p>
                       </div>
                       <button
                         className="reserveer-btn modern"
@@ -99,4 +91,4 @@ function Bedrijven() {
   );
 }
 
-export default Bedrijven; 
+export default StudentBedrijven; 
