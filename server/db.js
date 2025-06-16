@@ -15,7 +15,7 @@ connection.connect((err) =>{
         console.error('Fout bij verbinden met MySQL:', err);
         return;
     }
-    console.log('Verbonden met de MySQL database!')
+    console.log('Verbonden met de MySQL database!');
 });
 
 module.exports = connection;

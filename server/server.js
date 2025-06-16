@@ -8,6 +8,8 @@ app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
+// === Initialisatie bedrijven-tabel verwijderd ===
+
 // Root route
 app.get('/', (req, res) => {
   res.json({ message: 'CareerLaunch API is running' });
@@ -15,6 +17,7 @@ app.get('/', (req, res) => {
 
 // Login endpoint
 app.post('/api/login', async (req, res) => {
+  console.log('Login endpoint aangeroepen met body:', req.body); // Debug log
   try {
     const { gebruikersnaam, wachtwoord, type } = req.body;
     console.log('Login attempt:', { gebruikersnaam, type });
@@ -44,7 +47,7 @@ app.post('/api/login', async (req, res) => {
       res.status(401).json({ error: 'Ongeldige gebruikersnaam of wachtwoord' });
     }
   } catch (err) {
-    console.error('Login error:', err);
+    console.error('Login error:', err); // Log de error
     res.status(500).json({ 
       error: 'Database error', 
       details: err.message 
@@ -119,33 +122,25 @@ app.get('/api/structure', (req, res) => {
 
 // User registration endpoint
 app.post('/api/register', async (req, res) => {
-  console.log('Received registration request:', req.body);
   const { type, ...userData } = req.body;
-  
+
   if (type === 'student') {
     try {
-      const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar } = userData;
-      
-      // First check table structure
-      const [structure] = await db.promise().query('DESCRIBE gebruikers');
-      console.log('Table structure:', structure);
-
+      const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden } = userData;
+      const dienstverbandenStr = dienstverbanden ? JSON.stringify(dienstverbanden) : null;
       // Check if user exists
       const [existingUsers] = await db.promise().query(
         'SELECT * FROM gebruikers WHERE email = ? OR gebruikersnaam = ?',
         [email, gebruikersnaam]
       );
-
       if (existingUsers.length > 0) {
         return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
       }
-
       // Insert new user
       const [result] = await db.promise().query(
-        'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar]
+        'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbandenStr]
       );
-
       console.log('User created successfully:', result);
       res.status(201).json({ message: 'Account succesvol aangemaakt' });
     } catch (err) {
@@ -211,23 +206,35 @@ app.post('/api/register', async (req, res) => {
 // Reserve a speeddate
 app.post('/api/speeddate', async (req, res) => {
   try {
-    const { user_id, bedrijf_id, starttijd, eindtijd } = req.body;
-    if (!user_id || !bedrijf_id) {
-      return res.status(400).json({ error: 'user_id en bedrijf_id zijn verplicht' });
+    const { user_id, bedrijf_id, speed_id } = req.body;
+    if (!user_id || !bedrijf_id || !speed_id) {
+      return res.status(400).json({ error: 'user_id, bedrijf_id en speed_id zijn verplicht' });
     }
-    // Find a free slot for this bedrijf
-    const [slots] = await db.promise().query(
-      'SELECT * FROM speeddates WHERE bedrijf_id = ? AND is_bezet = 0 LIMIT 1',
-      [bedrijf_id]
+
+    // Controleer of de student al een actieve reservatie heeft bij dit bedrijf
+    const [existing] = await db.promise().query(
+      'SELECT * FROM speeddates WHERE user_id = ? AND bedrijf_id = ? AND is_bezet = 1',
+      [user_id, bedrijf_id]
     );
-    if (slots.length === 0) {
-      return res.status(400).json({ error: 'Geen vrije tijdsloten beschikbaar voor dit bedrijf' });
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'Je hebt al een reservatie bij dit bedrijf. Annuleer eerst je bestaande reservatie om een nieuwe te maken.' });
     }
+
+    // Find the exact slot by speed_id
+    const [slots] = await db.promise().query(
+      'SELECT * FROM speeddates WHERE speed_id = ? AND bedrijf_id = ? AND is_bezet = 0',
+      [speed_id, bedrijf_id]
+    );
+
+    if (slots.length === 0) {
+      return res.status(400).json({ error: 'Dit tijdslot is niet meer beschikbaar' });
+    }
+
     const slot = slots[0];
-    // Reserve the slot
+    // Reserve the exact slot
     await db.promise().query(
       'UPDATE speeddates SET is_bezet = 1, user_id = ? WHERE speed_id = ?',
-      [user_id, slot.speed_id]
+      [user_id, speed_id]
     );
     res.json({ message: 'Speeddate succesvol gereserveerd', speed_id: slot.speed_id });
   } catch (err) {
@@ -236,25 +243,139 @@ app.post('/api/speeddate', async (req, res) => {
   }
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+// Get all timeslots for a specific bedrijf
+app.get('/api/speeddates/:bedrijfId', async (req, res) => {
+  try {
+    const { bedrijfId } = req.params;
+    const [slots] = await db.promise().query(
+      'SELECT * FROM speeddates WHERE bedrijf_id = ? ORDER BY starttijd',
+      [bedrijfId]
+    );
+    console.log("bedrijfId", bedrijfId);
+    res.json(slots);
+  } catch (err) {
+    console.error('Error fetching speeddates:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
 });
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).json({ 
-    error: 'Internal server error', 
-    details: err.message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-  });
+// Get user's reservations
+app.get('/api/reservations/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const [reservations] = await db.promise().query(
+      `SELECT s.*, b.naam as bedrijfsnaam, b.sector, b.beschrijving 
+       FROM speeddates s 
+       JOIN bedrijven b ON s.bedrijf_id = b.bedrijf_id 
+       WHERE s.user_id = ? AND s.is_bezet = 1 
+       ORDER BY s.starttijd`,
+      [userId]
+    );
+    res.json(reservations);
+  } catch (err) {
+    console.error('Error fetching user reservations:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server draait op http://localhost:${PORT}`);
+// Annuleer een reservering
+app.delete('/api/reservations/:speed_id', async (req, res) => {
+  try {
+    const { speed_id } = req.params;
+    const [result] = await db.promise().query(
+      'UPDATE speeddates SET is_bezet = 0, user_id = NULL WHERE speed_id = ?',
+      [speed_id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Reservering niet gevonden.' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error annuleer reservering:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
 });
 
+// Profiel updaten (student)
+app.patch('/api/profiel/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { voornaam, naam, email, opleiding, opleiding_jaar, dienstverbanden } = req.body;
+    // dienstverbanden als JSON-string opslaan
+    const dienstverbandenStr = dienstverbanden ? JSON.stringify(dienstverbanden) : null;
+    const [result] = await db.promise().query(
+      `UPDATE gebruikers SET voornaam = ?, naam = ?, email = ?, opleiding = ?, opleiding_jaar = ?, dienstverbanden = ? WHERE id = ?`,
+      [voornaam, naam, email, opleiding, opleiding_jaar, dienstverbandenStr, id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Gebruiker niet gevonden.' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error profiel updaten:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Profiel ophalen (student)
+app.get('/api/profiel/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.promise().query('SELECT * FROM gebruikers WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Gebruiker niet gevonden.' });
+    }
+    const user = rows[0];
+    // Parse dienstverbanden als JSON-array
+    if (user.dienstverbanden) {
+      try {
+        user.dienstverbanden = JSON.parse(user.dienstverbanden);
+      } catch (e) {
+        user.dienstverbanden = [];
+      }
+    } else {
+      user.dienstverbanden = [];
+    }
+    delete user.wachtwoord;
+    res.json(user);
+  } catch (err) {
+    console.error('Error profiel ophalen:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Get all students
+app.get('/api/studenten', async (req, res) => {
+  try {
+    const [studenten] = await db.promise().query('SELECT * FROM gebruikers');
+    res.json(studenten);
+  } catch (err) {
+    console.error('Error fetching students:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Get single student profile
+app.get('/api/studenten/:studentId', async (req, res) => {
+  try {
+    const [studenten] = await db.promise().query(
+      'SELECT * FROM gebruikers WHERE id = ?',
+      [req.params.studentId]
+    );
+    
+    if (studenten.length === 0) {
+      return res.status(404).json({ error: 'Student niet gevonden' });
+    }
+
+    const student = studenten[0];
+    delete student.wachtwoord; // Remove password from response
+    
+    res.json(student);
+  } catch (err) {
+    console.error('Error fetching student profile:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
 
 //    Opmerking verwijder niet deze script want ik gaan dat later hergebruiken
 
@@ -307,3 +428,44 @@ data.forEach(bedrijf => {
 console.log(`ingevoegd: ${name}`);
 });
 */
+
+// Profiel van bedrijf updaten
+app.post('/api/bedrijf/update', async (req, res) => {
+  console.log('Ontvangen body voor update:', req.body); // Debug log
+  const { id, naam, email, gebruikersnaam, beschrijving, bedrijf_URL } = req.body;
+  if (!id) {
+    return res.status(400).json({ error: 'Bedrijf ID ontbreekt' });
+  }
+  try {
+    await db.promise().query(
+      `UPDATE bedrijven SET naam = ?, email = ?, gebruikersnaam = ?, beschrijving = ?, bedrijf_URL = ? WHERE bedrijf_id = ?`,
+      [naam, email, gebruikersnaam, beschrijving, bedrijf_URL, id]
+    );
+    res.json({ message: 'Profiel succesvol bijgewerkt' });
+  } catch (err) {
+    console.error('Fout bij updaten profiel:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Get reservations for a company
+app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
+  try {
+    const [reservaties] = await db.promise().query(
+      `SELECT s.*, g.voornaam, g.naam, g.gebruikersnaam, g.email 
+       FROM speeddates s 
+       JOIN gebruikers g ON s.user_id = g.id 
+       WHERE s.bedrijf_id = ? AND s.is_bezet = 1 
+       ORDER BY s.starttijd ASC`,
+      [req.params.bedrijfId]
+    );
+    res.json(reservaties);
+  } catch (err) {
+    console.error('Error fetching company reservations:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

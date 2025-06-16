@@ -1,0 +1,288 @@
+.reservaties-container {
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #f5f5f5;
+}
+
+.reservaties-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.reservaties-content h1 {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+.reservations-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.reservation-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.2s ease-in-out;
+}
+
+.reservation-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.reservation-header {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.reservation-header h2 {
+  color: #333;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.sector {
+  display: inline-block;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.reservation-details {
+  color: #666;
+}
+
+.reservation-details > div {
+  margin-bottom: 1rem;
+}
+
+.reservation-details strong {
+  color: #333;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.reservation-description p {
+  margin: 0.5rem 0 0;
+  line-height: 1.5;
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-top: 1rem;
+}
+
+.reservations-table-wrapper {
+  overflow-x: auto;
+  margin-top: 2rem;
+}
+
+.reservaties-intro {
+  background: #e6f0ff;
+  color: #2563eb;
+  font-size: 1.13rem;
+  border-radius: 1rem;
+  padding: 1.1rem 1.5rem;
+  margin-bottom: 2.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  box-shadow: 0 2px 8px rgba(30,41,59,0.04);
+}
+
+.reservations-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(30,41,59,0.07);
+  font-size: 1rem;
+}
+
+.reservations-table th, .reservations-table td {
+  padding: 1rem 0.7rem;
+  text-align: left;
+  border-bottom: 1px solid #f0f4fa;
+}
+
+.reservations-table th {
+  background: #e6f0ff;
+  color: #2563eb;
+  font-size: 1.08rem;
+  border: none;
+}
+
+.reservations-table td {
+  background: #fff;
+  border: none;
+  border-bottom: 1px solid #f0f4fa;
+  vertical-align: middle;
+}
+
+.reservations-table tr:last-child td {
+  border-bottom: none;
+}
+
+.reservations-table td {
+  color: #444;
+  vertical-align: top;
+}
+
+.desc-wrapper {
+  max-width: 320px;
+  transition: max-height 0.3s cubic-bezier(.4,0,.2,1), opacity 0.3s;
+  overflow: hidden;
+  opacity: 1;
+}
+.desc-wrapper.expanded {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.meer-lezen-btn {
+  background: none;
+  color: #2563eb;
+  border: none;
+  font-size: 1em;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 0.2em;
+  transition: color 0.2s;
+  padding: 0;
+}
+.meer-lezen-btn:hover {
+  color: #1d4ed8;
+}
+
+.annuleer-btn {
+  background: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px rgba(244,67,54,0.08);
+}
+.annuleer-btn:hover {
+  background: #b71c1c;
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px rgba(244,67,54,0.15);
+}
+
+@media (max-width: 768px) {
+  .reservaties-container {
+    padding: 1rem;
+  }
+
+  .reservaties-content h1 {
+    font-size: 2rem;
+  }
+
+  .reservations-list {
+    grid-template-columns: 1fr;
+  }
+
+  .reservations-table th, .reservations-table td {
+    padding: 0.7rem 0.3rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .reservaties-content {
+    max-width: 100%;
+  }
+  .reservations-table-wrapper {
+    margin-top: 1.2rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .reservations-table, .reservations-table thead, .reservations-table tbody, .reservations-table tr, .reservations-table th, .reservations-table td {
+    display: block;
+    width: 100%;
+  }
+  .reservations-table thead {
+    display: none;
+  }
+  .reservations-table tr {
+    margin-bottom: 1.5rem;
+    background: #fff;
+    border-radius: 1.2rem;
+    box-shadow: 0 2px 8px rgba(30,41,59,0.07);
+    padding: 1.2rem 1rem;
+  }
+  .reservations-table td {
+    padding: 0.7rem 0.5rem;
+    border: none;
+    position: relative;
+  }
+  .reservations-table td:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #2563eb;
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.98em;
+  }
+  .annuleer-btn {
+    margin-top: 0.7rem;
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reservatie-item {
+  opacity: 0;
+  animation: fadeSlideUp 0.15s ease forwards;
+}
+
+/* Snelle opeenvolgende animaties voor elke reservatie */
+.reservatie-item:nth-child(1) { animation-delay: 0.02s; }
+.reservatie-item:nth-child(2) { animation-delay: 0.04s; }
+.reservatie-item:nth-child(3) { animation-delay: 0.06s; }
+.reservatie-item:nth-child(4) { animation-delay: 0.08s; }
+.reservatie-item:nth-child(5) { animation-delay: 0.1s; }
+.reservatie-item:nth-child(6) { animation-delay: 0.12s; }
+.reservatie-item:nth-child(7) { animation-delay: 0.14s; }
+.reservatie-item:nth-child(8) { animation-delay: 0.16s; }
+.reservatie-item:nth-child(9) { animation-delay: 0.18s; }
+.reservatie-item:nth-child(10) { animation-delay: 0.2s; }
+.reservatie-item:nth-child(11) { animation-delay: 0.22s; }
+.reservatie-item:nth-child(12) { animation-delay: 0.24s; }
+.reservatie-item:nth-child(13) { animation-delay: 0.26s; }
+.reservatie-item:nth-child(14) { animation-delay: 0.28s; }
+.reservatie-item:nth-child(15) { animation-delay: 0.3s; }
+.reservatie-item:nth-child(16) { animation-delay: 0.32s; }
+.reservatie-item:nth-child(17) { animation-delay: 0.34s; }
+.reservatie-item:nth-child(18) { animation-delay: 0.36s; }
+.reservatie-item:nth-child(19) { animation-delay: 0.38s; }
+.reservatie-item:nth-child(20) { animation-delay: 0.4s; } 

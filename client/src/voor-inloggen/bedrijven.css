@@ -1,62 +1,420 @@
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.content-wrap {
+  flex: 1;
+  background-color: #f5f7fa;
+  padding: 2rem 1rem;
+}
+
 .bedrijven-container {
-  padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.bedrijven-title {
+  text-align: center;
+  color: #1a365d;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  z-index: 1;
+  position: relative;
+}
+
+.bedrijven-subtitle {
+  text-align: center;
+  color: #64748b;
+  font-size: 1.2rem;
+  margin-bottom: 2.5rem;
+  z-index: 1;
+  position: relative;
 }
 
 .bedrijven-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  z-index: 1;
+  position: relative;
+}
+
+@media (min-width: 1024px) {
+  .bedrijven-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.bedrijven-modern-bg {
+  background: #f9fafe;
+  min-height: 100vh;
+  position: relative;
 }
 
 .bedrijf-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
   padding: 1.5rem;
-  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .bedrijf-card:hover {
-  transform: translateY(-5px);
+  transform: scale(1.03) translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(37, 99, 235, 0.1);
 }
 
-.bedrijf-naam {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #333;
+.bedrijf-card.modern.no-bg {
+  position: relative;
+  border-radius: 1.3rem;
+  min-height: 340px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: #fff;
+  transition: transform 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s cubic-bezier(.4,0,.2,1);
+  animation: fadeInUp 0.5s ease forwards, float 3s ease-in-out infinite;
+  animation-delay: calc(var(--animation-order) * 0.1s), 0s;
+  border-top: 7px solid var(--accent-color, #3b82f6);
 }
 
-.bedrijf-info {
-  color: #666;
-  margin-bottom: 0.5rem;
+.bedrijf-card.modern.no-bg:hover {
+  transform: scale(1.025) translateY(-4px);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.16);
+  z-index: 2;
 }
 
-.bedrijf-info strong {
-  color: #333;
+.bedrijf-card.modern.no-bg .bedrijf-icon {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
-.bedrijf-beschrijving {
-  margin-top: 1rem;
-  color: #666;
+.bedrijf-card.modern.no-bg:hover .bedrijf-icon {
+  transform: translateX(-50%) translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.bedrijf-card.modern.no-bg h3 {
+  margin: 0.5rem 0;
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.bedrijf-card.modern.no-bg p {
+  margin: 0.5rem 0;
+  color: #64748b;
+  font-size: 0.95rem;
   line-height: 1.5;
 }
 
-.bedrijven-header {
+.bedrijf-card.modern.no-bg .bedrijf-link {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: white;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.bedrijf-card.modern.no-bg .bedrijf-link:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+.bedrijf-card-accent {
+  width: 100%;
+  height: 0.7rem;
+  background: var(--accent-color, #3b82f6);
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 1.3rem 1.3rem 0 0;
+}
+
+.bedrijf-card-content {
+  position: relative;
+  z-index: 2;
+  color: #1a365d;
+  padding: 2.2rem 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.bedrijf-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-color, #3b82f6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 1.1rem;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.08);
+}
+
+.bedrijf-naam {
+  color: #1a365d;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.1rem;
   text-align: center;
-  margin-bottom: 2rem;
 }
 
-.bedrijven-header h1 {
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 1rem;
+.bedrijf-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
 }
 
-.bedrijven-header p {
-  color: #666;
-  font-size: 1.1rem;
+.bedrijf-details {
+  margin-bottom: 0.7rem;
+}
+
+.bedrijf-details p {
+  margin: 0.3rem 0;
+  color: #334155;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bedrijf-details a {
+  color: #2563eb;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.bedrijf-details a:hover {
+  color: #93c5fd;
+}
+
+.reserveer-btn.modern {
+  width: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  color: #fff;
+  border: none;
+  border-radius: 0.8rem;
+  padding: 1rem 0;
+  font-size: 1.13rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 0.7rem;
+  box-shadow: 0 2px 12px rgba(59,130,246,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1), box-shadow 0.3s cubic-bezier(.4,0,.2,1), background 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+.reserveer-btn.modern:hover {
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.20);
+}
+
+.btn-icon {
+  font-size: 1.25em;
+}
+
+.navbar {
+  background-color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-logo {
+  cursor: pointer;
+}
+
+.navbar-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a365d;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: #4a5568;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #2563eb;
+}
+
+.navbar-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navbar-btn.register {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+}
+
+.navbar-btn.register:hover {
+  background-color: #1d4ed8;
+}
+
+.navbar-btn.login {
+  background-color: transparent;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.navbar-btn.login:hover {
+  background-color: #f0f7ff;
+}
+
+.footer {
+  background-color: #1a365d;
+  color: white;
+  padding: 2rem 0;
+  margin-top: auto;
+}
+
+.footer-row {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+.footer-col {
+  flex: 1;
+}
+
+.footer-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-menu li {
+  margin: 0.5rem 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.footer-menu li:hover {
+  color: #93c5fd;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 1rem;
+}
+
+.footer-socials .icon {
+  color: white;
+  font-size: 1.5rem;
+  transition: color 0.2s ease;
+}
+
+.footer-socials .icon:hover {
+  color: #93c5fd;
+}
+
+@media (max-width: 900px) {
+  .bedrijven-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .bedrijven-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .bedrijf-card-content {
+    padding: 1.3rem 0.7rem 1rem 0.7rem;
+  }
+  .bedrijf-card-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+    margin-bottom: 0.7rem;
+  }
+}
+
+/* Hero golfvorm bovenaan */
+.bedrijven-hero-wave {
+  width: 100vw;
+  min-width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  height: 180px;
+  overflow: hidden;
+}
+
+.bedrijven-hero-wave svg {
+  width: 100vw;
+  min-width: 100%;
+  height: 180px;
+  display: block;
 } 

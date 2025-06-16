@@ -1,0 +1,145 @@
+/* contactBedrijf.css - Styling voor de contactpagina van bedrijven */
+
+.contactbedrijf-container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 32px 28px 28px 28px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.contactbedrijf-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1a237e;
+  text-align: center;
+}
+
+.contactbedrijf-subtitle {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.contactbedrijf-info-table {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  background: #f5f7fa;
+  padding: 18px 20px;
+}
+
+.contactbedrijf-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+.contactbedrijf-info-row:last-child {
+  border-bottom: none;
+}
+.contactbedrijf-info-label {
+  font-weight: 600;
+  color: #283593;
+}
+.contactbedrijf-info-value {
+  color: #333;
+}
+
+.contactbedrijf-divider {
+  margin: 32px 0 18px 0;
+  border: none;
+  border-top: 1.5px solid #e0e0e0;
+}
+
+.contactbedrijf-form-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #1a237e;
+  text-align: center;
+}
+
+.contactbedrijf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contactbedrijf-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #222;
+  gap: 6px;
+}
+
+.contactbedrijf-form input,
+.contactbedrijf-form textarea {
+  padding: 10px 12px;
+  border: 1px solid #bdbdbd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fafbfc;
+  transition: border 0.2s;
+}
+.contactbedrijf-form input:focus,
+.contactbedrijf-form textarea:focus {
+  border: 1.5px solid #3949ab;
+  outline: none;
+}
+.contactbedrijf-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.contactbedrijf-btn {
+  background: #3949ab;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+.contactbedrijf-btn:disabled {
+  background: #b0b6d6;
+  cursor: not-allowed;
+}
+.contactbedrijf-btn:not(:disabled):hover {
+  background: #283593;
+}
+
+.contactbedrijf-success {
+  color: #2e7d32;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  text-align: center;
+}
+.contactbedrijf-error {
+  color: #c62828;
+  background: #ffebee;
+  border: 1px solid #ef9a9a;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .contactbedrijf-container {
+    padding: 1.2rem 0.7rem;
+  }
+  .contactbedrijf-form {
+    max-width: 100%;
+  }
+} 

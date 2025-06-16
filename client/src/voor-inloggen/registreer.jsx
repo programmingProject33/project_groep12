@@ -5,6 +5,14 @@ import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 // useNavigate is een hook (speciale functie) die je gebruikt om te navigeren (pagina veranderen) zonder dat de pagina helemaal opnieuw laadt.
 
+const STUDIE_OPLEIDINGEN = [
+  "Bachelor Toegepaste Informatica",
+  "Internet of Things",
+  "Toegepaste Artificiële Intelligentie",
+  "Multimedia & Creatieve Technologie",
+  "Elektromechanische Systemen"
+];
+
 export default function Registreer()   // Dit is een functionele component in React. Het maakt de registratiepagina.
  {
    const [activeTab, setActiveTab] = useState("student");  // Hier gebruiken we een hook (useState) om bij te houden welke tab actief is (student of bedrijf).
@@ -26,7 +34,8 @@ export default function Registreer()   // Dit is een functionele component in Re
     wachtwoord: '',
     wachtwoord2: '',
     opleiding: '',
-    opleiding_jaar: ''
+    opleiding_jaar: '',
+    linkedin: ''
   });
 
   // State for company form
@@ -45,7 +54,10 @@ export default function Registreer()   // Dit is een functionele component in Re
     tel_contact: '',
     gebruikersnaam_bedrijf: '',
     wachtwoord_bedrijf: '',
-    wachtwoord2_bedrijf: ''
+    wachtwoord2_bedrijf: '',
+    sector: '',
+    beschrijving: '',
+    zoeken_we: ''
   });
 
   // Error state
@@ -111,6 +123,9 @@ export default function Registreer()   // Dit is een functionele component in Re
       return;
     }
 
+    // Always use gebruikersnaam from localStorage if available
+    const gebruikersnaam = localStorage.getItem('gebruikersnaam') || companyForm.gebruikersnaam;
+
     try {
       const response = await fetch('http://localhost:5000/api/register', {
         method: 'POST',
@@ -119,7 +134,8 @@ export default function Registreer()   // Dit is een functionele component in Re
         },
         body: JSON.stringify({
           type: 'bedrijf',
-          ...companyForm
+          ...companyForm,
+          gebruikersnaam // override or add
         }),
       });
 
@@ -138,9 +154,14 @@ export default function Registreer()   // Dit is een functionele component in Re
   };
 
   return (
-    <div>
-      {/* Hoofdinhoud van de registratiepagina */}
-      <main className="registreer-main">
+    <div className="registreer-bg">
+      <div className="registreer-hero">
+        <svg className="registreer-wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+          <path fill="#eef4ff" fillOpacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,149.3C960,160,1056,160,1152,138.7C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
+        </svg>
+        <h1 className="registreer-hero-title">Registreren</h1>
+      </div>
+      <main className="registreer-main registreer-anim">
         <div className="registreer-tabs">
           {/* Twee knoppen om te kiezen tussen Student of Bedrijf registratie */}
           <button
@@ -211,25 +232,32 @@ export default function Registreer()   // Dit is een functionele component in Re
               </label>
               <label>
                 Opleiding:
-                <input 
-                  type="text" 
+                <select 
                   name="opleiding" 
                   value={studentForm.opleiding}
                   onChange={handleStudentChange}
                   required
-                />
+                  className="registerstudent-form select"
+                >
+                  {STUDIE_OPLEIDINGEN.map((opleiding) => (
+                    <option key={opleiding} value={opleiding}>
+                      {opleiding}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label>
                 Opleiding Jaar:
-                <input 
-                  type="number" 
+                <select 
                   name="opleiding_jaar" 
                   value={studentForm.opleiding_jaar}
                   onChange={handleStudentChange}
-                  min="1"
-                  max="4"
                   required
-                />
+                  className="registerstudent-form select"
+                >
+                  <option value="2">Jaar 2</option>
+                  <option value="3">Jaar 3</option>
+                </select>
               </label>
               <label>
                 Wachtwoord:
@@ -251,6 +279,19 @@ export default function Registreer()   // Dit is een functionele component in Re
                   required
                 />
               </label>
+              <label>
+                LinkedIn-profiel (optioneel):
+                <input
+                  type="url"
+                  name="linkedin"
+                  value={studentForm.linkedin || ''}
+                  onChange={handleStudentChange}
+                  pattern="https://www.linkedin.com/*"
+                  placeholder="Bijvoorbeeld: https://www.linkedin.com/in/voornaam-achternaam"
+                  className="registerstudent-form input"
+                />
+                <span className="form-helper">Bijvoorbeeld: https://www.linkedin.com/in/voornaam-achternaam</span>
+              </label>
               <button type="submit" className="registerstudent-btn student-btn">
                 Account maken
               </button>
@@ -270,6 +311,34 @@ export default function Registreer()   // Dit is een functionele component in Re
                   type="text" 
                   name="bedrijfsnaam" 
                   value={companyForm.bedrijfsnaam}
+                  onChange={handleCompanyChange}
+                  required
+                />
+              </label>
+              <label>
+                Sector:
+                <input
+                  type="text"
+                  name="sector"
+                  value={companyForm.sector}
+                  onChange={handleCompanyChange}
+                  required
+                />
+              </label>
+              <label>
+                Wie zijn we:
+                <textarea
+                  name="beschrijving"
+                  value={companyForm.beschrijving}
+                  onChange={handleCompanyChange}
+                  required
+                />
+              </label>
+              <label>
+                Dit zoeken we:
+                <textarea
+                  name="zoeken_we"
+                  value={companyForm.zoeken_we}
                   onChange={handleCompanyChange}
                   required
                 />
