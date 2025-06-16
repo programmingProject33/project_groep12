@@ -35,6 +35,8 @@ function getSectorIcon(sector) {
 
 function Bedrijven() {
   const [bedrijven, setBedrijven] = useState([]);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingBedrijfId, setPendingBedrijfId] = useState(null);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -44,6 +46,20 @@ function Bedrijven() {
       .then((data) => setBedrijven(data))
       .catch((err) => console.error("Fout bij ophalen:", err));
   }, []);
+
+  const handleReserveerClick = (bedrijfId) => {
+    if (user) {
+      navigate(`/speeddate/${bedrijfId}`);
+    } else {
+      setPendingBedrijfId(bedrijfId);
+      setShowLoginModal(true);
+    }
+  };
+
+  const closeModal = () => {
+    setShowLoginModal(false);
+    setPendingBedrijfId(null);
+  };
 
   return (
     <div className="page-container bedrijven-modern-bg">
@@ -83,7 +99,7 @@ function Bedrijven() {
                       </div>
                       <button
                         className="reserveer-btn modern"
-                        onClick={() => navigate(`/speeddate/${bedrijf.bedrijf_id}`)}
+                        onClick={() => handleReserveerClick(bedrijf.bedrijf_id)}
                       >
                         <FaCalendarAlt className="btn-icon" style={{ marginRight: 8 }} /> Reserveer speeddate
                       </button>
@@ -95,6 +111,20 @@ function Bedrijven() {
           </div>
         </div>
       </main>
+      {showLoginModal && (
+        <div className="login-modal-overlay">
+          <div className="login-modal-box">
+            <div className="login-modal-title">Reserveer een speeddate</div>
+            <div className="login-modal-content">
+              Log in om beschikbare tijdsloten te zien en een speeddate te reserveren.
+            </div>
+            <button className="login-modal-btn" onClick={() => navigate('/login')}>
+              Inloggen
+            </button>
+            <button className="login-modal-close" onClick={closeModal} title="Sluiten">&times;</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
