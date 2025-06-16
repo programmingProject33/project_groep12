@@ -1,14 +1,22 @@
-import React, { useState } from "react";
 import React, { useState, useEffect } from "react";
 import "./Profiel.css";
 import { useAuth } from "../AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
+import { MdPerson, MdEmail, MdSchool, MdGrade, MdLogout } from "react-icons/md";
 import {
   FaLinkedin,
   FaInstagram,
   FaXTwitter,
   FaTiktok
 } from "react-icons/fa6";
+
+const DIENSTVERBAND_OPTIES = [
+  "Voltijds",
+  "Deeltijds",
+  "Stage",
+  "Flexi-job",
+  "Vrijwilliger"
+];
 
 const Profiel = () => {
   const { user, setUser } = useAuth();
