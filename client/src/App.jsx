@@ -25,6 +25,7 @@ import BedrijfStudenten from "./inloggen-bedrijf/Studenten.jsx";
 import BedrijfReservaties from "./inloggen-bedrijf/reservatieBedrijf.jsx";
 import BedrijfContact from "./inloggen-bedrijf/contactBedrijf.jsx";
 import BedrijfProfiel from "./inloggen-bedrijf/profielBedrijf.jsx";
+import StudentProfiel from "./inloggen-bedrijf/StudentProfiel.jsx";
 
 // Context
 import { useAuth } from "./AuthContext.jsx";
@@ -58,6 +59,15 @@ function App() {
           <ProtectedRoute>
             {user && user.type === 'bedrijf' ? (
               <BedrijfStudenten />
+            ) : (
+              <div>Geen toegang</div>
+            )}
+          </ProtectedRoute>
+        } />
+        <Route path="/bedrijf/student/:studentId" element={
+          <ProtectedRoute>
+            {user && user.type === 'bedrijf' ? (
+              <StudentProfiel />
             ) : (
               <div>Geen toegang</div>
             )}

@@ -280,6 +280,28 @@ app.get('/api/studenten', async (req, res) => {
   }
 });
 
+// Get single student profile
+app.get('/api/studenten/:studentId', async (req, res) => {
+  try {
+    const [studenten] = await db.promise().query(
+      'SELECT * FROM gebruikers WHERE id = ?',
+      [req.params.studentId]
+    );
+    
+    if (studenten.length === 0) {
+      return res.status(404).json({ error: 'Student niet gevonden' });
+    }
+
+    const student = studenten[0];
+    delete student.wachtwoord; // Remove password from response
+    
+    res.json(student);
+  } catch (err) {
+    console.error('Error fetching student profile:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 //    Opmerking verwijder niet deze script want ik gaan dat later hergebruiken
 
 
@@ -347,6 +369,24 @@ app.post('/api/bedrijf/update', async (req, res) => {
     res.json({ message: 'Profiel succesvol bijgewerkt' });
   } catch (err) {
     console.error('Fout bij updaten profiel:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Get reservations for a company
+app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
+  try {
+    const [reservaties] = await db.promise().query(
+      `SELECT s.*, g.voornaam, g.naam, g.gebruikersnaam, g.email 
+       FROM speeddates s 
+       JOIN gebruikers g ON s.user_id = g.id 
+       WHERE s.bedrijf_id = ? AND s.is_bezet = 1 
+       ORDER BY s.starttijd ASC`,
+      [req.params.bedrijfId]
+    );
+    res.json(reservaties);
+  } catch (err) {
+    console.error('Error fetching company reservations:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });

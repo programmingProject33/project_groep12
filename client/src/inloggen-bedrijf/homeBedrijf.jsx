@@ -1,12 +1,15 @@
 import React from "react";
+import { useAuth } from "../AuthContext";
+import { useNavigate } from "react-router-dom";
 import "./homeBedrijf.css";
 import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 import BedrijfNavbar from "./BedrijfNavbar";
 import BedrijfFooter from "./bedrijfFooter";
-import { useNavigate } from "react-router-dom";
 
-export default function BedrijfHome() {
+export default function HomeBedrijf() {
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const bedrijfsnaam = user?.naam || user?.bedrijfsnaam || "[Bedrijf]";
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -14,25 +17,36 @@ export default function BedrijfHome() {
   }
 
   return (
-    <div>
+    <div className="bedrijf-home-wrapper">
       <BedrijfNavbar />
-      {/* HERO SECTION */}
-      <header className="hero">
-        <div className="hero-content">
-          <h1>Career Launch '25-'26</h1>
-          <p>
-            Het evenement Career Launch '25-'26 aan de Erasmus Hogeschool Brussel biedt studenten van de EHB de kans om in contact te komen met bedrijven die op zoek zijn naar stagiairs en werknemers. Het richt zich op studenten van de opleidingen Toegepaste Informatica, Multimedia & Creative Technologies, Programmeren, Systeem- en Netwerkbeheer, en Internet of Things.
-            Tijdens de Career Launch kunnen studenten deelnemen aan groepsessies, speeddates en netwerkmomenten met vertegenwoordigers van diverse bedrijven. Organisaties zoals Accenture, Capgemini, Colruyt Group en vele anderen zijn aanwezig om hun werking toe te lichten en potentiële kandidaten te ontmoeten.
-            Het doel van dit evenement is om studenten te helpen bij het vinden van stages en jobs, en bedrijven de kans te geven getalenteerde en gemotiveerde studenten te leren kennen.
-          </p>
+      {/* Hero Section */}
+      <section className="bedrijf-hero">
+        <div className="bedrijf-hero-content">
+          <h1>Welkom, {bedrijfsnaam}!</h1>
+          <p className="bedrijf-hero-sub">Beheer je reservaties en bekijk studentprofielen.</p>
+          <button className="bedrijf-hero-btn" onClick={() => navigate("/bedrijf/reservaties")}>Bekijk reservaties</button>
         </div>
-        <div className="hero-img">
-          <div className="hero-info">
-            <div className="hero-info-item"><b>Wanneer:</b> dinsdag 14 maart 2023, van 10:00 tot 16:00</div>
-            <div className="hero-info-item"><b>Waar:</b> EHB Kaai Campus</div>
-          </div>
+        <div className="bedrijf-hero-wave">
+          {/* SVG golfvorm */}
+          <svg viewBox="0 0 500 100" preserveAspectRatio="none" className="wave-svg">
+            <path d="M0,30 Q250,80 500,30 L500,100 L0,100 Z" fill="#e0e7ff" />
+          </svg>
         </div>
-      </header>
+      </section>
+
+      {/* Quick Actions */}
+      <section className="bedrijf-quick-actions">
+        <div className="bedrijf-action-card" onClick={() => navigate("/bedrijf/reservaties")}> 
+          <span className="bedrijf-action-icon" role="img" aria-label="Beheer reservaties">📅</span>
+          <h3><b>Beheer reservaties</b></h3>
+          <p>Bekijk en beheer je geplande speeddates met studenten.</p>
+        </div>
+        <div className="bedrijf-action-card" onClick={() => navigate("/bedrijf/studenten")}> 
+          <span className="bedrijf-action-icon" role="img" aria-label="Bekijk studenten">🎓</span>
+          <h3><b>Bekijk studenten</b></h3>
+          <p>Blader door profielen van beschikbare studenten.</p>
+        </div>
+      </section>
       <BedrijfFooter />
     </div>
   );
