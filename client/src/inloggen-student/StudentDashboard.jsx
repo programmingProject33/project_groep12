@@ -22,25 +22,25 @@ const events = [
 
 const tips = [
   {
-    emoji: "🤝",
+    emoji: "&#129309;",
     title: "Netwerk slim",
     desc: "Bouw je professionele netwerk op via LinkedIn en tijdens events op school of stage.",
     img: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80"
   },
   {
-    emoji: "🗣️",
+    emoji: "&#128483;&#65039;",
     title: "Bereid je pitch voor",
     desc: "Oefen hoe je jezelf in 1 minuut voorstelt – duidelijk, enthousiast en zelfzeker.",
     img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80"
   },
   {
-    emoji: "📄",
+    emoji: "&#128196;",
     title: "Houd je CV up-to-date",
     desc: "Voeg nieuwe ervaringen en vaardigheden meteen toe aan je CV. Zo ben je altijd klaar om te solliciteren.",
     img: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80"
   },
   {
-    emoji: "❓",
+    emoji: "&#10067;",
     title: "Stel vragen tijdens gesprekken",
     desc: "Toon interesse door vragen te stellen. Zo laat je zien dat je initiatief toont en goed voorbereid bent.",
     img: "https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80"
@@ -86,12 +86,12 @@ export default function StudentDashboard() {
         </div>
       </motion.section>
       <section className="tips-section career-tips-block">
-        <h2>💡 Carrière Tips</h2>
+        <h2>&#128161; Carrière Tips</h2>
         <ul className="career-tips-list with-images">
           {tips.map((tip, i) => (
             <li key={i} className="career-tip-row">
               <div className="career-tip-text">
-                <span className="tip-emoji">{tip.emoji}</span>
+                <span className="tip-emoji" dangerouslySetInnerHTML={{__html: tip.emoji}} />
                 <div>
                   <strong>{tip.title}</strong><br />
                   {tip.desc}

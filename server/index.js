@@ -124,7 +124,7 @@ app.post('/api/register', async (req, res) => {
 
   if (type === 'student') {
     try {
-      const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden } = userData;
+      const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden, linkedin } = userData;
       const dienstverbandenStr = dienstverbanden ? JSON.stringify(dienstverbanden) : null;
       // Check if user exists
       const [existingUsers] = await db.promise().query(
@@ -136,8 +136,8 @@ app.post('/api/register', async (req, res) => {
       }
       // Insert new user
       const [result] = await db.promise().query(
-        'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbandenStr]
+        'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden, linkedin) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbandenStr, linkedin || null]
       );
       console.log('User created successfully:', result);
       res.status(201).json({ message: 'Account succesvol aangemaakt' });
@@ -398,7 +398,7 @@ app.post('/api/bedrijf/update', async (req, res) => {
 app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
   try {
     const [reservaties] = await db.promise().query(
-      `SELECT s.*, g.voornaam, g.naam, g.gebruikersnaam, g.email 
+      `SELECT s.*, g.id AS student_id, g.voornaam, g.naam, g.gebruikersnaam, g.email, g.linkedin 
        FROM speeddates s 
        JOIN gebruikers g ON s.user_id = g.id 
        WHERE s.bedrijf_id = ? AND s.is_bezet = 1 

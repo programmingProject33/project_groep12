@@ -105,7 +105,7 @@ const Reservaties = () => {
       <div className="reservaties-content">
         <h1>Mijn Reserveringen</h1>
         <div className="reservaties-intro">
-          <span role="img" aria-label="calendar">📅</span> Hier vind je een overzicht van je geplande speeddates. Je kunt ook eenvoudig annuleren indien nodig.
+          <span role="img" aria-label="calendar" dangerouslySetInnerHTML={{__html: "&#128197;"}} /> Hier vind je een overzicht van je geplande speeddates. Je kunt ook eenvoudig annuleren indien nodig.
         </div>
         {reservations.length === 0 ? (
           <p>Je hebt nog geen reserveringen.</p>
@@ -114,12 +114,12 @@ const Reservaties = () => {
             <table className="reservations-table">
               <thead>
                 <tr>
-                  <th><span role="img" aria-label="bedrijf">🏢</span> Bedrijf</th>
-                  <th><span role="img" aria-label="sector">🏷️</span> Sector</th>
-                  <th><span role="img" aria-label="datum">📅</span> Datum</th>
-                  <th><span role="img" aria-label="tijd">🕓</span> Tijd</th>
-                  <th><span role="img" aria-label="beschrijving">📝</span> Beschrijving</th>
-                  <th><span role="img" aria-label="actie">🗑️</span></th>
+                  <th><span role="img" aria-label="bedrijf" dangerouslySetInnerHTML={{__html: "&#128188;"}} /> Bedrijf</th>
+                  <th><span role="img" aria-label="sector" dangerouslySetInnerHTML={{__html: "&#128278;"}} /> Sector</th>
+                  <th><span role="img" aria-label="datum" dangerouslySetInnerHTML={{__html: "&#128197;"}} /> Datum</th>
+                  <th><span role="img" aria-label="tijd" dangerouslySetInnerHTML={{__html: "&#128340;"}} /> Tijd</th>
+                  <th><span role="img" aria-label="beschrijving" dangerouslySetInnerHTML={{__html: "&#128221;"}} /> Beschrijving</th>
+                  <th><span role="img" aria-label="actie" dangerouslySetInnerHTML={{__html: "&#128465;"}} /></th>
                 </tr>
               </thead>
               <tbody>
@@ -156,7 +156,7 @@ const Reservaties = () => {
                       </td>
                       <td>
                         <button className="annuleer-btn" onClick={() => handleAnnuleer(reservation.speed_id)}>
-                          <span role="img" aria-label="verwijder">🗑️</span>
+                          <span role="img" aria-label="verwijder" dangerouslySetInnerHTML={{__html: "&#128465;"}} />
                         </button>
                       </td>
                     </tr>

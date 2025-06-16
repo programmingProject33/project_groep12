@@ -39,7 +39,7 @@ export default function Contact() {
 
       <main className="contact-main">
         <div className="contact-intro">
-          <h1>📬 Heb je een vraag?</h1>
+          <h1><span dangerouslySetInnerHTML={{__html: "&#128236;"}} /> Heb je een vraag?</h1>
           <p>We staan voor je klaar! Laat gerust een bericht achter – we beantwoorden je mail zo snel mogelijk.</p>
         </div>
 

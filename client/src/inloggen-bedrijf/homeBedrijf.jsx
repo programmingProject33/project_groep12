@@ -37,12 +37,12 @@ export default function HomeBedrijf() {
       {/* Quick Actions */}
       <section className="bedrijf-quick-actions">
         <div className="bedrijf-action-card" onClick={() => navigate("/bedrijf/reservaties")}> 
-          <span className="bedrijf-action-icon" role="img" aria-label="Beheer reservaties">📅</span>
+          <span className="bedrijf-action-icon" role="img" aria-label="Beheer reservaties" dangerouslySetInnerHTML={{__html: "&#128197;"}} />
           <h3><b>Beheer reservaties</b></h3>
           <p>Bekijk en beheer je geplande speeddates met studenten.</p>
         </div>
         <div className="bedrijf-action-card" onClick={() => navigate("/bedrijf/studenten")}> 
-          <span className="bedrijf-action-icon" role="img" aria-label="Bekijk studenten">🎓</span>
+          <span className="bedrijf-action-icon" role="img" aria-label="Bekijk studenten" dangerouslySetInnerHTML={{__html: "&#127891;"}} />
           <h3><b>Bekijk studenten</b></h3>
           <p>Blader door profielen van beschikbare studenten.</p>
         </div>

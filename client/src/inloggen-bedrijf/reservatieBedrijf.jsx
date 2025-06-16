@@ -3,6 +3,8 @@ import { useAuth } from "../AuthContext";
 import BedrijfNavbar from "./BedrijfNavbar";
 import BedrijfFooter from "./bedrijfFooter";
 import "./reservatieBedrijf.css";
+import "./Studenten.css";
+import { FaLinkedin } from "react-icons/fa";
 
 export default function Reservaties() {
   const { user } = useAuth();
@@ -10,6 +12,9 @@ export default function Reservaties() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterDate, setFilterDate] = useState("");
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentLoading, setStudentLoading] = useState(false);
+  const [studentError, setStudentError] = useState("");
 
   useEffect(() => {
     const fetchReservaties = async () => {
@@ -31,6 +36,23 @@ export default function Reservaties() {
       fetchReservaties();
     }
   }, [user]);
+
+  const fetchStudent = async (studentId) => {
+    setStudentLoading(true);
+    setStudentError("");
+    try {
+      const response = await fetch(`/api/studenten/${studentId}`);
+      if (!response.ok) {
+        throw new Error("Student niet gevonden");
+      }
+      const data = await response.json();
+      setSelectedStudent(data);
+    } catch (err) {
+      setStudentError(err.message);
+    } finally {
+      setStudentLoading(false);
+    }
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -93,7 +115,8 @@ export default function Reservaties() {
                       <th>Student</th>
                       <th>Datum</th>
                       <th>Tijdstip</th>
-                      <th>Email</th>
+                      <th>LinkedIn</th>
+                      <th>Acties</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -102,7 +125,23 @@ export default function Reservaties() {
                         <td>{`${reservatie.voornaam} ${reservatie.naam}`}</td>
                         <td>{formatDate(reservatie.starttijd)}</td>
                         <td>{formatTime(reservatie.starttijd)}</td>
-                        <td>{reservatie.email}</td>
+                        <td>
+                          {reservatie.linkedin && reservatie.linkedin.startsWith("https://www.linkedin.com/") ? (
+                            <a href={reservatie.linkedin} target="_blank" rel="noopener noreferrer" title="Bekijk LinkedIn-profiel">
+                              LinkedIn
+                            </a>
+                          ) : (
+                            <span style={{ color: '#aaa', fontStyle: 'italic' }}>Geen profiel beschikbaar</span>
+                          )}
+                        </td>
+                        <td>
+                          <button 
+                            className="studenten-action-btn"
+                            onClick={() => fetchStudent(reservatie.student_id)}
+                          >
+                            Bekijk Profiel
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -110,6 +149,51 @@ export default function Reservaties() {
               </div>
             )}
           </>
+        )}
+
+        {selectedStudent && (
+          <div className="student-detail-modal">
+            <div className="student-detail-content">
+              <button className="close-modal-btn" onClick={() => setSelectedStudent(null)}>Sluiten</button>
+              {studentLoading ? (
+                <div>Laden...</div>
+              ) : studentError ? (
+                <div style={{color: 'red'}}>{studentError}</div>
+              ) : (
+                <>
+                  <h2>{selectedStudent.voornaam} {selectedStudent.naam}</h2>
+                  <p><strong>Gebruikersnaam:</strong> {selectedStudent.gebruikersnaam}</p>
+                  <p><strong>E-mail:</strong> {selectedStudent.email}</p>
+                  <p><strong>Opleiding:</strong> {selectedStudent.opleiding}</p>
+                  <p><strong>Opleiding jaar:</strong> {selectedStudent.opleiding_jaar}</p>
+                  <p><strong>LinkedIn:</strong> {selectedStudent.linkedin && selectedStudent.linkedin.startsWith("https://www.linkedin.com/") ? (
+                    <a href={selectedStudent.linkedin} target="_blank" rel="noopener noreferrer"><FaLinkedin style={{ color: '#0a66c2', fontSize: '1.3em' }} /></a>
+                  ) : (
+                    <span style={{ color: '#aaa', fontStyle: 'italic' }}>Geen profiel beschikbaar</span>
+                  )}</p>
+                  <div style={{marginTop: '1.2rem'}}>
+                    <strong>Dienstverbanden:</strong>
+                    <ul style={{marginTop: '0.5rem'}}>
+                      {(() => {
+                        if (!selectedStudent.dienstverbanden) return <li style={{color:'#aaa'}}>Niet opgegeven</li>;
+                        let arr = selectedStudent.dienstverbanden;
+                        if (typeof arr === 'string') {
+                          try {
+                            arr = JSON.parse(arr);
+                          } catch {
+                            arr = arr.replace(/\[|\]|"/g, '').split(',').map(d => d.trim()).filter(Boolean);
+                          }
+                        }
+                        if (!Array.isArray(arr)) arr = [String(arr)];
+                        return arr.map((d, i) => <li key={i}>{d.trim()}</li>);
+                      })()}
+                    </ul>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="modal-backdrop" onClick={() => setSelectedStudent(null)}></div>
+          </div>
         )}
       </main>
       <BedrijfFooter />

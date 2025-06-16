@@ -159,11 +159,26 @@ export default function Profiel() {
               </div>
               <div className="profiel-info-item">
                 <span className="profiel-label">Voorkeursdienstverband</span>
-                <p>{(user?.dienstverbanden && user.dienstverbanden.length > 0) ? user.dienstverbanden.join(", ") : <span style={{color:'#aaa'}}>Niet opgegeven</span>}</p>
+                <p>{(() => {
+                  let dienstverbanden = user?.dienstverbanden;
+                  if (typeof dienstverbanden === 'string') {
+                    try {
+                      dienstverbanden = JSON.parse(dienstverbanden);
+                    } catch {
+                      dienstverbanden = dienstverbanden.split(',').map(v => v.trim()).filter(Boolean);
+                    }
+                  }
+                  if (Array.isArray(dienstverbanden)) {
+                    return dienstverbanden.length > 0
+                      ? dienstverbanden.join(", ")
+                      : <span style={{color:'#aaa'}}>Niet opgegeven</span>;
+                  }
+                  return <span style={{color:'#aaa'}}>Niet opgegeven</span>;
+                })()}</p>
               </div>
             </div>
             <div className="profiel-actions">
-              <button className="edit-profile-btn" onClick={handleEdit}>✏️ Bewerk profiel</button>
+              <button className="edit-profile-btn" onClick={handleEdit}><span dangerouslySetInnerHTML={{__html: "&#9998;"}} /> Bewerk profiel</button>
               <button
                 className="logout-btn"
                 onClick={() => {

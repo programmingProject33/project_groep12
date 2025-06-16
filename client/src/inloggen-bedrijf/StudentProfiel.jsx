@@ -111,10 +111,10 @@ export default function StudentProfiel() {
               <ul>
                 {student.dienstverbanden ? (
                   student.dienstverbanden.split(',').map((dienstverband, index) => (
-                    <li key={index}>{dienstverband.trim()}</li>
+                    <li key={index}><span dangerouslySetInnerHTML={{__html: "&#128188;"}} /> {dienstverband.trim()}</li>
                   ))
                 ) : (
-                  <li>Geen dienstverbanden opgegeven</li>
+                  <li><span dangerouslySetInnerHTML={{__html: "&#10067;"}} /> Geen dienstverbanden opgegeven</li>
                 )}
               </ul>
             </div>

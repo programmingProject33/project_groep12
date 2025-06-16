@@ -34,7 +34,8 @@ export default function Registreer()   // Dit is een functionele component in Re
     wachtwoord: '',
     wachtwoord2: '',
     opleiding: '',
-    opleiding_jaar: ''
+    opleiding_jaar: '',
+    linkedin: ''
   });
 
   // State for company form
@@ -277,6 +278,19 @@ export default function Registreer()   // Dit is een functionele component in Re
                   onChange={handleStudentChange}
                   required
                 />
+              </label>
+              <label>
+                LinkedIn-profiel (optioneel):
+                <input
+                  type="url"
+                  name="linkedin"
+                  value={studentForm.linkedin || ''}
+                  onChange={handleStudentChange}
+                  pattern="https://www.linkedin.com/*"
+                  placeholder="Bijvoorbeeld: https://www.linkedin.com/in/voornaam-achternaam"
+                  className="registerstudent-form input"
+                />
+                <span className="form-helper">Bijvoorbeeld: https://www.linkedin.com/in/voornaam-achternaam</span>
               </label>
               <button type="submit" className="registerstudent-btn student-btn">
                 Account maken
