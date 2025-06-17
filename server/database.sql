@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS gebruikers (
     wachtwoord VARCHAR(255) NOT NULL,
     opleiding VARCHAR(100),
     opleiding_jaar INT,
+    dienstverbanden TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
