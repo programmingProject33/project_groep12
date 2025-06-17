@@ -155,42 +155,70 @@ app.post('/api/register', async (req, res) => {
     }
   } else if (type === 'bedrijf') {
     const { 
-      bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
-      voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
-      gebruikersnaam_bedrijf, wachtwoord_bedrijf 
+      bedrijfsnaam, 
+      btw, 
+      straat, 
+      huis_nr, 
+      bus_nr, 
+      postcode, 
+      gemeente, 
+      telbedrijf, 
+      emailbedrijf,
+      voornaam_contact, 
+      naam_contact, 
+      specialisatie, 
+      email_contact, 
+      tel_contact,
+      gebruikersnaam_bedrijf, 
+      wachtwoord_bedrijf,
+      beschrijving,
+      zoeken_we 
     } = userData;
     
     // Check if company already exists
-    db.query('SELECT * FROM bedrijven WHERE emailbedrijf = ? OR gebruikersnaam = ?', 
+    db.query('SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?', 
       [emailbedrijf, gebruikersnaam_bedrijf], 
       (err, results) => {
         if (err) {
-          console.error('Database error checking existing company:', err);
+          console.error('Database error checking existing company:', err, { emailbedrijf, gebruikersnaam_bedrijf });
           return res.status(500).json({ error: 'Database error', details: err.message });
         }
         if (results.length > 0) {
+          console.error('Company already exists:', { emailbedrijf, gebruikersnaam_bedrijf });
           return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
         }
         
         // Insert new company
         const query = `INSERT INTO bedrijven (
-          bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
-          voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
-          gebruikersnaam, wachtwoord
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+          naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email,
+          contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
+          gebruikersnaam, wachtwoord, beschrijving, zoeken_we
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         
         const values = [
-          bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
-          voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
-          gebruikersnaam_bedrijf, wachtwoord_bedrijf
+          bedrijfsnaam, // naam
+          btw,          // BTW_nr
+          straat,       // straatnaam
+          huis_nr,      // huis_nr
+          bus_nr,       // bus_nr
+          postcode,     // postcode
+          gemeente,     // gemeente
+          telbedrijf,   // telefoon_nr
+          emailbedrijf, // email
+          voornaam_contact,
+          naam_contact,
+          specialisatie,
+          email_contact,
+          tel_contact,
+          gebruikersnaam_bedrijf,
+          wachtwoord_bedrijf,
+          beschrijving,
+          zoeken_we
         ];
-        
-        console.log('Executing query:', query);
-        console.log('With values:', values);
         
         db.query(query, values, (err, result) => {
           if (err) {
-            console.error('Database error creating company:', err);
+            console.error('Database error creating company:', err, values);
             return res.status(500).json({ error: 'Database error', details: err.message });
           }
           console.log('Company created successfully:', result);

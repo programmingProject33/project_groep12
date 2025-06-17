@@ -25,5 +25,7 @@ CREATE TABLE IF NOT EXISTS bedrijven (
     gebruikersnaam VARCHAR(50) NOT NULL UNIQUE,
     wachtwoord VARCHAR(255) NOT NULL,
     sector VARCHAR(100),
+    beschrijving TEXT,
+    zoeken_we TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ); 
