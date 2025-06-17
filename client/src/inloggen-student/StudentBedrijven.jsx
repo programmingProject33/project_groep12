@@ -71,7 +71,13 @@ function StudentBedrijven() {
                       <div className="bedrijf-details">
                         <p><span role="img" aria-label="adres" dangerouslySetInnerHTML={{__html: "&#128205;"}} /> {bedrijf.straatnaam} {bedrijf.huis_nr}{bedrijf.bus_nr && ` bus ${bedrijf.bus_nr}`}, {bedrijf.postcode} {bedrijf.gemeente}</p>
                         <p><span role="img" aria-label="email" dangerouslySetInnerHTML={{__html: "&#128231;"}} /> <a href={`mailto:${bedrijf.email}`}>{bedrijf.email}</a></p>
-                        <p><span role="img" aria-label="website" dangerouslySetInnerHTML={{__html: "&#127760;"}} /> <a href={bedrijf.bedrijf_URL.startsWith('http') ? bedrijf.bedrijf_URL : `https://${bedrijf.bedrijf_URL}`} target="_blank" rel="noopener noreferrer">{bedrijf.bedrijf_URL}</a></p>
+                        <p><span role="img" aria-label="website" dangerouslySetInnerHTML={{__html: "&#127760;"}} /> {bedrijf.bedrijf_URL ? (
+                          <a href={bedrijf.bedrijf_URL.startsWith('http') ? bedrijf.bedrijf_URL : `https://${bedrijf.bedrijf_URL}`} target="_blank" rel="noopener noreferrer">
+                            {bedrijf.bedrijf_URL}
+                          </a>
+                        ) : (
+                          <span>Geen website beschikbaar</span>
+                        )}</p>
                       </div>
                       <button
                         className="reserveer-btn modern"
