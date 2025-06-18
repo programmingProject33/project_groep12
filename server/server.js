@@ -238,15 +238,15 @@ app.post('/api/register', async (req, res) => {
 // Reserve a speeddate
 app.post('/api/speeddate', async (req, res) => {
   try {
-    const { user_id, bedrijf_id, speed_id } = req.body;
-    if (!user_id || !bedrijf_id || !speed_id) {
-      return res.status(400).json({ error: 'user_id, bedrijf_id en speed_id zijn verplicht' });
+    const { gebruiker_id, bedrijf_id, speed_id } = req.body;
+    if (!gebruiker_id || !bedrijf_id || !speed_id) {
+      return res.status(400).json({ error: 'gebruiker_id, bedrijf_id en speed_id zijn verplicht' });
     }
 
     // Controleer of de student al een actieve reservatie heeft bij dit bedrijf
     const [existing] = await db.promise().query(
-      'SELECT * FROM speeddates WHERE user_id = ? AND bedrijf_id = ? AND is_bezet = 1',
-      [user_id, bedrijf_id]
+      'SELECT * FROM speeddates WHERE gebruiker_id = ? AND bedrijf_id = ? AND is_bezet = 1',
+      [gebruiker_id, bedrijf_id]
     );
     if (existing.length > 0) {
       return res.status(400).json({ error: 'Je hebt al een reservatie bij dit bedrijf. Annuleer eerst je bestaande reservatie om een nieuwe te maken.' });
@@ -265,8 +265,8 @@ app.post('/api/speeddate', async (req, res) => {
     const slot = slots[0];
     // Reserve the exact slot
     await db.promise().query(
-      'UPDATE speeddates SET is_bezet = 1, user_id = ? WHERE speed_id = ?',
-      [user_id, speed_id]
+      'UPDATE speeddates SET is_bezet = 1, gebruiker_id = ? WHERE speed_id = ?',
+      [gebruiker_id, speed_id]
     );
     res.json({ message: 'Speeddate succesvol gereserveerd', speed_id: slot.speed_id });
   } catch (err) {
@@ -292,16 +292,16 @@ app.get('/api/speeddates/:bedrijfId', async (req, res) => {
 });
 
 // Get user's reservations
-app.get('/api/reservations/:userId', async (req, res) => {
+app.get('/api/reservations/:gebruikerId', async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { gebruikerId } = req.params;
     const [reservations] = await db.promise().query(
       `SELECT s.*, b.naam as bedrijfsnaam, b.sector, b.beschrijving 
        FROM speeddates s 
        JOIN bedrijven b ON s.bedrijf_id = b.bedrijf_id 
-       WHERE s.user_id = ? AND s.is_bezet = 1 
+       WHERE s.gebruiker_id = ? AND s.is_bezet = 1 
        ORDER BY s.starttijd`,
-      [userId]
+      [gebruikerId]
     );
     res.json(reservations);
   } catch (err) {
@@ -315,7 +315,7 @@ app.delete('/api/reservations/:speed_id', async (req, res) => {
   try {
     const { speed_id } = req.params;
     const [result] = await db.promise().query(
-      'UPDATE speeddates SET is_bezet = 0, user_id = NULL WHERE speed_id = ?',
+      'UPDATE speeddates SET is_bezet = 0, gebruiker_id = NULL WHERE speed_id = ?',
       [speed_id]
     );
     if (result.affectedRows === 0) {
@@ -329,15 +329,15 @@ app.delete('/api/reservations/:speed_id', async (req, res) => {
 });
 
 // Profiel updaten (student)
-app.patch('/api/profiel/:id', async (req, res) => {
+app.patch('/api/profiel/:gebruikerId', async (req, res) => {
   try {
-    const { id } = req.params;
+    const { gebruikerId } = req.params;
     const { voornaam, naam, email, opleiding, opleiding_jaar, dienstverbanden } = req.body;
     // dienstverbanden als JSON-string opslaan
     const dienstverbandenStr = dienstverbanden ? JSON.stringify(dienstverbanden) : null;
     const [result] = await db.promise().query(
-      `UPDATE gebruikers SET voornaam = ?, naam = ?, email = ?, opleiding = ?, opleiding_jaar = ?, dienstverbanden = ? WHERE id = ?`,
-      [voornaam, naam, email, opleiding, opleiding_jaar, dienstverbandenStr, id]
+      `UPDATE gebruikers SET voornaam = ?, naam = ?, email = ?, opleiding = ?, opleiding_jaar = ?, dienstverbanden = ? WHERE gebruiker_id = ?`,
+      [voornaam, naam, email, opleiding, opleiding_jaar, dienstverbandenStr, gebruikerId]
     );
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Gebruiker niet gevonden.' });
@@ -350,10 +350,10 @@ app.patch('/api/profiel/:id', async (req, res) => {
 });
 
 // Profiel ophalen (student)
-app.get('/api/profiel/:id', async (req, res) => {
+app.get('/api/profiel/:gebruikerId', async (req, res) => {
   try {
-    const { id } = req.params;
-    const [rows] = await db.promise().query('SELECT * FROM gebruikers WHERE id = ?', [id]);
+    const { gebruikerId } = req.params;
+    const [rows] = await db.promise().query('SELECT * FROM gebruikers WHERE gebruiker_id = ?', [gebruikerId]);
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Gebruiker niet gevonden.' });
     }
@@ -391,7 +391,7 @@ app.get('/api/studenten', async (req, res) => {
 app.get('/api/studenten/:studentId', async (req, res) => {
   try {
     const [studenten] = await db.promise().query(
-      'SELECT * FROM gebruikers WHERE id = ?',
+      'SELECT * FROM gebruikers WHERE gebruiker_id = ?',
       [req.params.studentId]
     );
     
@@ -465,7 +465,7 @@ console.log(`ingevoegd: ${name}`);
 app.post('/api/bedrijf/update', async (req, res) => {
   console.log('Ontvangen body voor update:', req.body); // Debug log
   const {
-    id,
+    gebruikerId,
     naam,
     BTW_nr,
     bedrijf_URL,
@@ -487,7 +487,7 @@ app.post('/api/bedrijf/update', async (req, res) => {
     beschrijving,
     zoeken_we
   } = req.body;
-  if (!id) {
+  if (!gebruikerId) {
     return res.status(400).json({ error: 'Bedrijf ID ontbreekt' });
   }
   try {
@@ -536,13 +536,13 @@ app.post('/api/bedrijf/update', async (req, res) => {
         sector,
         beschrijving,
         zoeken_we,
-        id
+        gebruikerId
       ]
     );
     // Dan de volledige geüpdatete data ophalen
     const [updatedBedrijf] = await db.promise().query(
       'SELECT * FROM bedrijven WHERE bedrijf_id = ?',
-      [id]
+      [gebruikerId]
     );
     if (updatedBedrijf.length === 0) {
       return res.status(404).json({ error: 'Bedrijf niet gevonden na update' });
@@ -565,7 +565,7 @@ app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
     const [reservaties] = await db.promise().query(
       `SELECT s.*, g.voornaam, g.naam, g.gebruikersnaam, g.email 
        FROM speeddates s 
-       JOIN gebruikers g ON s.user_id = g.id 
+       JOIN gebruikers g ON s.gebruiker_id = g.gebruiker_id 
        WHERE s.bedrijf_id = ? AND s.is_bezet = 1 
        ORDER BY s.starttijd ASC`,
       [req.params.bedrijfId]

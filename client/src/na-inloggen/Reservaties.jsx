@@ -15,15 +15,15 @@ const Reservaties = () => {
     const fetchReservations = async () => {
       try {
         const user = JSON.parse(localStorage.getItem('user'));
-        const userId = user?.id;
-        console.log('userId', userId);
-        if (!userId) {
+        const gebruikerId = user?.gebruiker_id;
+        console.log('gebruikerId', gebruikerId);
+        if (!gebruikerId) {
           navigate('/login');
           return;
         }
 
         console.log("fetching reservations");
-        const response = await fetch(`http://localhost:5000/api/reservations/${userId}`);
+        const response = await fetch(`http://localhost:5000/api/reservations/${gebruikerId}`);
         console.log("response", response);
         if (!response.ok) {
           throw new Error('Failed to fetch reservations');

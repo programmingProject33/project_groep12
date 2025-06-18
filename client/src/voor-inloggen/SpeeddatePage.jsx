@@ -57,7 +57,7 @@ export default function SpeeddatePage() {
   }, []);
 
   const handleReserve = async () => {
-    if (!user || !user.id) {
+    if (!user || !user.gebruiker_id) {
       navigate('/login');
       return;
     }
@@ -69,7 +69,7 @@ export default function SpeeddatePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: user.id,
+          gebruiker_id: user.gebruiker_id,
           bedrijf_id: bedrijfId,
           speed_id: selectedSlot.speed_id
         })
