@@ -10,6 +10,7 @@ const connection = mysql.createConnection({
     port: process.env.DB_PORT || 3306,
 });
 
+
 connection.connect((err) =>{
     if(err){
         console.error('Fout bij verbinden met MySQL:', err);
@@ -19,3 +20,15 @@ connection.connect((err) =>{
 });
 
 module.exports = connection;
+
+
+
+
+///// dit is een connectie tot de localhost database, als de online datahost valt dan, is dit een alternatief
+/*const connection = mysql.createConnection({
+   host: 'localhost', 
+   user: 'root',
+   password: '',
+   database: 'pp-groep12',
+   port: process.env.DB_PORT || 3306,
+});*/

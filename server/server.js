@@ -1,17 +1,47 @@
+const helmet = require('helmet');
 const express = require('express');
 const cors = require('cors');
 const db = require('./db');
-/* const fs = require('fs');  verwijder dit niet het leest de josn file  */
+require('dotenv').config(); 
+
+// begin van admin routes
+const adminLogin = require('./routes/adminLogin');
+const protectedRoute = require('./routes/adminProtected');
+const adminProfile = require('./routes/adminProfile');
+const bedrijven = require('./routes/bedrijven');
+const studenten = require('./routes/studenten');
+const speeddates = require('./routes/speeddates');
+const stats = require('./routes/stats');
+const admins = require('./routes/admins');
+
+
+
+
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 const PORT = process.env.PORT || 5000;
+
+app.use(cors());
+app.use(helmet()); // XSS-headers, CSP e.d. " het is een beveiliging tegen javascript injactie"
+app.use(express.json({ limit: '10kb' }));  // voorkomen grote payloads
+//app.use(express.json());
+
 
 // Root route
 app.get('/', (req, res) => {
   res.json({ message: 'CareerLaunch API is running' });
 });
+
+// admin routes 
+app.use('/api/admin', adminLogin);
+app.use('/api/admin', protectedRoute);
+app.use('/api/admin', adminProfile);
+app.use('/api/admin', bedrijven);
+app.use('/api/admin', studenten);
+app.use('/api/admin', speeddates);
+app.use('/api/admin', stats );
+app.use('/api/admin', admins);
+// eind van admin routes
 
 // Login endpoint
 app.post('/api/login', async (req, res) => {
@@ -251,59 +281,7 @@ app.use((err, req, res, next) => {
   });
 });
 
+                      
 app.listen(PORT, () => {
   console.log(`Server draait op http://localhost:${PORT}`);
 });
-
-
-//    Opmerking verwijder niet deze script want ik gaan dat later hergebruiken
-
-
-// data importeren van bedrijvenlijst.json en deze in databank opslaan
-/*const data =JSON.parse(fs.readFileSync('bedrijvenlijst.json', 'utf8'));
- 
-data.forEach(bedrijf => {
-  const { name, url, doelgroep_jaar, doelgroep_opleiding, aanbiedingen } = bedrijf; 
-
-  const inserBedijf = `INSERT INTO bedrijven (naam, bedrijf_URL) VALUES (?, ?)`;
-  
-  db.query(inserBedijf, [name, url], (err, result) =>{
-    if(err){
-      console.error('fout bij invoegen bedrijf: ', name, err);
-      return;
-    }
-
-    const bedrijfId = result.insertId;
-
-    doelgroep_jaar.forEach(jaar => {
-      db.query(
-      `INSERT INTO bedrijf_doelgroep_jaar (bedrijf_id, jaar) VALUES (?, ?)`,
-      [bedrijfId, jaar]
-      );
-    });
-
-    doelgroep_opleiding.forEach(opleiding => {
-      db.query(
-        `INSERT INTO bedrijf_doelgroep_opl (bedrijf_id, opleiding) VALUES (?, ?)`,
-        [bedrijfId, opleiding]
-      );
-    });
-
-    aanbiedingen.forEach(type => {
-      db.query(
-        `INSERT INTO bedrijven_aanbiedingen (bedrijf_id, type) VALUES (?, ?)`,
-        [bedrijfId, type]
-      );
-    });
-
-    const sqlSpeeddates = `INSERT INTO speeddates (bedrijf_id, is_bezet) VALUES (?, ?)`;
-    db.query(sqlSpeeddates, [bedrijfId, bedrijf.speeddates], (err) => {
-      if (err) throw err;
-    });
-    
-
-  });
-
-console.log(`ingevoegd: ${name}`);
-});
-*/
