@@ -1,55 +1,94 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import BedrijfNavbar from "./BedrijfNavbar";
 import BedrijfFooter from "./bedrijfFooter";
 import "./profielBedrijf.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext.jsx";
+import { FaBuilding } from "react-icons/fa";
 
 export default function Profiel() {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
-  console.log("user in profiel:", user); // Debug: toon het user-object in de browserconsole
-  const [form, setForm] = useState({
-    naam: user?.naam || "",
-    email: user?.email || "",
-    gebruikersnaam: user?.gebruikersnaam || "",
-    beschrijving: user?.beschrijving || "",
-    bedrijf_URL: user?.bedrijf_URL || ""
-  });
+  const [editMode, setEditMode] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-  const [editing, setEditing] = useState(false);
+  const fileInputRef = useRef();
 
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
-    navigate("/");
-  };
+  // Alle bedrijfsvelden
+  const [profile, setProfile] = useState({
+    bedrijf_id: user?.bedrijf_id || "",
+    bedrijf_URL: user?.bedrijf_URL || "",
+    naam: user?.naam || "",
+    BTW_nr: user?.BTW_nr || "",
+    straatnaam: user?.straatnaam || "",
+    huis_nr: user?.huis_nr || "",
+    bus_nr: user?.bus_nr || "",
+    postcode: user?.postcode || "",
+    gemeente: user?.gemeente || "",
+    telefoon_nr: user?.telefoon_nr || "",
+    email: user?.email || "",
+    contact_voornaam: user?.contact_voornaam || "",
+    contact_naam: user?.contact_naam || "",
+    contact_specialisatie: user?.contact_specialisatie || "",
+    contact_email: user?.contact_email || "",
+    contact_telefoon: user?.contact_telefoon || "",
+    gebruikersnaam: user?.gebruikersnaam || "",
+    wachtwoord: user?.wachtwoord || "",
+    sector: user?.sector || "",
+    beschrijving: user?.beschrijving || "",
+    zoeken_we: user?.zoeken_we || "",
+    created_at: user?.created_at || ""
+  });
+
+  useEffect(() => {
+    if (user) {
+      setProfile({
+        bedrijf_id: user.bedrijf_id || "",
+        bedrijf_URL: user.bedrijf_URL || "",
+        naam: user.naam || "",
+        BTW_nr: user.BTW_nr || "",
+        straatnaam: user.straatnaam || "",
+        huis_nr: user.huis_nr || "",
+        bus_nr: user.bus_nr || "",
+        postcode: user.postcode || "",
+        gemeente: user.gemeente || "",
+        telefoon_nr: user.telefoon_nr || "",
+        email: user.email || "",
+        contact_voornaam: user.contact_voornaam || "",
+        contact_naam: user.contact_naam || "",
+        contact_specialisatie: user.contact_specialisatie || "",
+        contact_email: user.contact_email || "",
+        contact_telefoon: user.contact_telefoon || "",
+        gebruikersnaam: user.gebruikersnaam || "",
+        wachtwoord: user.wachtwoord || "",
+        sector: user.sector || "",
+        beschrijving: user.beschrijving || "",
+        zoeken_we: user.zoeken_we || "",
+        created_at: user.created_at || ""
+      });
+    }
+  }, [user]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleEdit = () => {
-    setEditing(true);
-    setSuccess("");
-    setError("");
+    setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
     setSuccess("");
     setError("");
+    const postData = { ...profile, id: parseInt(profile.bedrijf_id, 10) };
+    console.log('POST profiel:', postData);
     try {
       const res = await fetch("/api/bedrijf/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, id: user.bedrijf_id })
+        body: JSON.stringify(postData)
       });
       if (res.ok) {
         setSuccess("Profiel succesvol bijgewerkt.");
-        setEditing(false);
-        setUser({ ...user, ...form });
+        setEditMode(false);
+        setUser({ ...user, ...profile });
       } else {
         setError("Er is iets misgegaan bij het opslaan.");
       }
@@ -58,72 +97,86 @@ export default function Profiel() {
     }
   };
 
+  // Avatar: eerste letter bedrijfsnaam
+  const avatar = (
+    <div className="bedrijfprofiel-avatar-letter">
+      {(profile.naam || "").charAt(0).toUpperCase() || <FaBuilding />}
+    </div>
+  );
+
   return (
-    <div>
+    <div className="bedrijfprofiel-bg">
       <BedrijfNavbar />
-      <main className="profielbedrijf-main">
-        <h1>Profiel</h1>
-        <p>Hier kun je de bedrijfsgegevens en contactinformatie bekijken of aanpassen.</p>
-        {success && <div className="profielbedrijf-success">{success}</div>}
-        {error && <div className="profielbedrijf-error">{error}</div>}
-        {editing ? (
-          <form className="profielbedrijf-form" onSubmit={handleSave}>
-            <label>
-              Bedrijfsnaam
-              <input type="text" name="naam" value={form.naam} onChange={handleChange} />
-            </label>
-            <label>
-              E-mail
-              <input type="email" name="email" value={form.email} onChange={handleChange} />
-            </label>
-            <label>
-              Gebruikersnaam
-              <input type="text" name="gebruikersnaam" value={form.gebruikersnaam} onChange={handleChange} />
-            </label>
-            <label>
-              Beschrijving
-              <textarea name="beschrijving" value={form.beschrijving} onChange={handleChange} />
-            </label>
-            <label>
-              Website
-              <input type="text" name="bedrijf_URL" value={form.bedrijf_URL} onChange={handleChange} />
-            </label>
-            <button type="submit" className="profielbedrijf-save-btn">Opslaan</button>
+      <div className="bedrijfprofiel-card">
+        <div className="bedrijfprofiel-avatar-box">{avatar}</div>
+        <div className="bedrijfprofiel-title">{profile.naam}</div>
+        <div className="bedrijfprofiel-sub">{profile.sector}</div>
+        {success && <div className="bedrijfprofiel-success">{success}</div>}
+        {error && <div className="bedrijfprofiel-error">{error}</div>}
+        <button className="profielbedrijf-edit-btn" onClick={() => setEditMode((v) => !v)}>
+          {editMode ? "Annuleren" : "Profiel bewerken"}
+        </button>
+        {editMode ? (
+          <form className="bedrijfprofiel-form" onSubmit={handleSave}>
+            <div className="bedrijfprofiel-info-list">
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Bedrijfsnaam</span><input name="naam" value={profile.naam} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">BTW-nummer</span><input name="BTW_nr" value={profile.BTW_nr} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Website</span><input name="bedrijf_URL" value={profile.bedrijf_URL} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Straatnaam</span><input name="straatnaam" value={profile.straatnaam} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Huisnummer</span><input name="huis_nr" value={profile.huis_nr} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Busnummer</span><input name="bus_nr" value={profile.bus_nr} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Postcode</span><input name="postcode" value={profile.postcode} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Gemeente</span><input name="gemeente" value={profile.gemeente} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Telefoon</span><input name="telefoon_nr" value={profile.telefoon_nr} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">E-mail</span><input name="email" value={profile.email} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact voornaam</span><input name="contact_voornaam" value={profile.contact_voornaam} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact naam</span><input name="contact_naam" value={profile.contact_naam} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact specialisatie</span><input name="contact_specialisatie" value={profile.contact_specialisatie} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact e-mail</span><input name="contact_email" value={profile.contact_email} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact telefoon</span><input name="contact_telefoon" value={profile.contact_telefoon} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Gebruikersnaam</span><input name="gebruikersnaam" value={profile.gebruikersnaam} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Wachtwoord</span><input name="wachtwoord" type="password" value={profile.wachtwoord} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Sector</span><input name="sector" value={profile.sector} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Beschrijving</span><textarea name="beschrijving" value={profile.beschrijving} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Wat zoeken we?</span><textarea name="zoeken_we" value={profile.zoeken_we} onChange={handleChange} /></div>
+            </div>
+            <button type="submit" className="bedrijfprofiel-save-btn">Opslaan</button>
           </form>
         ) : (
-          <>
-            <form className="profielbedrijf-form" onSubmit={e => e.preventDefault()}>
-              <label>
-                Bedrijfsnaam
-                <input type="text" name="naam" value={form.naam} disabled />
-              </label>
-              <label>
-                E-mail
-                <input type="email" name="email" value={form.email} disabled />
-              </label>
-              <label>
-                Gebruikersnaam
-                <input type="text" name="gebruikersnaam" value={form.gebruikersnaam} disabled />
-              </label>
-              <label>
-                Beschrijving
-                <textarea name="beschrijving" value={form.beschrijving} disabled />
-              </label>
-              <label>
-                Website
-                <input type="text" name="bedrijf_URL" value={form.bedrijf_URL} disabled />
-              </label>
-            </form>
-            <button type="button" className="profielbedrijf-edit-btn" onClick={handleEdit}>Bewerken</button>
-          </>
+          <div className="bedrijfprofiel-info-list">
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Bedrijfsnaam</span><span className="bedrijfprofiel-value">{profile.naam}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">BTW-nummer</span><span className="bedrijfprofiel-value">{profile.BTW_nr}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Website</span><span className="bedrijfprofiel-value">{profile.bedrijf_URL}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Straatnaam</span><span className="bedrijfprofiel-value">{profile.straatnaam}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Huisnummer</span><span className="bedrijfprofiel-value">{profile.huis_nr}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Busnummer</span><span className="bedrijfprofiel-value">{profile.bus_nr}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Postcode</span><span className="bedrijfprofiel-value">{profile.postcode}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Gemeente</span><span className="bedrijfprofiel-value">{profile.gemeente}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Telefoon</span><span className="bedrijfprofiel-value">{profile.telefoon_nr}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">E-mail</span><span className="bedrijfprofiel-value">{profile.email}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact voornaam</span><span className="bedrijfprofiel-value">{profile.contact_voornaam}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact naam</span><span className="bedrijfprofiel-value">{profile.contact_naam}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact specialisatie</span><span className="bedrijfprofiel-value">{profile.contact_specialisatie}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact e-mail</span><span className="bedrijfprofiel-value">{profile.contact_email}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact telefoon</span><span className="bedrijfprofiel-value">{profile.contact_telefoon}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Gebruikersnaam</span><span className="bedrijfprofiel-value">{profile.gebruikersnaam}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Wachtwoord</span><span className="bedrijfprofiel-value">••••••••</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Sector</span><span className="bedrijfprofiel-value">{profile.sector}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Beschrijving</span><span className="bedrijfprofiel-value">{profile.beschrijving}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Wat zoeken we?</span><span className="bedrijfprofiel-value">{profile.zoeken_we}</span></div>
+          </div>
         )}
         <button
-          onClick={handleLogout}
+          onClick={() => {
+            setUser(null);
+            localStorage.removeItem("user");
+            navigate("/");
+          }}
           className="profielbedrijf-logout-btn"
         >
           Uitloggen
         </button>
-      </main>
+      </div>
       <BedrijfFooter />
     </div>
   );

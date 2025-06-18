@@ -111,10 +111,6 @@
 .bedrijfprofiel-bg {
   min-height: 100vh;
   background: #f9fbff;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
 }
 
 .bedrijfprofiel-card {
@@ -122,18 +118,13 @@
   border-radius: 1.5rem;
   box-shadow: 0 4px 24px rgba(30,41,59,0.10);
   padding: 2.5rem 2.2rem 2.2rem 2.2rem;
-  max-width: 540px;
+  max-width: 420px;
   width: 100%;
-  margin: 2.5rem auto 2.5rem auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.2rem;
-  animation: fadein 0.7s cubic-bezier(.4,0,.2,1);
-}
-@keyframes fadein {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  margin: 2.5rem auto 2.5rem auto;
 }
 
 .bedrijfprofiel-avatar-box {
@@ -142,6 +133,7 @@
   align-items: center;
   margin-bottom: 0.5rem;
 }
+
 .bedrijfprofiel-avatar-letter {
   width: 92px;
   height: 92px;
@@ -159,18 +151,89 @@
 }
 
 .bedrijfprofiel-title {
-  font-size: 1.7rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 0.2rem;
   text-align: center;
 }
+
 .bedrijfprofiel-sub {
   color: #64748b;
   font-size: 1.05rem;
   margin-bottom: 0.7rem;
   text-align: center;
 }
+
+.bedrijfprofiel-info-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-top: 1.2rem;
+}
+
+.bedrijfprofiel-info-item {
+  background: #f5f7fa;
+  border-radius: 0.7rem;
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  font-size: 1.08rem;
+  color: #222;
+  font-weight: 500;
+}
+
+.bedrijfprofiel-label {
+  color: #2563eb;
+  font-weight: 700;
+  margin-right: 0.7rem;
+  min-width: 120px;
+  display: inline-block;
+}
+
+.bedrijfprofiel-value {
+  color: #222;
+  font-weight: 500;
+}
+
+.bedrijfprofiel-edit-btn {
+  background: #e0e7ff;
+  color: #2563eb;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 0.7rem;
+  margin-top: 0.2rem;
+  align-self: flex-end;
+  transition: background 0.18s;
+}
+.bedrijfprofiel-edit-btn:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+.bedrijfprofiel-save-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1.2rem;
+  align-self: flex-end;
+  transition: background 0.18s;
+}
+.bedrijfprofiel-save-btn:hover {
+  background: #1d4ed8;
+}
+
 .bedrijfprofiel-success {
   width: 100%;
   margin-bottom: 0.7rem;

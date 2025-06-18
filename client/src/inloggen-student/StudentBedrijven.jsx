@@ -32,9 +32,12 @@ function StudentBedrijven() {
   console.log('user:', user, 'isAuthLoading:', isAuthLoading);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/bedrijven")
+    fetch("/api/bedrijven")
       .then((res) => res.json())
-      .then((data) => setBedrijven(data))
+      .then((data) => {
+        console.log('Opgehaalde bedrijven:', data);
+        setBedrijven(data);
+      })
       .catch((err) => console.error("Fout bij ophalen:", err));
   }, []);
 
@@ -50,40 +53,44 @@ function StudentBedrijven() {
           <h1 className="bedrijven-title"><span role="img" aria-label="zoek" dangerouslySetInnerHTML={{__html: "&#128269;"}} /> Ontdek onze partnerbedrijven</h1>
           <p className="bedrijven-subtitle">Kies je favoriet en plan je speeddates</p>
           <div className="bedrijven-grid">
-            {Array.isArray(bedrijven) && bedrijven.map((bedrijf, index) => {
-              const accentColor = getSectorColor(index, bedrijf.sector);
-              const icon = getSectorIcon(bedrijf.sector);
-              return (
-                <div
-                  key={bedrijf.bedrijf_id}
-                  className="bedrijf-card modern no-bg"
-                  style={{
-                    '--accent-color': accentColor,
-                    '--animation-order': index,
-                    animationDelay: `${index * 0.1}s`
-                  }}
-                >
-                  <div className="bedrijf-card-accent"></div>
-                  <div className="bedrijf-card-content">
-                    <div className="bedrijf-card-icon">{icon}</div>
-                    <h2 className="bedrijf-naam">{bedrijf.naam}</h2>
-                    <div className="bedrijf-info">
-                      <div className="bedrijf-details">
-                        <p><span role="img" aria-label="adres" dangerouslySetInnerHTML={{__html: "&#128205;"}} /> {bedrijf.straatnaam} {bedrijf.huis_nr}{bedrijf.bus_nr && ` bus ${bedrijf.bus_nr}`}, {bedrijf.postcode} {bedrijf.gemeente}</p>
-                        <p><span role="img" aria-label="email" dangerouslySetInnerHTML={{__html: "&#128231;"}} /> <a href={`mailto:${bedrijf.email}`}>{bedrijf.email}</a></p>
-                        <p><span role="img" aria-label="website" dangerouslySetInnerHTML={{__html: "&#127760;"}} /> <a href={bedrijf.bedrijf_URL.startsWith('http') ? bedrijf.bedrijf_URL : `https://${bedrijf.bedrijf_URL}`} target="_blank" rel="noopener noreferrer">{bedrijf.bedrijf_URL}</a></p>
+            {Array.isArray(bedrijven) && bedrijven
+              .sort((a, b) => a.naam.localeCompare(b.naam))
+              .map((bedrijf, index) => {
+                const accentColor = getSectorColor(index, bedrijf.sector);
+                const icon = getSectorIcon(bedrijf.sector);
+                return (
+                  <div
+                    key={bedrijf.bedrijf_id}
+                    className="bedrijf-card modern no-bg bedrijf-fadein"
+                    style={{
+                      '--accent-color': accentColor,
+                      '--animation-order': index,
+                      animationDelay: '0s'
+                    }}
+                  >
+                    <div className="bedrijf-card-accent"></div>
+                    <div className="bedrijf-card-content">
+                      <div className="bedrijf-card-icon">{icon}</div>
+                      <h2 className="bedrijf-naam">{bedrijf.naam}</h2>
+                      <div className="bedrijf-info">
+                        <div className="bedrijf-details">
+                          <p key={`adres-${bedrijf.bedrijf_id}`}><span role="img" aria-label="adres" dangerouslySetInnerHTML={{__html: "&#128205;"}} /> {bedrijf.straatnaam} {bedrijf.huis_nr}{bedrijf.bus_nr && ` bus ${bedrijf.bus_nr}`}, {bedrijf.postcode} {bedrijf.gemeente}</p>
+                          <p key={`email-${bedrijf.bedrijf_id}`}><span role="img" aria-label="email" dangerouslySetInnerHTML={{__html: "&#128231;"}} /> <a href={`mailto:${bedrijf.email}`}>{bedrijf.email}</a></p>
+                          {bedrijf.bedrijf_URL && (
+                            <p key={`website-${bedrijf.bedrijf_id}`}><span role="img" aria-label="website" dangerouslySetInnerHTML={{__html: "&#127760;"}} /> <a href={bedrijf.bedrijf_URL.startsWith('http') ? bedrijf.bedrijf_URL : `https://${bedrijf.bedrijf_URL}`} target="_blank" rel="noopener noreferrer">{bedrijf.bedrijf_URL}</a></p>
+                          )}
+                        </div>
+                        <button
+                          className="reserveer-btn modern"
+                          onClick={() => navigate(`/speeddate/${bedrijf.bedrijf_id}`)}
+                        >
+                          <FaCalendarAlt className="btn-icon" style={{ marginRight: 8 }} /> Reserveer speeddate
+                        </button>
                       </div>
-                      <button
-                        className="reserveer-btn modern"
-                        onClick={() => navigate(`/speeddate/${bedrijf.bedrijf_id}`)}
-                      >
-                        <FaCalendarAlt className="btn-icon" style={{ marginRight: 8 }} /> Reserveer speeddate
-                      </button>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </div>
       </main>
