@@ -28,7 +28,10 @@ export default function Contact() {
     formRef.current.appendChild(hiddenTimeInput);
 
     emailjs
-      .sendForm("service_56505", "template_56505", formRef.current, "pUyVB_nOy-XVHRrga")
+      .sendForm("admin_groep12",    // ✅ your service ID
+        "admin_12",         // ✅ your template ID
+        formRef.current,    // ✅ form reference
+        "hR1SrVH5iBfyJtEzM")
       .then(() => {
         setSent(true);
         formRef.current.reset();
