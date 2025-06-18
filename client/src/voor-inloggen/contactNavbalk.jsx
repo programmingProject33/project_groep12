@@ -1,15 +1,29 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "./contactNavbalk.css";
-import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
+import { FaLinkedin, FaInstagram, FaTiktok } from "react-icons/fa6";
+import emailjs from "emailjs-com";
 
 export default function Contact() {
   const navigate = useNavigate();
   const [sent, setSent] = useState(false);
+  const formRef = useRef();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSent(true);
+
+    emailjs
+      .sendForm("admin_groep12", "admin_12", formRef.current, "hR1SrVH5iBfyJtEzM")
+      .then(
+        (result) => {
+          console.log("Email successfully sent!", result.text);
+          setSent(true);
+        },
+        (error) => {
+          console.error("Email send error:", error.text);
+          setSent(false);
+        }
+      );
   };
 
   return (
@@ -20,6 +34,7 @@ export default function Contact() {
         <p className="subtitle">
           We helpen je graag! Neem contact met ons op als je vragen of opmerkingen hebt.
         </p>
+
         <section className="contact-info">
           <h2>Contact Informaties</h2>
           <div className="contact-table">
@@ -40,22 +55,22 @@ export default function Contact() {
 
         <section className="contact-form-section">
           <h2>Send us a Message</h2>
-          <form className="contact-form" onSubmit={handleSubmit}>
+          <form className="contact-form" ref={formRef} onSubmit={handleSubmit}>
             <label>
               Voornaam + Achternaam
-              <input type="text" placeholder="Enter your name" required />
+              <input name="user_name" type="text" placeholder="Enter your name" required />
             </label>
             <label>
               E-mail
-              <input type="email" placeholder="Enter your email" required />
+              <input name="user_email" type="email" placeholder="Enter your email" required />
             </label>
             <label>
               Onderwerp
-              <input type="text" placeholder="Enter the subject" required />
+              <input name="subject" type="text" placeholder="Enter the subject" required />
             </label>
             <label>
               Message
-              <textarea placeholder="Enter your message" rows={5} required />
+              <textarea name="message" placeholder="Enter your message" rows={5} required />
             </label>
             <button type="submit" className="contact-btn">
               Verzenden
@@ -116,7 +131,6 @@ export default function Contact() {
               >
                 <FaInstagram />
               </a>
-           
               <a
                 href="https://www.tiktok.com/@erasmushogeschool"
                 target="_blank"
