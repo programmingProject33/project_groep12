@@ -128,6 +128,10 @@ app.post('/api/register', async (req, res) => {
     try {
       const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden } = userData;
       const dienstverbandenStr = dienstverbanden ? JSON.stringify(dienstverbanden) : null;
+      
+      // Convert empty string to NULL for integer fields
+      const opleidingJaarValue = opleiding_jaar === '' ? null : opleiding_jaar;
+      
       // Check if user exists
       const [existingUsers] = await db.promise().query(
         'SELECT * FROM gebruikers WHERE email = ? OR gebruikersnaam = ?',
@@ -139,7 +143,7 @@ app.post('/api/register', async (req, res) => {
       // Insert new user
       const [result] = await db.promise().query(
         'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbandenStr]
+        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleidingJaarValue, dienstverbandenStr]
       );
       console.log('User created successfully:', result);
       res.status(201).json({ message: 'Account succesvol aangemaakt' });
