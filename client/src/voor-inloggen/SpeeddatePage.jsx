@@ -13,6 +13,7 @@ export default function SpeeddatePage() {
   const [errorMessage, setErrorMessage] = useState("");
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [userReservations, setUserReservations] = useState([]);
 
   const fetchTimeslots = async () => {
     setLoadingSlots(true);
@@ -59,6 +60,33 @@ export default function SpeeddatePage() {
       window.removeEventListener('reservationCancelled', handleReservationCancelled);
     };
   }, []);
+
+  useEffect(() => {
+    // Haal alle reserveringen van de student op
+    async function fetchUserReservations() {
+      if (!user) return;
+      try {
+        const res = await fetch(`http://localhost:5000/api/reservations/${user.gebruiker_id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setUserReservations(data);
+        }
+      } catch (e) {}
+    }
+    fetchUserReservations();
+  }, [user]);
+
+  // Check of student al een reservering heeft bij dit bedrijf
+  const existingReservation = userReservations.find(r => String(r.bedrijf_id) === String(bedrijfId));
+
+  // Verzamel alle reeds gereserveerde tijdstippen van de student
+  const reservedTimes = userReservations.map(r => r.starttijd);
+
+  // Verzamel alle bezette tijdsloten bij dit bedrijf
+  const takenSlots = timeslots.filter(slot => slot.is_bezet);
+  if (bedrijf && process.env.NODE_ENV !== 'production') {
+    console.log(`Bezet bij bedrijf ${bedrijf.naam} (${bedrijfId}):`, takenSlots.map(s => ({ tijd: s.starttijd, gebruiker_id: s.gebruiker_id })));
+  }
 
   const handleReserve = async () => {
     if (!user || !user.gebruiker_id) {
@@ -139,6 +167,11 @@ export default function SpeeddatePage() {
           </div>
 
           <div className="speeddate-slots-box">
+            {existingReservation && (
+              <div style={{background:'#e0fbe6', color:'#166534', borderRadius:8, padding:'1rem', marginBottom:16, fontWeight:600, fontSize:'1.08rem', textAlign:'center'}}>
+                ✅ Je hebt een reservering op {formatTime(existingReservation.starttijd)} - {formatTime(existingReservation.eindtijd)} bij dit bedrijf.
+              </div>
+            )}
             {errorMessage && (
               <div style={{ color: 'red', marginBottom: 16, fontWeight: 500 }}>
                 {errorMessage}
@@ -168,17 +201,23 @@ export default function SpeeddatePage() {
                       Er zijn momenteel geen tijdsloten beschikbaar voor dit bedrijf.
                     </div>
                   ) : (
-                    timeslots.filter(isNotPauseSlot).map((slot) => (
-                      <button
-                        key={slot.speed_id}
-                        className={`speeddate-slot-btn${slot.is_bezet ? " reserved" : ""}${selectedSlot && selectedSlot.speed_id === slot.speed_id ? " selected" : ""}`}
-                        onClick={() => !slot.is_bezet && setSelectedSlot(slot)}
-                        type="button"
-                        disabled={slot.is_bezet}
-                      >
-                        {formatTime(slot.starttijd)} - {formatTime(slot.eindtijd)}
-                      </button>
-                    ))
+                    timeslots.filter(isNotPauseSlot).map((slot) => {
+                      // Blokkeer slot als het tijdstip al door deze student is gereserveerd (bedrijf-onafhankelijk)
+                      const isOwnReserved = reservedTimes.includes(slot.starttijd);
+                      // Blokkeer slot als het al bezet is door een andere student bij dit bedrijf
+                      const isTakenByOther = slot.is_bezet && (!user || slot.gebruiker_id !== user.gebruiker_id);
+                      return (
+                        <button
+                          key={slot.speed_id}
+                          className={`speeddate-slot-btn${slot.is_bezet || isOwnReserved ? " reserved" : ""}${selectedSlot && selectedSlot.speed_id === slot.speed_id ? " selected" : ""}`}
+                          onClick={() => !slot.is_bezet && !isOwnReserved && !isTakenByOther && setSelectedSlot(slot)}
+                          type="button"
+                          disabled={slot.is_bezet || isOwnReserved || isTakenByOther}
+                        >
+                          {formatTime(slot.starttijd)} - {formatTime(slot.eindtijd)}
+                        </button>
+                      );
+                    })
                   )}
                 </div>
                 {selectedSlot && (
