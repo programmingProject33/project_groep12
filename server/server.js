@@ -155,42 +155,70 @@ app.post('/api/register', async (req, res) => {
     }
   } else if (type === 'bedrijf') {
     const { 
-      bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
-      voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
-      gebruikersnaam_bedrijf, wachtwoord_bedrijf 
+      bedrijfsnaam, 
+      btw, 
+      straat, 
+      huis_nr, 
+      bus_nr, 
+      postcode, 
+      gemeente, 
+      telbedrijf, 
+      emailbedrijf,
+      voornaam_contact, 
+      naam_contact, 
+      specialisatie, 
+      email_contact, 
+      tel_contact,
+      gebruikersnaam_bedrijf, 
+      wachtwoord_bedrijf,
+      beschrijving,
+      zoeken_we 
     } = userData;
     
     // Check if company already exists
-    db.query('SELECT * FROM bedrijven WHERE emailbedrijf = ? OR gebruikersnaam = ?', 
+    db.query('SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?', 
       [emailbedrijf, gebruikersnaam_bedrijf], 
       (err, results) => {
         if (err) {
-          console.error('Database error checking existing company:', err);
+          console.error('Database error checking existing company:', err, { emailbedrijf, gebruikersnaam_bedrijf });
           return res.status(500).json({ error: 'Database error', details: err.message });
         }
         if (results.length > 0) {
+          console.error('Company already exists:', { emailbedrijf, gebruikersnaam_bedrijf });
           return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
         }
         
         // Insert new company
         const query = `INSERT INTO bedrijven (
-          bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
-          voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
-          gebruikersnaam, wachtwoord
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+          naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email,
+          contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
+          gebruikersnaam, wachtwoord, beschrijving, zoeken_we
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         
         const values = [
-          bedrijfsnaam, kvk, btw, straat, gemeente, telbedrijf, emailbedrijf,
-          voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
-          gebruikersnaam_bedrijf, wachtwoord_bedrijf
+          bedrijfsnaam, // naam
+          btw,          // BTW_nr
+          straat,       // straatnaam
+          huis_nr,      // huis_nr
+          bus_nr,       // bus_nr
+          postcode,     // postcode
+          gemeente,     // gemeente
+          telbedrijf,   // telefoon_nr
+          emailbedrijf, // email
+          voornaam_contact,
+          naam_contact,
+          specialisatie,
+          email_contact,
+          tel_contact,
+          gebruikersnaam_bedrijf,
+          wachtwoord_bedrijf,
+          beschrijving,
+          zoeken_we
         ];
-        
-        console.log('Executing query:', query);
-        console.log('With values:', values);
         
         db.query(query, values, (err, result) => {
           if (err) {
-            console.error('Database error creating company:', err);
+            console.error('Database error creating company:', err, values);
             return res.status(500).json({ error: 'Database error', details: err.message });
           }
           console.log('Company created successfully:', result);
@@ -432,30 +460,91 @@ console.log(`ingevoegd: ${name}`);
 // Profiel van bedrijf updaten
 app.post('/api/bedrijf/update', async (req, res) => {
   console.log('Ontvangen body voor update:', req.body); // Debug log
-  const { id, naam, email, gebruikersnaam, beschrijving, bedrijf_URL } = req.body;
+  const {
+    id,
+    naam,
+    BTW_nr,
+    bedrijf_URL,
+    straatnaam,
+    huis_nr,
+    bus_nr,
+    postcode,
+    gemeente,
+    telefoon_nr,
+    email,
+    contact_voornaam,
+    contact_naam,
+    contact_specialisatie,
+    contact_email,
+    contact_telefoon,
+    gebruikersnaam,
+    wachtwoord,
+    sector,
+    beschrijving,
+    zoeken_we
+  } = req.body;
   if (!id) {
     return res.status(400).json({ error: 'Bedrijf ID ontbreekt' });
   }
   try {
-    // Eerst updaten
+    // Alle velden updaten behalve bedrijf_id en created_at
     await db.promise().query(
-      `UPDATE bedrijven SET naam = ?, email = ?, gebruikersnaam = ?, beschrijving = ?, bedrijf_URL = ? WHERE bedrijf_id = ?`,
-      [naam, email, gebruikersnaam, beschrijving, bedrijf_URL, id]
+      `UPDATE bedrijven SET 
+        naam = ?, 
+        BTW_nr = ?,
+        bedrijf_URL = ?,
+        straatnaam = ?,
+        huis_nr = ?,
+        bus_nr = ?,
+        postcode = ?,
+        gemeente = ?,
+        telefoon_nr = ?,
+        email = ?,
+        contact_voornaam = ?,
+        contact_naam = ?,
+        contact_specialisatie = ?,
+        contact_email = ?,
+        contact_telefoon = ?,
+        gebruikersnaam = ?,
+        wachtwoord = ?,
+        sector = ?,
+        beschrijving = ?,
+        zoeken_we = ?
+      WHERE bedrijf_id = ?`,
+      [
+        naam,
+        BTW_nr,
+        bedrijf_URL,
+        straatnaam,
+        huis_nr,
+        bus_nr,
+        postcode,
+        gemeente,
+        telefoon_nr,
+        email,
+        contact_voornaam,
+        contact_naam,
+        contact_specialisatie,
+        contact_email,
+        contact_telefoon,
+        gebruikersnaam,
+        wachtwoord,
+        sector,
+        beschrijving,
+        zoeken_we,
+        id
+      ]
     );
-    
     // Dan de volledige geüpdatete data ophalen
     const [updatedBedrijf] = await db.promise().query(
       'SELECT * FROM bedrijven WHERE bedrijf_id = ?',
       [id]
     );
-    
     if (updatedBedrijf.length === 0) {
       return res.status(404).json({ error: 'Bedrijf niet gevonden na update' });
     }
-    
     const user = updatedBedrijf[0];
     delete user.wachtwoord; // Verwijder wachtwoord uit response
-    
     res.json({
       message: 'Profiel succesvol bijgewerkt',
       user: user
@@ -480,6 +569,61 @@ app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
     res.json(reservaties);
   } catch (err) {
     console.error('Error fetching company reservations:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Create timeslots for a company
+app.post('/api/speeddates/create', async (req, res) => {
+  try {
+    const { bedrijf_id, date } = req.body;
+    
+    if (!bedrijf_id || !date) {
+      return res.status(400).json({ error: 'bedrijf_id en date zijn verplicht' });
+    }
+
+    // Tijdsloten genereren voor de opgegeven datum
+    // Van 10:00 tot 13:00 en 14:00 tot 16:00, elke 10 minuten
+    const slots = [];
+    const baseDate = new Date(date);
+    
+    // Ochtend slots (10:00 - 13:00)
+    for (let hour = 10; hour < 13; hour++) {
+      for (let minute = 0; minute < 60; minute += 10) {
+        const startTime = new Date(baseDate);
+        startTime.setHours(hour, minute, 0);
+        
+        const endTime = new Date(startTime);
+        endTime.setMinutes(endTime.getMinutes() + 10);
+        
+        slots.push([startTime, endTime]);
+      }
+    }
+    
+    // Middag slots (14:00 - 16:00)
+    for (let hour = 14; hour < 16; hour++) {
+      for (let minute = 0; minute < 60; minute += 10) {
+        const startTime = new Date(baseDate);
+        startTime.setHours(hour, minute, 0);
+        
+        const endTime = new Date(startTime);
+        endTime.setMinutes(endTime.getMinutes() + 10);
+        
+        slots.push([startTime, endTime]);
+      }
+    }
+
+    // Slots in de database invoegen
+    for (const [starttijd, eindtijd] of slots) {
+      await db.promise().query(
+        'INSERT INTO speeddates (bedrijf_id, starttijd, eindtijd) VALUES (?, ?, ?)',
+        [bedrijf_id, starttijd, eindtijd]
+      );
+    }
+
+    res.json({ message: 'Tijdsloten succesvol aangemaakt', count: slots.length });
+  } catch (err) {
+    console.error('Error creating timeslots:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
