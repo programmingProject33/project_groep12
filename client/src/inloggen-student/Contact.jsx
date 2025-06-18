@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import emailjs from "emailjs-com";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 import { IoSend } from "react-icons/io5";
 import "./Contact.css";
@@ -7,6 +8,7 @@ import "./Contact.css";
 export default function Contact() {
   const navigate = useNavigate();
   const [sent, setSent] = useState(false);
+  const formRef = useRef();
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -17,7 +19,25 @@ export default function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSent(true);
+
+    const time = new Date().toLocaleString();
+    const hiddenTimeInput = document.createElement("input");
+    hiddenTimeInput.type = "hidden";
+    hiddenTimeInput.name = "time";
+    hiddenTimeInput.value = time;
+    formRef.current.appendChild(hiddenTimeInput);
+
+    emailjs
+      .sendForm("service_56505", "template_56505", formRef.current, "pUyVB_nOy-XVHRrga")
+      .then(() => {
+        setSent(true);
+        formRef.current.reset();
+        alert("Bericht succesvol verzonden!");
+      })
+      .catch((error) => {
+        console.error("EmailJS fout:", error);
+        alert("Er is iets misgegaan. Probeer het later opnieuw.");
+      });
   };
 
   return (
@@ -39,7 +59,7 @@ export default function Contact() {
 
       <main className="contact-main">
         <div className="contact-intro">
-          <h1><span dangerouslySetInnerHTML={{__html: "&#128236;"}} /> Heb je een vraag?</h1>
+          <h1><span role="img" aria-label="mail">&#128236;</span> Heb je een vraag?</h1>
           <p>We staan voor je klaar! Laat gerust een bericht achter – we beantwoorden je mail zo snel mogelijk.</p>
         </div>
 
@@ -57,25 +77,26 @@ export default function Contact() {
             <p>Nijverheidskaai 170, 1070 Anderlecht</p>
           </div>
         </div>
-        <form className="contact-form" onSubmit={handleSubmit}>
+
+        <form ref={formRef} className="contact-form" onSubmit={handleSubmit}>
           <label>
             Naam
-            <input type="text" required placeholder="Jouw naam" />
+            <input type="text" name="name" required placeholder="Jouw naam" />
           </label>
           <label>
             E-mail
-            <input type="email" required placeholder="jouw@email.be" />
+            <input type="email" name="email" required placeholder="jouw@email.be" />
           </label>
           <label>
             Bericht
-            <textarea rows={4} required placeholder="Hoe kunnen we je helpen?" />
+            <textarea name="message" rows={4} required placeholder="Hoe kunnen we je helpen?" />
           </label>
           <button type="submit">
-            <span>Verzenden</span>
+            <span>{sent ? "Verzonden!" : "Verzenden"}</span>
             <IoSend className="send-icon" />
           </button>
         </form>
       </main>
     </div>
   );
-} 
+}
