@@ -42,21 +42,11 @@ function Bedrijven() {
   const { user } = useAuth();
 
   useEffect(() => {
-    const start = Date.now();
     fetch("/api/bedrijven")
       .then((res) => res.json())
       .then((data) => {
-        const elapsed = Date.now() - start;
-        const minLoading = 600;
-        if (elapsed < minLoading) {
-          setTimeout(() => {
-            setBedrijven(data);
-            setIsLoading(false);
-          }, minLoading - elapsed);
-        } else {
-          setBedrijven(data);
-          setIsLoading(false);
-        }
+        setBedrijven(data);
+        setIsLoading(false);
       })
       .catch((err) => console.error("Fout bij ophalen:", err));
   }, []);

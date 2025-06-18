@@ -6,6 +6,15 @@ import "./reservatieBedrijf.css";
 import "./Studenten.css";
 import { FaLinkedin } from "react-icons/fa";
 
+function mapKlasToAula(val) {
+  if (!val) return val;
+  const match = String(val).match(/^klas\s?(\d)$/i);
+  if (match) {
+    return `aula ${match[1]}`;
+  }
+  return val;
+}
+
 export default function Reservaties() {
   const { user, isAuthLoading } = useAuth();
   const [reservaties, setReservaties] = useState([]);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import BedrijfNavbar from "./BedrijfNavbar";
 import BedrijfFooter from "./bedrijfFooter";
 import "./Studenten.css";
-import { FaLinkedin } from "react-icons/fa";
+import { FaLinkedin, FaEye, FaSearch } from "react-icons/fa";
 import { useAuth } from "../AuthContext.jsx";
 
 export default function Studenten() {
@@ -12,7 +12,7 @@ export default function Studenten() {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterOpleiding, setFilterOpleiding] = useState("alle");
-  const [filterDienstverband, setFilterDienstverband] = useState("alle");
+  const [selectedDienstverbanden, setSelectedDienstverbanden] = useState([]);
   const [sortField, setSortField] = useState("naam");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -29,10 +29,12 @@ export default function Studenten() {
     "Postgraduaat Toegepaste Artificial Intelligence"
   ];
   const DIENSTVERBANDEN = [
+    "Stage",
     "Voltijds",
     "Deeltijds",
+    "Bijbaan",
     "Freelance",
-    "Stage"
+    "Geen voorkeuren"
   ];
 
   if (isAuthLoading) return null;
@@ -88,24 +90,25 @@ export default function Studenten() {
     return norm;
   };
 
+  const toggleDienstverband = (type) => {
+    setSelectedDienstverbanden((prev) =>
+      prev.includes(type)
+        ? prev.filter((t) => t !== type)
+        : [...prev, type]
+    );
+  };
+
   const filteredStudenten = studenten.filter(student => {
     const dienstverbandRaw = student.dienstverbanden || student.dienstverband || '';
     const dienstverbandArr = normalizeDienstverband(dienstverbandRaw);
-    console.log('Student:', student.naam, '| Origineel:', dienstverbandRaw, '| Genormaliseerd:', dienstverbandArr);
-    const filterDienstverbandNorm = filterDienstverband.toLowerCase();
-
     const matchesSearch = 
       student.naam.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.opleiding.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesOpleiding = 
-      filterOpleiding === "alle" || 
-      student.opleiding.toLowerCase() === filterOpleiding.toLowerCase();
-
+    const matchesOpleiding =
+      filterOpleiding === '' || filterOpleiding === 'alle' || student.opleiding.toLowerCase() === filterOpleiding.toLowerCase();
     const matchesDienstverband =
-      filterDienstverbandNorm === "alle" ||
-      dienstverbandArr.includes(filterDienstverbandNorm);
-
+      selectedDienstverbanden.length === 0 ||
+      dienstverbandArr.some(d => selectedDienstverbanden.map(f => f.toLowerCase()).includes(d));
     return matchesSearch && matchesOpleiding && matchesDienstverband;
   });
 
@@ -137,6 +140,18 @@ export default function Studenten() {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   }
 
+  const dienstverbandBadge = (type) => {
+    const map = {
+      stage: "bg-blue-100 text-blue-800",
+      voltijds: "bg-gray-100 text-gray-800",
+      deeltijds: "bg-gray-100 text-gray-800",
+      bijbaan: "bg-gray-100 text-gray-800",
+      freelance: "bg-gray-100 text-gray-800",
+      "geen voorkeuren": "bg-gray-100 text-gray-800"
+    };
+    return map[type?.toLowerCase()] || "bg-gray-100 text-gray-800";
+  };
+
   if (loading) {
     return (
       <div>
@@ -162,108 +177,89 @@ export default function Studenten() {
   }
 
   return (
-    <div>
+    <div style={{ background: '#f3f4f6', minHeight: '100vh', paddingBottom: '2rem', position: 'relative' }}>
       <BedrijfNavbar />
-      <main className="studenten-main">
-        <h1>Studenten</h1>
-        <p className="studenten-intro">Bekijk hier alle studenten die zich hebben aangemeld voor het Career Launch evenement.</p>
-        
-        <div className="studenten-filters">
-          <div className="search-container">
+      <main className="studenten-main-content" style={{ maxWidth: 1400, margin: '0 auto', padding: '2rem 1rem 0 1rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <h1 style={{ fontSize: '2.2rem', fontWeight: 700, marginBottom: 0 }}>Studentenprofielen</h1>
+          <p style={{ color: '#64748b', marginBottom: '2rem', marginTop: '0.7rem' }}>Bekijk studentenprofielen en kom in contact met potentiële kandidaten voor uw team.</p>
+        </div>
+        {/* Filterbox */}
+        <div className="filterbox">
+          <div className="filterbox-row">
             <input
               type="text"
-              placeholder="Zoek op naam..."
+              placeholder="Zoek op voornaam of achternaam"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="studenten-search"
+              onChange={e => setSearchTerm(e.target.value)}
             />
-          </div>
-          <div className="filter-container">
             <select
               value={filterOpleiding}
-              onChange={(e) => setFilterOpleiding(e.target.value)}
-              className="studenten-filter"
+              onChange={e => setFilterOpleiding(e.target.value)}
             >
-              <option value="alle">Alle opleidingen</option>
-              {OPLEIDINGEN.map(opleiding => (
-                <option key={opleiding} value={opleiding}>{opleiding}</option>
+              <option value="">Selecteer opleiding</option>
+              {OPLEIDINGEN.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
           </div>
-          <div className="filter-container">
-            <select
-              value={filterDienstverband}
-              onChange={(e) => setFilterDienstverband(e.target.value)}
-              className="studenten-filter"
-            >
-              <option value="alle">Alle dienstverbanden</option>
-              {DIENSTVERBANDEN.map(dienst => (
-                <option key={dienst} value={dienst}>{dienst}</option>
-              ))}
-            </select>
+          <div className="pillbar">
+            {DIENSTVERBANDEN.map(type => (
+              <button
+                key={type}
+                type="button"
+                className={`pill${selectedDienstverbanden.includes(type) ? ' active' : ''}`}
+                onClick={() => toggleDienstverband(type)}
+              >
+                {type}
+              </button>
+            ))}
           </div>
         </div>
-
-        <div className="studenten-table-container">
-          <table className="studenten-table">
-            <thead>
-              <tr>
-                <th>Naam</th>
-                <th>Opleiding</th>
-                <th>Dienstverbanden</th>
-                <th>Acties</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedStudenten.map(student => (
-                <tr key={student.gebruiker_id}>
-                  <td>{student.naam}</td>
-                  <td>{student.opleiding}</td>
-                  <td>{
-                    (() => {
-                      const dienstverbandRaw = student.dienstverbanden || student.dienstverband || '';
-                      const arr = normalizeDienstverband(dienstverbandRaw);
-                      return arr.length ? arr.map((d, i) => <span key={d.trim() + i}>{d.trim()}{i < arr.length - 1 ? ', ' : ''}</span>) : <span style={{color:'#aaa'}}>Niet opgegeven</span>;
-                    })()
-                  }</td>
-                  <td>
-                    <button 
-                      className="studenten-action-btn"
-                      onClick={() => fetchStudent(student.gebruiker_id)}
-                    >
-                      Bekijk Profiel
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Studentenlijst */}
+        <div className="studenten-kaarten-container">
+          {sortedStudenten.length === 0 && (
+            <div style={{ textAlign: 'center', color: '#94a3b8', padding: '3rem 0', width: '100%' }}>Geen studenten gevonden.</div>
+          )}
+          {sortedStudenten.map(student => {
+            const dienstverbandRaw = student.dienstverbanden || student.dienstverband || '';
+            const arr = normalizeDienstverband(dienstverbandRaw);
+            return (
+              <div key={student.gebruiker_id} className="studenten-kaart">
+                {arr.length ? (
+                  <span className="dienstverband-badge"><strong>Dienstverband:</strong> {arr[0]}</span>
+                ) : null}
+                <div className="student-naam"><strong>Naam:</strong> {student.naam}</div>
+                <div className="student-opleiding"><strong>Opleiding:</strong> {student.opleiding}</div>
+                <button
+                  className="studenten-action-btn"
+                  onClick={() => fetchStudent(student.gebruiker_id)}
+                >
+                  Bekijk profiel
+                </button>
+              </div>
+            );
+          })}
         </div>
-
+        {/* Modal voor studentprofiel */}
         {selectedStudent && (
-          <div className="student-detail-modal" style={{zIndex: 2000}}>
-            <div className="student-detail-content" style={{boxShadow: '0 8px 32px rgba(37,99,235,0.18)', border: '2.5px solid #2563eb', minWidth: 340, maxWidth: 420, background: '#f8fafc'}}>
-              <button className="close-modal-btn" onClick={() => setSelectedStudent(null)}>Sluiten</button>
-              <h2 style={{textAlign:'center', color:'#2563eb', marginBottom: '1.2rem'}}>Studentenprofiel</h2>
+          <div className="student-detail-modal">
+            <div className="student-detail-content">
+              <button className="close-modal-btn" onClick={() => setSelectedStudent(null)} style={{position:'absolute',top:18,right:18,fontSize:'1.2rem',background:'none',border:'none',cursor:'pointer'}}>×</button>
               {studentLoading ? (
                 <div>Laden...</div>
               ) : studentError ? (
-                <div style={{color: 'red'}}>{studentError}</div>
+                <div style={{color:'red'}}>{studentError}</div>
               ) : (
                 <>
+                  <h2 style={{marginBottom:'1.2rem',color:'#2563eb'}}>Studentenprofiel</h2>
                   <p><strong>Naam:</strong> {selectedStudent.voornaam} {selectedStudent.naam}</p>
-                  <p><strong>Gebruikersnaam:</strong> {selectedStudent.gebruikersnaam}</p>
                   <p><strong>E-mail:</strong> {selectedStudent.email}</p>
                   <p><strong>Opleiding:</strong> {selectedStudent.opleiding}</p>
                   <p><strong>Opleiding jaar:</strong> {selectedStudent.opleiding_jaar}</p>
-                  <p><strong>LinkedIn:</strong> {selectedStudent.linkedin && selectedStudent.linkedin.startsWith("https://www.linkedin.com/") ? (
-                    <a href={selectedStudent.linkedin} target="_blank" rel="noopener noreferrer"><FaLinkedin style={{ color: '#0a66c2', fontSize: '1.3em' }} /></a>
-                  ) : (
-                    <span style={{ color: '#aaa', fontStyle: 'italic' }}>Geen profiel beschikbaar</span>
-                  )}</p>
-                  <div style={{marginTop: '1.2rem'}}>
+                  <div style={{marginTop:'1.2rem'}}>
                     <strong>Dienstverbanden:</strong>
-                    <ul style={{marginTop: '0.5rem'}}>
+                    <ul style={{marginTop:'0.5rem'}}>
                       {(() => {
                         if (!selectedStudent.dienstverbanden) return <li style={{color:'#aaa'}}>Niet opgegeven</li>;
                         let arr = selectedStudent.dienstverbanden;
@@ -275,20 +271,14 @@ export default function Studenten() {
                           }
                         }
                         if (!Array.isArray(arr)) arr = [String(arr)];
-                        return arr.map((d, i) => <li key={d.trim() + i}>{d.trim()}</li>);
+                        return arr.map((d, i) => <li key={i}>{d.trim()}</li>);
                       })()}
                     </ul>
                   </div>
                 </>
               )}
             </div>
-            <div className="modal-backdrop" style={{background:'rgba(30,41,59,0.32)', zIndex: 1999}} onClick={() => setSelectedStudent(null)}></div>
-          </div>
-        )}
-
-        {sortedStudenten.length === 0 && (
-          <div className="studenten-empty">
-            Geen studenten gevonden die voldoen aan de zoekcriteria.
+            <div className="modal-backdrop" onClick={() => setSelectedStudent(null)}></div>
           </div>
         )}
       </main>

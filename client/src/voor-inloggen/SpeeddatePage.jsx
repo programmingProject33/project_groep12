@@ -9,11 +9,13 @@ export default function SpeeddatePage() {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [loading, setLoading] = useState(false);
   const [timeslots, setTimeslots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const fetchTimeslots = async () => {
+    setLoadingSlots(true);
     try {
       const response = await fetch(`http://localhost:5000/api/speeddates/${bedrijfId}`);
       if (!response.ok) {
@@ -24,6 +26,8 @@ export default function SpeeddatePage() {
     } catch (err) {
       console.error('Error fetching timeslots:', err);
       setErrorMessage('Er is een fout opgetreden bij het ophalen van de tijdsloten.');
+    } finally {
+      setLoadingSlots(false);
     }
   };
 
@@ -155,17 +159,27 @@ export default function SpeeddatePage() {
             ) : (
               <>
                 <div className="speeddate-slots-grid">
-                  {timeslots.filter(isNotPauseSlot).map((slot) => (
-                    <button
-                      key={slot.speed_id}
-                      className={`speeddate-slot-btn${slot.is_bezet ? " reserved" : ""}${selectedSlot && selectedSlot.speed_id === slot.speed_id ? " selected" : ""}`}
-                      onClick={() => !slot.is_bezet && setSelectedSlot(slot)}
-                      type="button"
-                      disabled={slot.is_bezet}
-                    >
-                      {formatTime(slot.starttijd)} - {formatTime(slot.eindtijd)}
-                    </button>
-                  ))}
+                  {loadingSlots ? (
+                    <div style={{ gridColumn: '1/-1', textAlign: 'center', color: '#2563eb', fontWeight: 600, fontSize: '1.1rem', padding: '1.5rem 0' }}>
+                      Tijdsloten laden...
+                    </div>
+                  ) : timeslots.filter(isNotPauseSlot).length === 0 ? (
+                    <div style={{ gridColumn: '1/-1', textAlign: 'center', color: '#64748b', fontWeight: 500, fontSize: '1.1rem', padding: '1.5rem 0' }}>
+                      Er zijn momenteel geen tijdsloten beschikbaar voor dit bedrijf.
+                    </div>
+                  ) : (
+                    timeslots.filter(isNotPauseSlot).map((slot) => (
+                      <button
+                        key={slot.speed_id}
+                        className={`speeddate-slot-btn${slot.is_bezet ? " reserved" : ""}${selectedSlot && selectedSlot.speed_id === slot.speed_id ? " selected" : ""}`}
+                        onClick={() => !slot.is_bezet && setSelectedSlot(slot)}
+                        type="button"
+                        disabled={slot.is_bezet}
+                      >
+                        {formatTime(slot.starttijd)} - {formatTime(slot.eindtijd)}
+                      </button>
+                    ))
+                  )}
                 </div>
                 {selectedSlot && (
                   <>

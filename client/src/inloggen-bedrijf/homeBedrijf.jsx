@@ -6,6 +6,15 @@ import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 import BedrijfNavbar from "./BedrijfNavbar";
 import BedrijfFooter from "./bedrijfFooter";
 
+function mapKlasToAula(val) {
+  if (!val) return val;
+  const match = String(val).match(/^klas\s?(\d)$/i);
+  if (match) {
+    return `aula ${match[1]}`;
+  }
+  return val;
+}
+
 export default function HomeBedrijf() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -29,8 +38,8 @@ export default function HomeBedrijf() {
             <div className="bedrijf-lokaal-info">
               <span className="bedrijf-lokaal-label">Jouw locatie tijdens Career Launch:</span>
               <div className="bedrijf-lokaal-badge">
-                <span className="bedrijf-lokaal-naam">Lokaal: <b>{user.lokaal}</b></span>
-                <span className="bedrijf-lokaal-verdieping">Verdieping: <b>{user.verdieping}</b></span>
+                <span className="bedrijf-lokaal-naam">Lokaal: <b>{mapKlasToAula(user.lokaal)}</b></span>
+                <span className="bedrijf-lokaal-verdieping">Verdieping: <b>{mapKlasToAula(user.verdieping)}</b></span>
               </div>
             </div>
           )}
