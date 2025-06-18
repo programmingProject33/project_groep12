@@ -157,6 +157,10 @@ const Reservaties = () => {
                             desc
                           )}
                         </div>
+                        <div style={{marginTop: '0.5rem'}}>
+                          <strong>Lokaal:</strong> {reservation.lokaal || 'Niet toegewezen'}<br/>
+                          <strong>Verdieping:</strong> {reservation.verdieping || 'Onbekend'}
+                        </div>
                       </td>
                       <td>
                         <button className="annuleer-btn" onClick={() => handleAnnuleer(reservation.speed_id)}>

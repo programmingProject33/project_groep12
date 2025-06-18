@@ -24,6 +24,16 @@ export default function HomeBedrijf() {
         <div className="bedrijf-hero-content">
           <h1>Welkom, {bedrijfsnaam}!</h1>
           <p className="bedrijf-hero-sub">Beheer je reservaties en bekijk studentprofielen.</p>
+          {/* Lokaal en verdieping info */}
+          {user?.lokaal && user?.verdieping && (
+            <div className="bedrijf-lokaal-info">
+              <span className="bedrijf-lokaal-label">Jouw locatie tijdens Career Launch:</span>
+              <div className="bedrijf-lokaal-badge">
+                <span className="bedrijf-lokaal-naam">Lokaal: <b>{user.lokaal}</b></span>
+                <span className="bedrijf-lokaal-verdieping">Verdieping: <b>{user.verdieping}</b></span>
+              </div>
+            </div>
+          )}
           <button className="bedrijf-hero-btn" onClick={() => navigate("/bedrijf/reservaties")}>Bekijk reservaties</button>
         </div>
         <div className="bedrijf-hero-wave">

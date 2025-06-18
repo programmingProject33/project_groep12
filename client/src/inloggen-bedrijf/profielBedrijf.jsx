@@ -37,7 +37,9 @@ export default function Profiel() {
     sector: user?.sector || "",
     beschrijving: user?.beschrijving || "",
     zoeken_we: user?.zoeken_we || "",
-    created_at: user?.created_at || ""
+    created_at: user?.created_at || "",
+    lokaal: user?.lokaal || "",
+    verdieping: user?.verdieping || ""
   });
 
   useEffect(() => {
@@ -64,7 +66,9 @@ export default function Profiel() {
         sector: user.sector || "",
         beschrijving: user.beschrijving || "",
         zoeken_we: user.zoeken_we || "",
-        created_at: user.created_at || ""
+        created_at: user.created_at || "",
+        lokaal: user.lokaal || "",
+        verdieping: user.verdieping || ""
       });
     }
   }, [user]);
@@ -139,6 +143,8 @@ export default function Profiel() {
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Sector</span><input name="sector" value={profile.sector} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Beschrijving</span><textarea name="beschrijving" value={profile.beschrijving} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Wat zoeken we?</span><textarea name="zoeken_we" value={profile.zoeken_we} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Lokaal</span><span className="bedrijfprofiel-value">{profile.lokaal || 'Niet toegewezen'}</span></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Verdieping</span><span className="bedrijfprofiel-value">{profile.verdieping || 'Onbekend'}</span></div>
             </div>
             <button type="submit" className="bedrijfprofiel-save-btn">Opslaan</button>
           </form>
@@ -164,6 +170,8 @@ export default function Profiel() {
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Sector</span><span className="bedrijfprofiel-value">{profile.sector}</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Beschrijving</span><span className="bedrijfprofiel-value">{profile.beschrijving}</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Wat zoeken we?</span><span className="bedrijfprofiel-value">{profile.zoeken_we}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Lokaal</span><span className="bedrijfprofiel-value">{profile.lokaal || 'Niet toegewezen'}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Verdieping</span><span className="bedrijfprofiel-value">{profile.verdieping || 'Onbekend'}</span></div>
           </div>
         )}
         <button

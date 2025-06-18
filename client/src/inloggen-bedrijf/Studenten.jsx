@@ -19,6 +19,22 @@ export default function Studenten() {
   const [studentLoading, setStudentLoading] = useState(false);
   const [studentError, setStudentError] = useState("");
 
+  const OPLEIDINGEN = [
+    "Multimedia & Creatieve Technologie (bachelor)",
+    "Toegepaste Informatica (bachelor)",
+    "Graduaat Elektromechanische Systemen",
+    "Graduaat Programmeren",
+    "Graduaat Systeem- en Netwerkbeheer",
+    "Postgraduaat Coding (online)",
+    "Postgraduaat Toegepaste Artificial Intelligence"
+  ];
+  const DIENSTVERBANDEN = [
+    "Voltijds",
+    "Deeltijds",
+    "Freelance",
+    "Stage"
+  ];
+
   if (isAuthLoading) return null;
 
   useEffect(() => {
@@ -98,24 +114,22 @@ export default function Studenten() {
     if (sortField === "naam") {
       if (sortOrder === "asc") return a.naam.localeCompare(b.naam);
       else return b.naam.localeCompare(a.naam);
+    } else if (sortField === "opleiding") {
+      if (sortOrder === "asc") return (a.opleiding || "").localeCompare(b.opleiding || "");
+      else return (b.opleiding || "").localeCompare(a.opleiding || "");
+    } else if (sortField === "dienstverbanden") {
+      // Sorteer op eerste dienstverband alfabetisch
+      const aDienst = (Array.isArray(a.dienstverbanden) ? a.dienstverbanden[0] : (a.dienstverbanden || "")).toLowerCase();
+      const bDienst = (Array.isArray(b.dienstverbanden) ? b.dienstverbanden[0] : (b.dienstverbanden || "")).toLowerCase();
+      if (sortOrder === "asc") return aDienst.localeCompare(bDienst);
+      else return bDienst.localeCompare(aDienst);
     } else if (sortField === "tijdstip") {
-      // Sorteer op tijdstip (ervan uitgaande dat er een tijdstip veld is, anders overslaan)
       if (!a.tijdstip || !b.tijdstip) return 0;
       if (sortOrder === "asc") return a.tijdstip.localeCompare(b.tijdstip);
       else return b.tijdstip.localeCompare(a.tijdstip);
     }
     return 0;
   });
-
-  const opleidingen = ["alle", "Toegepaste Informatica", "Multimedia & Creative Technologies", "Programmeren", "Systeem- en Netwerkbeheer", "Internet of Things"];
-  const dienstverbanden = [
-    "alle",
-    "Stage",
-    "Studentenjob",
-    "Volle werk",
-    "Voltijds",
-    "Deeltijds"
-  ];
 
   function formatTime(isoString) {
     if (!isoString) return '';
@@ -165,26 +179,26 @@ export default function Studenten() {
             />
           </div>
           <div className="filter-container">
-            <label>Sorteer op: </label>
-            <select value={sortField} onChange={e => setSortField(e.target.value)}>
-              <option value="naam">Naam</option>
-              <option value="tijdstip">Tijdstip</option>
-            </select>
-            <select value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
-              <option value="asc">Oplopend (A-Z / Vroegste)</option>
-              <option value="desc">Aflopend (Z-A / Laatste)</option>
-            </select>
-          </div>
-          <div className="filter-container">
             <select
               value={filterOpleiding}
               onChange={(e) => setFilterOpleiding(e.target.value)}
               className="studenten-filter"
             >
-              {opleidingen.map(opleiding => (
-                <option key={opleiding} value={opleiding}>
-                  {opleiding === "alle" ? "Alle opleidingen" : opleiding}
-                </option>
+              <option value="alle">Alle opleidingen</option>
+              {OPLEIDINGEN.map(opleiding => (
+                <option key={opleiding} value={opleiding}>{opleiding}</option>
+              ))}
+            </select>
+          </div>
+          <div className="filter-container">
+            <select
+              value={filterDienstverband}
+              onChange={(e) => setFilterDienstverband(e.target.value)}
+              className="studenten-filter"
+            >
+              <option value="alle">Alle dienstverbanden</option>
+              {DIENSTVERBANDEN.map(dienst => (
+                <option key={dienst} value={dienst}>{dienst}</option>
               ))}
             </select>
           </div>
@@ -202,20 +216,20 @@ export default function Studenten() {
             </thead>
             <tbody>
               {sortedStudenten.map(student => (
-                <tr key={student.id}>
+                <tr key={student.gebruiker_id}>
                   <td>{student.naam}</td>
                   <td>{student.opleiding}</td>
                   <td>{
                     (() => {
                       const dienstverbandRaw = student.dienstverbanden || student.dienstverband || '';
                       const arr = normalizeDienstverband(dienstverbandRaw);
-                      return arr.length ? arr.join(', ') : <span style={{color:'#aaa'}}>Niet opgegeven</span>;
+                      return arr.length ? arr.map((d, i) => <span key={d.trim() + i}>{d.trim()}{i < arr.length - 1 ? ', ' : ''}</span>) : <span style={{color:'#aaa'}}>Niet opgegeven</span>;
                     })()
                   }</td>
                   <td>
                     <button 
                       className="studenten-action-btn"
-                      onClick={() => fetchStudent(student.id)}
+                      onClick={() => fetchStudent(student.gebruiker_id)}
                     >
                       Bekijk Profiel
                     </button>
@@ -227,16 +241,17 @@ export default function Studenten() {
         </div>
 
         {selectedStudent && (
-          <div className="student-detail-modal">
-            <div className="student-detail-content">
+          <div className="student-detail-modal" style={{zIndex: 2000}}>
+            <div className="student-detail-content" style={{boxShadow: '0 8px 32px rgba(37,99,235,0.18)', border: '2.5px solid #2563eb', minWidth: 340, maxWidth: 420, background: '#f8fafc'}}>
               <button className="close-modal-btn" onClick={() => setSelectedStudent(null)}>Sluiten</button>
+              <h2 style={{textAlign:'center', color:'#2563eb', marginBottom: '1.2rem'}}>Studentenprofiel</h2>
               {studentLoading ? (
                 <div>Laden...</div>
               ) : studentError ? (
                 <div style={{color: 'red'}}>{studentError}</div>
               ) : (
                 <>
-                  <h2>{selectedStudent.voornaam} {selectedStudent.naam}</h2>
+                  <p><strong>Naam:</strong> {selectedStudent.voornaam} {selectedStudent.naam}</p>
                   <p><strong>Gebruikersnaam:</strong> {selectedStudent.gebruikersnaam}</p>
                   <p><strong>E-mail:</strong> {selectedStudent.email}</p>
                   <p><strong>Opleiding:</strong> {selectedStudent.opleiding}</p>
@@ -260,14 +275,14 @@ export default function Studenten() {
                           }
                         }
                         if (!Array.isArray(arr)) arr = [String(arr)];
-                        return arr.map((d, i) => <li key={i}>{d.trim()}</li>);
+                        return arr.map((d, i) => <li key={d.trim() + i}>{d.trim()}</li>);
                       })()}
                     </ul>
                   </div>
                 </>
               )}
             </div>
-            <div className="modal-backdrop" onClick={() => setSelectedStudent(null)}></div>
+            <div className="modal-backdrop" style={{background:'rgba(30,41,59,0.32)', zIndex: 1999}} onClick={() => setSelectedStudent(null)}></div>
           </div>
         )}
 

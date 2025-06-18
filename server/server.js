@@ -296,7 +296,7 @@ app.get('/api/reservations/:gebruikerId', async (req, res) => {
   try {
     const { gebruikerId } = req.params;
     const [reservations] = await db.promise().query(
-      `SELECT s.*, b.naam as bedrijfsnaam, b.sector, b.beschrijving 
+      `SELECT s.*, b.naam as bedrijfsnaam, b.sector, b.beschrijving, b.lokaal, b.verdieping 
        FROM speeddates s 
        JOIN bedrijven b ON s.bedrijf_id = b.bedrijf_id 
        WHERE s.gebruiker_id = ? AND s.is_bezet = 1 
@@ -563,9 +563,10 @@ app.post('/api/bedrijf/update', async (req, res) => {
 app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
   try {
     const [reservaties] = await db.promise().query(
-      `SELECT s.*, g.voornaam, g.naam, g.gebruikersnaam, g.email 
+      `SELECT s.*, g.voornaam, g.naam, g.gebruikersnaam, g.email, b.lokaal, b.verdieping 
        FROM speeddates s 
        JOIN gebruikers g ON s.gebruiker_id = g.gebruiker_id 
+       JOIN bedrijven b ON s.bedrijf_id = b.bedrijf_id 
        WHERE s.bedrijf_id = ? AND s.is_bezet = 1 
        ORDER BY s.starttijd ASC`,
       [req.params.bedrijfId]
