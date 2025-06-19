@@ -5,12 +5,14 @@ import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 // useNavigate is een hook (speciale functie) die je gebruikt om te navigeren (pagina veranderen) zonder dat de pagina helemaal opnieuw laadt.
 
-const STUDIE_OPLEIDINGEN = [
-  "Bachelor Toegepaste Informatica",
-  "Internet of Things",
-  "Toegepaste Artificiële Intelligentie",
-  "Multimedia & Creatieve Technologie",
-  "Elektromechanische Systemen"
+const OPLEIDINGEN = [
+  "Multimedia & Creatieve Technologie (bachelor)",
+  "Toegepaste Informatica (bachelor)",
+  "Graduaat Elektromechanische Systemen",
+  "Graduaat Programmeren",
+  "Graduaat Systeem- en Netwerkbeheer",
+  "Postgraduaat Coding (online)",
+  "Postgraduaat Toegepaste Artificial Intelligence"
 ];
 
 export default function Registreer()   // Dit is een functionele component in React. Het maakt de registratiepagina.
@@ -239,10 +241,9 @@ export default function Registreer()   // Dit is een functionele component in Re
                   required
                   className="registerstudent-form select"
                 >
-                  {STUDIE_OPLEIDINGEN.map((opleiding) => (
-                    <option key={opleiding} value={opleiding}>
-                      {opleiding}
-                    </option>
+                  <option value="">Kies je opleiding</option>
+                  {OPLEIDINGEN.map((opleiding) => (
+                    <option key={opleiding} value={opleiding}>{opleiding}</option>
                   ))}
                 </select>
               </label>

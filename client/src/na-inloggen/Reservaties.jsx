@@ -4,6 +4,15 @@ import './Reservaties.css';
 
 const MAX_DESC = 80;
 
+function mapKlasToAula(val) {
+  if (!val) return val;
+  const match = String(val).match(/^klas\s?(\d)$/i);
+  if (match) {
+    return `aula ${match[1]}`;
+  }
+  return val;
+}
+
 const Reservaties = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -156,6 +165,14 @@ const Reservaties = () => {
                           ) : (
                             desc
                           )}
+                        </div>
+                        <div style={{marginTop: '1.1rem', padding: '0.7rem 0 0.2rem 0', borderTop: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', gap: '0.2rem'}}>
+                          <span style={{fontWeight: 700, color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.4em'}}>
+                            <span role="img" aria-label="locatie">📍</span> Lokaal: <span style={{fontWeight: 600, color: '#222'}}>{mapKlasToAula(reservation.lokaal) || 'Niet toegewezen'}</span>
+                          </span>
+                          <span style={{fontWeight: 700, color: '#2563eb', display: 'flex', alignItems: 'center', gap: '0.4em'}}>
+                            <span role="img" aria-label="verdieping">🏢</span> Verdieping: <span style={{fontWeight: 600, color: '#222'}}>{mapKlasToAula(reservation.verdieping) || 'Onbekend'}</span>
+                          </span>
                         </div>
                       </td>
                       <td>

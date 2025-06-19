@@ -6,12 +6,20 @@ import "./reservatieBedrijf.css";
 import "./Studenten.css";
 import { FaLinkedin } from "react-icons/fa";
 
+function mapKlasToAula(val) {
+  if (!val) return val;
+  const match = String(val).match(/^klas\s?(\d)$/i);
+  if (match) {
+    return `aula ${match[1]}`;
+  }
+  return val;
+}
+
 export default function Reservaties() {
   const { user, isAuthLoading } = useAuth();
   const [reservaties, setReservaties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filterDate, setFilterDate] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentLoading, setStudentLoading] = useState(false);
   const [studentError, setStudentError] = useState("");
@@ -74,10 +82,6 @@ export default function Reservaties() {
     return `${hours}:${minutes} - ${hours}:${nextMinutes}`;
   };
 
-  const filteredReservaties = filterDate
-    ? reservaties.filter(res => formatDate(res.starttijd) === filterDate)
-    : reservaties;
-
   return (
     <div>
       <BedrijfNavbar />
@@ -90,25 +94,7 @@ export default function Reservaties() {
           <p className="error-message">{error}</p>
         ) : (
           <>
-            <div className="filter-container">
-              <label htmlFor="dateFilter">Filter op datum:</label>
-              <input
-                type="date"
-                id="dateFilter"
-                value={filterDate}
-                onChange={(e) => setFilterDate(e.target.value)}
-              />
-              {filterDate && (
-                <button 
-                  className="clear-filter"
-                  onClick={() => setFilterDate("")}
-                >
-                  Filter wissen
-                </button>
-              )}
-            </div>
-
-            {filteredReservaties.length === 0 ? (
+            {reservaties.length === 0 ? (
               <p>Geen reservaties gevonden</p>
             ) : (
               <div className="reservaties-table-container">
@@ -122,7 +108,7 @@ export default function Reservaties() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredReservaties.map((reservatie) => (
+                    {reservaties.map((reservatie) => (
                       <tr key={reservatie.speed_id}>
                         <td>{`${reservatie.voornaam} ${reservatie.naam}`}</td>
                         <td>{formatDate(reservatie.starttijd)}</td>

@@ -6,6 +6,16 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext.jsx";
 import { FaBuilding } from "react-icons/fa";
 
+// Mapping functie voor lokaal/klas naar aula
+function mapKlasToAula(val) {
+  if (!val) return val;
+  const match = String(val).match(/^klas\s?(\d)$/i);
+  if (match) {
+    return `aula ${match[1]}`;
+  }
+  return val;
+}
+
 export default function Profiel() {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
@@ -37,7 +47,9 @@ export default function Profiel() {
     sector: user?.sector || "",
     beschrijving: user?.beschrijving || "",
     zoeken_we: user?.zoeken_we || "",
-    created_at: user?.created_at || ""
+    created_at: user?.created_at || "",
+    lokaal: user?.lokaal || "",
+    verdieping: user?.verdieping || ""
   });
 
   useEffect(() => {
@@ -64,7 +76,9 @@ export default function Profiel() {
         sector: user.sector || "",
         beschrijving: user.beschrijving || "",
         zoeken_we: user.zoeken_we || "",
-        created_at: user.created_at || ""
+        created_at: user.created_at || "",
+        lokaal: user.lokaal || "",
+        verdieping: user.verdieping || ""
       });
     }
   }, [user]);
@@ -77,7 +91,7 @@ export default function Profiel() {
     e.preventDefault();
     setSuccess("");
     setError("");
-    const postData = { ...profile, id: parseInt(profile.bedrijf_id, 10) };
+    const postData = { ...profile, gebruikerId: parseInt(profile.bedrijf_id, 10) };
     console.log('POST profiel:', postData);
     try {
       const res = await fetch("/api/bedrijf/update", {
@@ -118,7 +132,7 @@ export default function Profiel() {
         </button>
         {editMode ? (
           <form className="bedrijfprofiel-form" onSubmit={handleSave}>
-            <div className="bedrijfprofiel-info-list">
+            <div className="bedrijfprofiel-info-list profiel-grid">
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Bedrijfsnaam</span><input name="naam" value={profile.naam} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">BTW-nummer</span><input name="BTW_nr" value={profile.BTW_nr} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Website</span><input name="bedrijf_URL" value={profile.bedrijf_URL} onChange={handleChange} /></div>
@@ -135,15 +149,16 @@ export default function Profiel() {
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact e-mail</span><input name="contact_email" value={profile.contact_email} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact telefoon</span><input name="contact_telefoon" value={profile.contact_telefoon} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Gebruikersnaam</span><input name="gebruikersnaam" value={profile.gebruikersnaam} onChange={handleChange} /></div>
-              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Wachtwoord</span><input name="wachtwoord" type="password" value={profile.wachtwoord} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Sector</span><input name="sector" value={profile.sector} onChange={handleChange} /></div>
-              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Beschrijving</span><textarea name="beschrijving" value={profile.beschrijving} onChange={handleChange} /></div>
-              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Wat zoeken we?</span><textarea name="zoeken_we" value={profile.zoeken_we} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Beschrijving</span><textarea name="beschrijving" value={profile.beschrijving} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Wat zoeken we?</span><textarea name="zoeken_we" value={profile.zoeken_we} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Lokaal</span><span className="bedrijfprofiel-value">{mapKlasToAula(profile.lokaal) || 'Niet toegewezen'}</span></div>
+              <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Verdieping</span><span className="bedrijfprofiel-value">{mapKlasToAula(profile.verdieping) || 'Onbekend'}</span></div>
             </div>
             <button type="submit" className="bedrijfprofiel-save-btn">Opslaan</button>
           </form>
         ) : (
-          <div className="bedrijfprofiel-info-list">
+          <div className="bedrijfprofiel-info-list profiel-grid">
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Bedrijfsnaam</span><span className="bedrijfprofiel-value">{profile.naam}</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">BTW-nummer</span><span className="bedrijfprofiel-value">{profile.BTW_nr}</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Website</span><span className="bedrijfprofiel-value">{profile.bedrijf_URL}</span></div>
@@ -160,10 +175,11 @@ export default function Profiel() {
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact e-mail</span><span className="bedrijfprofiel-value">{profile.contact_email}</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact telefoon</span><span className="bedrijfprofiel-value">{profile.contact_telefoon}</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Gebruikersnaam</span><span className="bedrijfprofiel-value">{profile.gebruikersnaam}</span></div>
-            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Wachtwoord</span><span className="bedrijfprofiel-value">••••••••</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Sector</span><span className="bedrijfprofiel-value">{profile.sector}</span></div>
-            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Beschrijving</span><span className="bedrijfprofiel-value">{profile.beschrijving}</span></div>
-            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Wat zoeken we?</span><span className="bedrijfprofiel-value">{profile.zoeken_we}</span></div>
+            <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Beschrijving</span><span className="bedrijfprofiel-value">{profile.beschrijving}</span></div>
+            <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Wat zoeken we?</span><span className="bedrijfprofiel-value">{profile.zoeken_we}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Lokaal</span><span className="bedrijfprofiel-value">{mapKlasToAula(profile.lokaal) || 'Niet toegewezen'}</span></div>
+            <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Verdieping</span><span className="bedrijfprofiel-value">{mapKlasToAula(profile.verdieping) || 'Onbekend'}</span></div>
           </div>
         )}
         <button

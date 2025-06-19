@@ -4,20 +4,21 @@ import { useAuth } from "../AuthContext.jsx";
 import { MdPerson, MdEmail, MdSchool } from "react-icons/md";
 import { FaLinkedin, FaStar, FaPuzzlePiece } from "react-icons/fa6";
 
-const DIENSTVERBAND_OPTIES = [
+const OPLEIDINGEN = [
+  "Multimedia & Creatieve Technologie (bachelor)",
+  "Toegepaste Informatica (bachelor)",
+  "Graduaat Elektromechanische Systemen",
+  "Graduaat Programmeren",
+  "Graduaat Systeem- en Netwerkbeheer",
+  "Postgraduaat Coding (online)",
+  "Postgraduaat Toegepaste Artificial Intelligence"
+];
+
+const DIENSTVERBANDEN = [
   "Voltijds",
   "Deeltijds",
   "Freelance",
-  "Stage",
-  "Geen voorkeur"
-];
-
-const OPLEIDING_OPTIES = [
-  "Bachelor Toegepaste Informatica",
-  "Internet of Things",
-  "Toegepaste Artificiële Intelligentie",
-  "Multimedia & Creatieve Technologie",
-  "Elektromechanische Systemen"
+  "Stage"
 ];
 
 const Profiel = () => {
@@ -68,8 +69,27 @@ const Profiel = () => {
   };
 
   const handleSave = async () => {
-    // PATCH-ready: stuur profiel naar backend
-    setUser({ ...user, ...profile });
+    try {
+      const res = await fetch(`/api/profiel/${user.gebruiker_id || user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          voornaam: profile.voornaam,
+          naam: profile.naam,
+          gebruikersnaam: profile.gebruikersnaam,
+          opleiding: profile.opleiding,
+          opleiding_jaar: profile.opleiding_jaar,
+          email: profile.email,
+          dienstverbanden: profile.dienstverbanden,
+          linkedin: profile.linkedin,
+          foto: profile.foto
+        })
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setUser({ ...user, ...profile }); // optioneel: setUser(updated)
+      }
+    } catch (e) {}
     setEditMode(false);
   };
 
@@ -197,7 +217,7 @@ const Profiel = () => {
                   className="profiel-input"
                 >
                   <option value="">Kies je opleiding</option>
-                  {OPLEIDING_OPTIES.map(opt => (
+                  {OPLEIDINGEN.map(opt => (
                     <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>
@@ -238,7 +258,7 @@ const Profiel = () => {
               <div>
                 <div className="profiel-label-new">Dienstverband</div>
                 <div className="profiel-dienstverbanden-edit-new">
-                  {['Voltijds','Deeltijds','Freelance','Stage','Geen voorkeur'].map(opt => (
+                  {DIENSTVERBANDEN.map(opt => (
                     <label key={opt} className="profiel-checkbox-label-new">
                       <input
                         type="checkbox"

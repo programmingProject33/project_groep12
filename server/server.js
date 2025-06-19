@@ -276,6 +276,25 @@ app.post('/api/speeddate', async (req, res) => {
       return res.status(400).json({ error: 'Je hebt al een reservatie bij dit bedrijf. Annuleer eerst je bestaande reservatie om een nieuwe te maken.' });
     }
 
+    // Haal het tijdstip van het gewenste slot op
+    const [slotRows] = await db.promise().query(
+      'SELECT starttijd FROM speeddates WHERE speed_id = ?',
+      [speed_id]
+    );
+    if (slotRows.length === 0) {
+      return res.status(400).json({ error: 'Tijdslot niet gevonden.' });
+    }
+    const { starttijd } = slotRows[0];
+
+    // Controleer of de student op dit tijdstip al ergens anders een reservatie heeft
+    const [conflict] = await db.promise().query(
+      'SELECT * FROM speeddates WHERE gebruiker_id = ? AND starttijd = ? AND is_bezet = 1',
+      [gebruiker_id, starttijd]
+    );
+    if (conflict.length > 0) {
+      return res.status(400).json({ error: 'Je hebt al een reservatie bij een ander bedrijf op dit tijdstip.' });
+    }
+
     // Find the exact slot by speed_id
     const [slots] = await db.promise().query(
       'SELECT * FROM speeddates WHERE speed_id = ? AND bedrijf_id = ? AND is_bezet = 0',
@@ -320,7 +339,7 @@ app.get('/api/reservations/:gebruikerId', async (req, res) => {
   try {
     const { gebruikerId } = req.params;
     const [reservations] = await db.promise().query(
-      `SELECT s.*, b.naam as bedrijfsnaam, b.sector, b.beschrijving 
+      `SELECT s.*, b.naam as bedrijfsnaam, b.sector, b.beschrijving, b.lokaal, b.verdieping 
        FROM speeddates s 
        JOIN bedrijven b ON s.bedrijf_id = b.bedrijf_id 
        WHERE s.gebruiker_id = ? AND s.is_bezet = 1 
@@ -587,9 +606,10 @@ app.post('/api/bedrijf/update', async (req, res) => {
 app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
   try {
     const [reservaties] = await db.promise().query(
-      `SELECT s.*, g.voornaam, g.naam, g.gebruikersnaam, g.email 
+      `SELECT s.*, g.voornaam, g.naam, g.gebruikersnaam, g.email, b.lokaal, b.verdieping 
        FROM speeddates s 
        JOIN gebruikers g ON s.gebruiker_id = g.gebruiker_id 
+       JOIN bedrijven b ON s.bedrijf_id = b.bedrijf_id 
        WHERE s.bedrijf_id = ? AND s.is_bezet = 1 
        ORDER BY s.starttijd ASC`,
       [req.params.bedrijfId]
