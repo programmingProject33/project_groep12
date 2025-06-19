@@ -144,6 +144,51 @@ app.get('/api/structure', (req, res) => {
   });
 });
 
+// Genereer tijdsloten van 10 min tussen 10:00-13:00 en 14:00-18:00
+const generateTimeslots = (dateStr) => {
+  const slots = [];
+  // 10:00 tot 18:00, elke 10 minuten
+  for (let hour = 10; hour < 18; hour++) {
+    for (let min = 0; min < 60; min += 10) {
+      // Pauzes overslaan:
+      const isPauze1 = (hour === 11 && min >= 20 && min < 40);
+      const isLunch = (hour === 13);
+      const isPauze2 = (hour === 16 && min >= 20 && min < 40);
+      if (isPauze1 || isLunch || isPauze2) continue;
+
+      const starttijd = `${dateStr} ${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}:00`;
+      const eindMin = min + 10;
+      let eindHour = hour;
+      let eindMinute = eindMin;
+      if (eindMin === 60) {
+        eindHour = hour + 1;
+        eindMinute = 0;
+      }
+      const eindtijd = `${dateStr} ${String(eindHour).padStart(2, '0')}:${String(eindMinute).padStart(2, '0')}:00`;
+      slots.push({ starttijd, eindtijd });
+    }
+  }
+  return slots;
+};
+
+// Functie om tijdsloten aan te maken voor een bedrijf
+async function createTimeslotsForBedrijf(bedrijfId, dateStr) {
+  try {
+    const slots = generateTimeslots(dateStr);
+    for (const slot of slots) {
+      await db.promise().query(
+        'INSERT INTO speeddates (bedrijf_id, starttijd, eindtijd, is_bezet) VALUES (?, ?, ?, 0)',
+        [bedrijfId, slot.starttijd, slot.eindtijd]
+      );
+    }
+    console.log(`Tijdsloten toegevoegd voor bedrijf_id: ${bedrijfId}`);
+    return true;
+  } catch (err) {
+    console.error(`Fout bij toevoegen tijdsloten voor bedrijf ${bedrijfId}:`, err);
+    return false;
+  }
+}
+
 // User registration endpoint
 app.post('/api/register', async (req, res) => {
   const { type, ...userData } = req.body;
@@ -203,57 +248,66 @@ app.post('/api/register', async (req, res) => {
       zoeken_we 
     } = userData;
     
-    // Check if company already exists
-    db.query('SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?', 
-      [emailbedrijf, gebruikersnaam_bedrijf], 
-      (err, results) => {
-        if (err) {
-          console.error('Database error checking existing company:', err, { emailbedrijf, gebruikersnaam_bedrijf });
-          return res.status(500).json({ error: 'Database error', details: err.message });
-        }
-        if (results.length > 0) {
-          console.error('Company already exists:', { emailbedrijf, gebruikersnaam_bedrijf });
-          return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
-        }
-        
-        // Insert new company
-        const query = `INSERT INTO bedrijven (
-          naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email,
-          contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
-          gebruikersnaam, wachtwoord, beschrijving, zoeken_we
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        
-        const values = [
-          bedrijfsnaam, // naam
-          btw,          // BTW_nr
-          straat,       // straatnaam
-          huis_nr,      // huis_nr
-          bus_nr,       // bus_nr
-          postcode,     // postcode
-          gemeente,     // gemeente
-          telbedrijf,   // telefoon_nr
-          emailbedrijf, // email
-          voornaam_contact,
-          naam_contact,
-          specialisatie,
-          email_contact,
-          tel_contact,
-          gebruikersnaam_bedrijf,
-          wachtwoord_bedrijf,
-          beschrijving,
-          zoeken_we
-        ];
-        
-        db.query(query, values, (err, result) => {
-          if (err) {
-            console.error('Database error creating company:', err, values);
-            return res.status(500).json({ error: 'Database error', details: err.message });
-          }
-          console.log('Company created successfully:', result);
-          res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt' });
-        });
+    try {
+      // Check if company already exists
+      const [existingCompanies] = await db.promise().query(
+        'SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?', 
+        [emailbedrijf, gebruikersnaam_bedrijf]
+      );
+      
+      if (existingCompanies.length > 0) {
+        console.error('Company already exists:', { emailbedrijf, gebruikersnaam_bedrijf });
+        return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
       }
-    );
+      
+      // Insert new company
+      const query = `INSERT INTO bedrijven (
+        naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email,
+        contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
+        gebruikersnaam, wachtwoord, beschrijving, zoeken_we
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      
+      const values = [
+        bedrijfsnaam, // naam
+        btw,          // BTW_nr
+        straat,       // straatnaam
+        huis_nr,      // huis_nr
+        bus_nr,       // bus_nr
+        postcode,     // postcode
+        gemeente,     // gemeente
+        telbedrijf,   // telefoon_nr
+        emailbedrijf, // email
+        voornaam_contact,
+        naam_contact,
+        specialisatie,
+        email_contact,
+        tel_contact,
+        gebruikersnaam_bedrijf,
+        wachtwoord_bedrijf,
+        beschrijving,
+        zoeken_we
+      ];
+      
+      const [result] = await db.promise().query(query, values);
+      console.log('Company created successfully:', result);
+      
+      // Automatisch tijdsloten aanmaken voor het nieuwe bedrijf
+      const bedrijfId = result.insertId;
+      const date = new Date();
+      date.setHours(0, 0, 0, 0);
+      
+      const timeslotsCreated = await createTimeslotsForBedrijf(bedrijfId, date.toISOString().split('T')[0]);
+      if (timeslotsCreated) {
+        console.log(`Automatisch tijdsloten aangemaakt voor nieuw bedrijf: ${bedrijfId}`);
+      } else {
+        console.error(`Fout bij aanmaken tijdsloten voor nieuw bedrijf: ${bedrijfId}`);
+      }
+      
+      res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt' });
+    } catch (err) {
+      console.error('Database error creating company:', err);
+      res.status(500).json({ error: 'Database error', details: err.message });
+    }
   } else {
     res.status(400).json({ error: 'Ongeldig type gebruiker' });
   }
@@ -672,6 +726,55 @@ app.post('/api/speeddates/create', async (req, res) => {
     res.json({ message: 'Tijdsloten succesvol aangemaakt', count: slots.length });
   } catch (err) {
     console.error('Error creating timeslots:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// API endpoint om tijdsloten aan te maken voor alle bedrijven die nog geen tijdsloten hebben
+app.post('/api/speeddates/create-for-all-companies', async (req, res) => {
+  try {
+    const { date } = req.body;
+    const targetDate = date ? new Date(date) : new Date();
+    targetDate.setHours(0, 0, 0, 0);
+
+    // Haal alle bedrijven op
+    const [bedrijven] = await db.promise().query('SELECT bedrijf_id FROM bedrijven');
+    
+    if (!bedrijven.length) {
+      return res.status(404).json({ error: 'Geen bedrijven gevonden' });
+    }
+
+    let createdCount = 0;
+    let skippedCount = 0;
+
+    for (const bedrijf of bedrijven) {
+      // Controleer of er al tijdsloten zijn voor dit bedrijf
+      const [bestaande] = await db.promise().query(
+        'SELECT COUNT(*) as aantal FROM speeddates WHERE bedrijf_id = ?', 
+        [bedrijf.bedrijf_id]
+      );
+      
+      if (bestaande[0].aantal > 0) {
+        console.log(`Bedrijf_id ${bedrijf.bedrijf_id} heeft al tijdsloten, overslaan.`);
+        skippedCount++;
+        continue;
+      }
+
+      // Maak tijdsloten aan voor dit bedrijf
+      const success = await createTimeslotsForBedrijf(bedrijf.bedrijf_id, targetDate.toISOString().split('T')[0]);
+      if (success) {
+        createdCount++;
+      }
+    }
+
+    res.json({ 
+      message: 'Tijdsloten verwerking voltooid', 
+      created: createdCount, 
+      skipped: skippedCount,
+      total: bedrijven.length 
+    });
+  } catch (err) {
+    console.error('Error creating timeslots for all companies:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });

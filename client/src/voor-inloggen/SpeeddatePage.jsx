@@ -120,19 +120,18 @@ export default function SpeeddatePage() {
     }
   };
 
-  // Helper to format ISO time to HH:mm
-  function formatTime(isoString) {
-    const date = new Date(isoString);
+  // Helper to format SQL datetime string to HH:mm
+  function formatTime(datetimeString) {
+    const date = new Date(datetimeString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   }
 
   // Filter timeslots: geen slots tussen 13:00 en 14:00
   function isNotPauseSlot(slot) {
-    const start = new Date(slot.starttijd);
-    const hour = start.getHours();
-    const min = start.getMinutes();
+    // Pak het uur direct uit de string
+    const hour = parseInt(slot.starttijd.slice(11, 13), 10);
     // 13:00:00 t.e.m. 13:59:59
-    return !(hour === 13);
+    return hour !== 13;
   }
 
   return (

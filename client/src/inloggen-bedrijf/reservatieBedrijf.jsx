@@ -76,10 +76,7 @@ export default function Reservaties() {
 
   const formatTime = (dateString) => {
     const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const nextMinutes = (parseInt(minutes) + 10).toString().padStart(2, '0');
-    return `${hours}:${minutes} - ${hours}:${nextMinutes}`;
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   };
 
   return (
