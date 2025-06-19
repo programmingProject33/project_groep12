@@ -1,12 +1,36 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./db');
-/* const fs = require('fs');  verwijder dit niet het leest de josn file  */
+
+// admin routes importeren 
+const adminLogin = require('./routes/adminLogin');           // POST /api/admin/login
+const adminProfile = require('./routes/adminProfile');       // GET /api/admin/me, PUT /api/admin/update
+const adminProtected = require('./routes/adminProtected');   // GET /api/admin/dashboard
+const adminRoutes = require('./routes/admins');               // GET/POST/DELETE /api/admin/admins
+const bedrijvenRoutes = require('./routes/bedrijven');       // GET /api/admin/bedrijven
+const studentenRoutes = require('./routes/studenten');       // GET /api/admin/studenten
+const speeddatesRoutes = require('./routes/speeddates');     // GET/POST/PUT /api/admin/speeddates
+const statistiekenRoutes = require('./routes/stats');        // GET /api/admin/stats
+
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 5000;
+
+
+// admin route begin
+app.use('/api/admin', adminLogin);
+app.use('/api/admin', adminProfile);
+app.use('/api/admin', adminProtected);
+app.use('/api/admin', adminRoutes);        // bevat adminbeheer
+
+app.use('/api/admin', bedrijvenRoutes);
+app.use('/api/admin', studentenRoutes);
+app.use('/api/admin', speeddatesRoutes);
+app.use('/api/admin', statistiekenRoutes);
+// admin routes eind
 
 // === Initialisatie bedrijven-tabel verwijderd ===
 
