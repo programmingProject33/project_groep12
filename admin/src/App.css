@@ -1,0 +1,282 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+  font-size: 16px;
+}
+
+/* HEADER */
+.headerBalk {
+   /* Donkerblauwgrijs */
+  padding: 10px 20px;
+  color: black;
+  position: relative;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  border-bottom: 3px solid #0088ff;
+}
+
+.headerBalk ul {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  list-style: none;
+  width: 100%;
+  margin: 0;
+  padding: 0 10px;
+}
+
+.headerBalk li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerBalk a {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerBalk ul li:last-child {
+  position: absolute;
+  right: 20px;
+}
+
+/* LOGO */
+.logo,
+.profielIcon {
+  width: 35px;
+  height: auto;
+}
+h1 {
+  margin-bottom: 10px;
+}
+/* LAYOUT STRUCTUUR */
+.layout {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background-color: #f1f5f9;
+  border-right: 3px solid #0088ff;
+  
+}
+
+.admin-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+}
+
+.admin-nav li {
+  max-width: 100%;
+}
+
+.admin-nav a {
+  text-decoration: none;
+  color: #1e293b;
+  display: block;
+  padding: 10px 14px 10px 30px;
+ 
+}
+
+.admin-nav a:hover {
+  background-color: #e2e8f0;
+}
+
+.admin-nav a.active {
+  font-weight: bold;
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  flex-grow: 1;
+  padding: 2rem;
+  background-color: #fff;
+  overflow-y: auto;
+}
+
+/* PAGINA SPECIFIEKE STIJLEN */
+.dashboard-container,
+.bedrijven-container,
+.studenten-container,
+.speeddates-container {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+
+
+
+  /* ========== TABELLAYOUT ========== */
+
+.table-container {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+table.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  background-color: white;
+  border: 1px solid #ddd;
+}
+
+table.custom-table th,
+table.custom-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+table.custom-table th {
+  background-color: #f1f5f9;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+table.custom-table tr:hover {
+  background-color: #f9fafb;
+}
+
+table.custom-table td:last-child {
+  white-space: nowrap;
+}
+
+/* ========== FILTERBALK ========== */
+
+.filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.filterbar input[type="text"],
+.filterbar select {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.filterbar select {
+  background-color: white;
+  cursor: pointer;
+}
+
+.filterbar button {
+  padding: 8px 14px;
+  background-color: #3b82f6;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.filterbar button:hover {
+  background-color: #2563eb;
+}
+
+
+/* ========== ADMIN PROFIEL LAYOUT ========== */
+
+.profile-container {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.profile-container h1 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  color: #1e293b;
+}
+
+.profile-field {
+  margin-bottom: 1rem;
+  
+}
+
+.profile-field label {
+  margin-right: 10px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+.profile-field input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  
+}
+
+.profile-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+
+.profile-buttons button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+button.wijzigen {
+  background-color: green;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+
+button.cancel {
+  background-color: rgb(193, 0, 0);
+  color: #fff;
+}
+
+button.save{
+  background-color: green;
+  color: #fff;
+
+}
+
+button.uitloggen {
+  background-color: rgb(193, 0, 0);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+
