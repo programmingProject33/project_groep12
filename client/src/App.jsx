@@ -16,7 +16,7 @@ import SpeeddatePage from "./voor-inloggen/SpeeddatePage.jsx";
 import UserLayout from "./inloggen-student/UserLayout";
 import ProtectedRoute from "./inloggen-student/ProtectedRoute";
 import StudentDashboard from "./inloggen-student/StudentDashboard";
-import Reservaties from "./na-inloggen/Reservaties";
+import Reservaties from "./inloggen-student/Reservaties";
 import Profiel from "./inloggen-student/Profiel";
 import Contact from "./inloggen-student/Contact";
 import StudentBedrijven from "./inloggen-student/StudentBedrijven";

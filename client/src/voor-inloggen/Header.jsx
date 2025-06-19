@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import "./Header.css";
 
-export default function GuestNavbar() {
+export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   

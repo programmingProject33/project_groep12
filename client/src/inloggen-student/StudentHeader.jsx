@@ -1,19 +1,17 @@
 import React from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import "./StudentHeader.css";
 
-export default function UserNavbar() {
+export default function StudentHeader() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  console.log("Current location:", location.pathname);
-  
   const handleNavigation = (path) => {
-    console.log("Navigating to:", path);
     navigate(path);
   };
 
   return (
-    <nav className="navbar user-navbar">
+    <nav className="navbar student-navbar">
       <div className="navbar-logo" onClick={() => handleNavigation("/student-dashboard")}>
         Careerlaunch
       </div>
@@ -24,9 +22,9 @@ export default function UserNavbar() {
           <Link to="/student-dashboard">Home</Link>
         </li>
         <li 
-          className={location.pathname === "/bedrijven" ? "active" : ""}
+          className={location.pathname === "/student/bedrijven" ? "active" : ""}
         >
-          <Link to="/bedrijven">Bedrijven</Link>
+          <Link to="/student/bedrijven">Bedrijven</Link>
         </li>
         <li 
           className={location.pathname === "/reservaties" ? "active" : ""}

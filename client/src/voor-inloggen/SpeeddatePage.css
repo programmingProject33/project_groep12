@@ -376,54 +376,6 @@ body {
   font-weight: 500;
 }
 
-.footer {
-  background-color: #1a365d;
-  color: white;
-  padding: 2rem;
-  margin-top: 3rem;
-}
-
-.footer-content {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-}
-
-.footer-contact h3,
-.footer-links h3 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
-
-.footer-contact p {
-  margin: 0.5rem 0;
-  color: #e2e8f0;
-}
-
-.footer-links {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.social-links {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.social-links a {
-  color: white;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.social-links a:hover {
-  color: #f28b82;
-}
-
 .login-prompt {
   text-align: center;
   padding: 2rem;

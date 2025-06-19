@@ -310,56 +310,6 @@
   background-color: #f0f7ff;
 }
 
-.footer {
-  background-color: #1a365d;
-  color: white;
-  padding: 2rem 0;
-  margin-top: auto;
-}
-
-.footer-row {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 2rem;
-}
-
-.footer-col {
-  flex: 1;
-}
-
-.footer-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.footer-menu li {
-  margin: 0.5rem 0;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.footer-menu li:hover {
-  color: #93c5fd;
-}
-
-.footer-socials {
-  display: flex;
-  gap: 1rem;
-}
-
-.footer-socials .icon {
-  color: white;
-  font-size: 1.5rem;
-  transition: color 0.2s ease;
-}
-
-.footer-socials .icon:hover {
-  color: #93c5fd;
-}
-
 @media (max-width: 900px) {
   .bedrijven-grid {
     grid-template-columns: 1fr 1fr;

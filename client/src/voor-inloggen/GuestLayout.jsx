@@ -1,17 +1,16 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import GuestNavbar from "./GuestNavbar";
+import Header from "./Header";
+import Footer from "./Footer";
 
 export default function GuestLayout() {
   return (
     <div>
-      <GuestNavbar />
+      <Header />
       <main>
         <Outlet />
       </main>
-      <footer className="footer guest-footer">
-        <div>© {new Date().getFullYear()} Careerlaunch</div>
-      </footer>
+      <Footer />
     </div>
   );
 } 

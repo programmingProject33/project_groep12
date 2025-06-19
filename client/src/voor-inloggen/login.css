@@ -138,15 +138,6 @@ body {
   text-decoration: underline;
 }
 
-/* Footer - no space below */
-.footer {
-  background: light;
-  color: white;
-  padding: 1.5rem 0;
-  width: 100%;
-  margin-top: auto; /* Pushes footer to bottom */
-}
-
 .login-bg {
   min-height: 100vh;
   background: #f8fafc;
