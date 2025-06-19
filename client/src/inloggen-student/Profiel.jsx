@@ -69,8 +69,27 @@ const Profiel = () => {
   };
 
   const handleSave = async () => {
-    // PATCH-ready: stuur profiel naar backend
-    setUser({ ...user, ...profile });
+    try {
+      const res = await fetch(`/api/profiel/${user.gebruiker_id || user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          voornaam: profile.voornaam,
+          naam: profile.naam,
+          gebruikersnaam: profile.gebruikersnaam,
+          opleiding: profile.opleiding,
+          opleiding_jaar: profile.opleiding_jaar,
+          email: profile.email,
+          dienstverbanden: profile.dienstverbanden,
+          linkedin: profile.linkedin,
+          foto: profile.foto
+        })
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setUser({ ...user, ...profile }); // optioneel: setUser(updated)
+      }
+    } catch (e) {}
     setEditMode(false);
   };
 

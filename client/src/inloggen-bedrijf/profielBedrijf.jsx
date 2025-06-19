@@ -91,7 +91,7 @@ export default function Profiel() {
     e.preventDefault();
     setSuccess("");
     setError("");
-    const postData = { ...profile, id: parseInt(profile.bedrijf_id, 10) };
+    const postData = { ...profile, gebruikerId: parseInt(profile.bedrijf_id, 10) };
     console.log('POST profiel:', postData);
     try {
       const res = await fetch("/api/bedrijf/update", {

@@ -532,4 +532,145 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Aangeraden voor jou sectie */
+.recommended-section {
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+}
+
+.recommended-title {
+  text-align: center;
+  color: #1e40af;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  z-index: 1;
+  position: relative;
+}
+
+.recommended-subtitle {
+  text-align: center;
+  color: #64748b;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  z-index: 1;
+  position: relative;
+}
+
+.recommended-grid {
+  margin-bottom: 2rem;
+}
+
+/* Aangeraden bedrijf cards */
+.bedrijf-card.recommended {
+  border: 2px solid #3b82f6 !important;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15) !important;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+  position: relative;
+  overflow: visible;
+}
+
+.bedrijf-card.recommended::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #3b82f6, #60a5fa, #93c5fd);
+  border-radius: 1.3rem;
+  z-index: -1;
+  opacity: 0.3;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
+.bedrijf-card.recommended:hover {
+  transform: scale(1.03) translateY(-6px) !important;
+  box-shadow: 0 12px 35px rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Match badge */
+.match-badge {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.match-badge span {
+  margin-right: 0.3rem;
+}
+
+/* Section divider */
+.section-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+  margin: 2rem auto;
+  max-width: 200px;
+  border-radius: 1px;
+}
+
+/* Alle bedrijven sectie */
+.all-bedrijven-section {
+  margin-top: 2rem;
+}
+
+.all-bedrijven-title {
+  text-align: center;
+  color: #1e293b;
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  z-index: 1;
+  position: relative;
+}
+
+/* Responsive aanpassingen voor recommended sectie */
+@media (max-width: 900px) {
+  .recommended-title {
+    font-size: 1.6rem;
+  }
+  
+  .recommended-subtitle {
+    font-size: 1rem;
+  }
+  
+  .all-bedrijven-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .recommended-section {
+    padding: 1rem 0;
+  }
+  
+  .recommended-title {
+    font-size: 1.4rem;
+  }
+  
+  .match-badge {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
 } 
