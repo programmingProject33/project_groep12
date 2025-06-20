@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import "./StudentHeader.css";
+import ehbLogo from "../assets/favicon_io/ehb-logo.png";
 
 export default function StudentHeader() {
   const navigate = useNavigate();
@@ -13,7 +14,13 @@ export default function StudentHeader() {
   return (
     <nav className="navbar student-navbar">
       <div className="navbar-logo" onClick={() => handleNavigation("/student-dashboard")}>
-        Careerlaunch
+        <img
+          src={ehbLogo}
+          alt="EHB logo"
+        />
+        <span>
+          Careerlaunch
+        </span>
       </div>
       <ul className="navbar-links">
         <li 

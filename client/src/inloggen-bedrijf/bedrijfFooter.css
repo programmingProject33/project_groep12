@@ -1,9 +1,9 @@
 .footer {
     background: #64748b;
     color: #fff;
-    padding: 2.5rem 2rem;
+    padding: 1.5rem 2rem;
     font-size: 1.13rem;
-    margin-top: 3rem;
+    margin-top: 2rem;
     
     overflow-x: hidden;
     box-sizing: border-box;
@@ -45,7 +45,7 @@
 }
 
 .footer-menu li {
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
     cursor: pointer;
 }
 
@@ -78,6 +78,7 @@
 
 .footer-mail {
     line-height: 1.6;
+    font-size: 1.3rem;
 }
 
 @media (max-width: 1200px) {
