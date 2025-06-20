@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Loader from "./Loader.jsx";
+import ScrollToTop from './ScrollToTop';
+import VerificationPage from './pages/VerificationPage';
 
 // Guest/Public Components
 import GuestLayout from "./voor-inloggen/GuestLayout";
@@ -55,6 +57,7 @@ function App() {
   }
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Publieke routes */}
         <Route path="/" element={<GuestLayout />}>
@@ -72,6 +75,9 @@ function App() {
           <Route path="contactNavbalk" element={<ContactNavbalk />} />
           <Route path="bedrijven" element={<BedrijvenRedirectWrapper />} />
         </Route>
+
+        {/* Route voor e-mail verificatie */}
+        <Route path="/verify" element={<VerificationPage />} />
 
         {/* Student routes met UserLayout als parent */}
         <Route path="/" element={

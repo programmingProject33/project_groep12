@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./registreer.css"; // Dit importeert de styling (kleuren, lay-out, lettertypes) van de pagina.
 import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 // Dit importeert iconen van sociale media die je kan gebruiken in de pagina.
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 // useNavigate is een hook (speciale functie) die je gebruikt om te navigeren (pagina veranderen) zonder dat de pagina helemaal opnieuw laadt.
 
 const OPLEIDINGEN = [
@@ -64,6 +64,7 @@ export default function Registreer()   // Dit is een functionele component in Re
 
   // Error state
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState(''); // State voor succesbericht
 
   const handleStudentChange = (e) => {
     setStudentForm({
@@ -82,6 +83,7 @@ export default function Registreer()   // Dit is een functionele component in Re
   const handleStudentSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage(''); // Reset berichten bij nieuwe poging
 
     // Validate passwords match
     if (studentForm.wachtwoord !== studentForm.wachtwoord2) {
@@ -108,8 +110,18 @@ export default function Registreer()   // Dit is een functionele component in Re
       }
 
       // Registration successful
-      alert('Account succesvol aangemaakt!');
-      navigate('/login');
+      setSuccessMessage('Bijna klaar! We hebben een verificatie-e-mail gestuurd. Controleer je inbox om je registratie te voltooien.');
+      setStudentForm({
+        voornaam: '',
+        naam: '',
+        email: '',
+        gebruikersnaam: '',
+        wachtwoord: '',
+        wachtwoord2: '',
+        opleiding: '',
+        opleiding_jaar: '',
+        linkedin: ''
+      });
     } catch (err) {
       setError(err.message);
     }
@@ -118,6 +130,7 @@ export default function Registreer()   // Dit is een functionele component in Re
   const handleCompanySubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage(''); // Reset berichten bij nieuwe poging
 
     // Validate passwords match
     if (companyForm.wachtwoord_bedrijf !== companyForm.wachtwoord2_bedrijf) {
@@ -148,8 +161,27 @@ export default function Registreer()   // Dit is een functionele component in Re
       }
 
       // Registration successful
-      alert('Bedrijfsaccount succesvol aangemaakt!');
-      navigate('/login');
+      setSuccessMessage('Bijna klaar! We hebben een verificatie-e-mail gestuurd. Controleer je inbox om je registratie te voltooien.');
+      setCompanyForm({
+        bedrijfsnaam: '',
+        kvk: '',
+        btw: '',
+        straat: '',
+        gemeente: '',
+        telbedrijf: '',
+        emailbedrijf: '',
+        voornaam_contact: '',
+        naam_contact: '',
+        specialisatie: '',
+        email_contact: '',
+        tel_contact: '',
+        gebruikersnaam_bedrijf: '',
+        wachtwoord_bedrijf: '',
+        wachtwoord2_bedrijf: '',
+        sector: '',
+        beschrijving: '',
+        zoeken_we: ''
+      });
     } catch (err) {
       setError(err.message);
     }
@@ -497,6 +529,14 @@ export default function Registreer()   // Dit is een functionele component in Re
             </form>
           )}
         </div>
+
+        {successMessage && (
+          <div className="registreer-success-container">
+            <h2>✅ Registratie aangevraagd!</h2>
+            <p>{successMessage}</p>
+            <p>Je kunt dit venster nu sluiten.</p>
+          </div>
+        )}
       </main>
     </div>
   );

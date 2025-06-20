@@ -1,12 +1,12 @@
 -- Create database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS careerlaunch;
+CREATE DATABASE IF NOT EXISTS 2425PROGPROJ02;
 
 -- Use the database
-USE careerlaunch;
+USE 2425PROGPROJ02;
 
--- Create gebruikers table
+-- Gebruikers (studenten) tabel - bestaande structuur
 CREATE TABLE IF NOT EXISTS gebruikers (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    gebruiker_id INT AUTO_INCREMENT PRIMARY KEY,
     voornaam VARCHAR(50) NOT NULL,
     naam VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -14,14 +14,13 @@ CREATE TABLE IF NOT EXISTS gebruikers (
     wachtwoord VARCHAR(255) NOT NULL,
     opleiding VARCHAR(100),
     opleiding_jaar INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     dienstverbanden TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    is_verified BOOLEAN DEFAULT FALSE,
+    verification_token VARCHAR(255)
 );
 
--- Verwijder de bestaande bedrijven tabel als die bestaat
-DROP TABLE IF EXISTS bedrijven;
-
--- Maak de nieuwe bedrijven tabel aan met de gewenste kolommen
+-- Bedrijven tabel
 CREATE TABLE IF NOT EXISTS bedrijven (
     bedrijf_id INT AUTO_INCREMENT PRIMARY KEY,
     bedrijf_URL VARCHAR(255),
@@ -44,7 +43,12 @@ CREATE TABLE IF NOT EXISTS bedrijven (
     sector VARCHAR(100),
     beschrijving TEXT,
     zoeken_we TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    lokaal VARCHAR(50),
+    verdieping VARCHAR(50),
+    number_of_representatives INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_verified BOOLEAN DEFAULT FALSE,
+    verification_token VARCHAR(255)
 );
 
 -- Verwijder alle bestaande tijdsloten om dubbele invoer te voorkomen
@@ -59,7 +63,7 @@ CREATE TABLE IF NOT EXISTS speeddates (
     eindtijd DATETIME NOT NULL,
     is_bezet BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (bedrijf_id) REFERENCES bedrijven(id),
-    FOREIGN KEY (user_id) REFERENCES gebruikers(id)
+    FOREIGN KEY (bedrijf_id) REFERENCES bedrijven(bedrijf_id),
+    FOREIGN KEY (user_id) REFERENCES gebruikers(gebruiker_id)
 );
 

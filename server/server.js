@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./db');
+const crypto = require('crypto');
+const { sendVerificationEmail } = require('./mailer');
 
 // admin routes importeren 
 const adminLogin = require('./routes/adminLogin');           // POST /api/admin/login
@@ -39,39 +41,48 @@ app.get('/', (req, res) => {
   res.json({ message: 'CareerLaunch API is running' });
 });
 
-// Login endpoint
+// User login endpoint
 app.post('/api/login', async (req, res) => {
-  console.log('Login endpoint aangeroepen met body:', req.body); // Debug log
-  try {
-    const { gebruikersnaam, wachtwoord, type } = req.body;
-    console.log('Login attempt:', { gebruikersnaam, type });
+  const { gebruikersnaam, wachtwoord, type } = req.body;
 
-    // Determine which table to query based on user type
+  try {
     const table = type === 'student' ? 'gebruikers' : 'bedrijven';
     
-    // Query the appropriate table
     const [users] = await db.promise().query(
-      `SELECT * FROM ${table} WHERE gebruikersnaam = ? AND wachtwoord = ?`,
-      [gebruikersnaam, wachtwoord]
+      `SELECT * FROM ${table} WHERE gebruikersnaam = ?`,
+      [gebruikersnaam]
     );
 
-    if (users.length > 0) {
-      const user = users[0];
-      // Remove sensitive information
-      delete user.wachtwoord;
-      
-      res.json({
-        message: 'Login succesvol',
-        user: {
-          ...user,
-          type: type
-        }
-      });
-    } else {
-      res.status(401).json({ error: 'Ongeldige gebruikersnaam of wachtwoord' });
+    if (users.length === 0) {
+      return res.status(401).json({ error: 'Ongeldige gebruikersnaam of wachtwoord' });
     }
+
+    const user = users[0];
+
+    // Stap 1: Controleer of het account geverifieerd is.
+    if (!user.is_verified) {
+      return res.status(403).json({ error: 'Account niet geverifieerd. Controleer je e-mail voor de verificatielink.' });
+    }
+
+    // Stap 2: Vergelijk het wachtwoord.
+    // Aanname: wachtwoorden zijn plain text opgeslagen. Voor productie is hashen essentieel.
+    if (user.wachtwoord !== wachtwoord) {
+      return res.status(401).json({ error: 'Ongeldige gebruikersnaam of wachtwoord' });
+    }
+    
+    // Stap 3: Login succesvol.
+    delete user.wachtwoord;
+    
+    res.json({
+      message: 'Login succesvol',
+      user: {
+        ...user,
+        type: type
+      }
+    });
+
   } catch (err) {
-    console.error('Login error:', err); // Log de error
+    console.error('Login error:', err);
     res.status(500).json({ 
       error: 'Database error', 
       details: err.message 
@@ -192,16 +203,14 @@ async function createTimeslotsForBedrijf(bedrijfId, dateStr) {
 // User registration endpoint
 app.post('/api/register', async (req, res) => {
   const { type, ...userData } = req.body;
+  const verificationToken = crypto.randomBytes(32).toString('hex');
 
   if (type === 'student') {
     try {
       const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden } = userData;
       const dienstverbandenStr = dienstverbanden ? JSON.stringify(dienstverbanden) : null;
-      
-      // Convert empty string to NULL for integer fields
       const opleidingJaarValue = opleiding_jaar === '' ? null : opleiding_jaar;
       
-      // Check if user exists
       const [existingUsers] = await db.promise().query(
         'SELECT * FROM gebruikers WHERE email = ? OR gebruikersnaam = ?',
         [email, gebruikersnaam]
@@ -209,104 +218,47 @@ app.post('/api/register', async (req, res) => {
       if (existingUsers.length > 0) {
         return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
       }
-      // Insert new user
+
       const [result] = await db.promise().query(
-        'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleidingJaarValue, dienstverbandenStr]
+        'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden, is_verified, verification_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleidingJaarValue, dienstverbandenStr, false, verificationToken]
       );
-      console.log('User created successfully:', result);
-      res.status(201).json({ message: 'Account succesvol aangemaakt' });
+      
+      await sendVerificationEmail(email, verificationToken);
+      
+      res.status(201).json({ message: 'Account succesvol aangemaakt. Controleer je e-mail voor de verificatielink.' });
     } catch (err) {
       console.error('Error in student registration:', err);
-      res.status(500).json({ 
-        error: 'Database error', 
-        details: err.message,
-        sqlMessage: err.sqlMessage,
-        sqlState: err.sqlState,
-        code: err.code
-      });
+      res.status(500).json({ error: 'Database error', details: err.message });
     }
   } else if (type === 'bedrijf') {
-    const { 
-      bedrijfsnaam, 
-      btw, 
-      straat, 
-      huis_nr, 
-      bus_nr, 
-      postcode, 
-      gemeente, 
-      telbedrijf, 
-      emailbedrijf,
-      voornaam_contact, 
-      naam_contact, 
-      specialisatie, 
-      email_contact, 
-      tel_contact,
-      gebruikersnaam_bedrijf, 
-      wachtwoord_bedrijf,
-      beschrijving,
-      zoeken_we 
-    } = userData;
-    
     try {
-      // Check if company already exists
-      const [existingCompanies] = await db.promise().query(
-        'SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?', 
-        [emailbedrijf, gebruikersnaam_bedrijf]
-      );
-      
-      if (existingCompanies.length > 0) {
-        console.error('Company already exists:', { emailbedrijf, gebruikersnaam_bedrijf });
-        return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
-      }
-      
-      // Insert new company
-      const query = `INSERT INTO bedrijven (
-        naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email,
-        contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
-        gebruikersnaam, wachtwoord, beschrijving, zoeken_we
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-      
-      const values = [
-        bedrijfsnaam, // naam
-        btw,          // BTW_nr
-        straat,       // straatnaam
-        huis_nr,      // huis_nr
-        bus_nr,       // bus_nr
-        postcode,     // postcode
-        gemeente,     // gemeente
-        telbedrijf,   // telefoon_nr
-        emailbedrijf, // email
-        voornaam_contact,
-        naam_contact,
-        specialisatie,
-        email_contact,
-        tel_contact,
-        gebruikersnaam_bedrijf,
-        wachtwoord_bedrijf,
-        beschrijving,
-        zoeken_we
-      ];
-      
-      const [result] = await db.promise().query(query, values);
-      console.log('Company created successfully:', result);
-      
-      // Automatisch tijdsloten aanmaken voor het nieuwe bedrijf
-      const bedrijfId = result.insertId;
-      const date = new Date();
-      date.setHours(0, 0, 0, 0);
-      
-      const timeslotsCreated = await createTimeslotsForBedrijf(bedrijfId, date.toISOString().split('T')[0]);
-      if (timeslotsCreated) {
-        console.log(`Automatisch tijdsloten aangemaakt voor nieuw bedrijf: ${bedrijfId}`);
-      } else {
-        console.error(`Fout bij aanmaken tijdsloten voor nieuw bedrijf: ${bedrijfId}`);
-      }
-      
-      res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt' });
+        const {
+            bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email,
+            contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
+            gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, lokaal, verdieping, number_of_representatives
+        } = userData;
+
+        const [existingBedrijven] = await db.promise().query(
+            'SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?',
+            [email, gebruikersnaam]
+        );
+        if (existingBedrijven.length > 0) {
+            return res.status(400).json({ error: 'Email of gebruikersnaam voor bedrijf bestaat al' });
+        }
+
+        const [result] = await db.promise().query(
+            `INSERT INTO bedrijven (bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, lokaal, verdieping, number_of_representatives, is_verified, verification_token) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, lokaal, verdieping, number_of_representatives, false, verificationToken]
+        );
+
+        await sendVerificationEmail(email, verificationToken);
+
+        res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt. Controleer je e-mail voor de verificatielink.' });
     } catch (err) {
-      console.error('Database error creating company:', err);
-      res.status(500).json({ error: 'Database error', details: err.message });
+        console.error('Error in bedrijf registration:', err);
+        res.status(500).json({ error: 'Database error', details: err.message });
     }
   } else {
     res.status(400).json({ error: 'Ongeldig type gebruiker' });
@@ -777,6 +729,50 @@ app.post('/api/speeddates/create-for-all-companies', async (req, res) => {
     console.error('Error creating timeslots for all companies:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
+});
+
+// Email verification endpoint
+app.get('/api/verify', async (req, res) => {
+    const { token } = req.query;
+
+    if (!token) {
+        return res.status(400).json({ error: 'Verificatie token is vereist' });
+    }
+
+    try {
+        // Probeer de token te vinden in de 'gebruikers' tabel
+        let [userResult] = await db.promise().query(
+            'SELECT * FROM gebruikers WHERE verification_token = ?', [token]
+        );
+
+        if (userResult.length > 0) {
+            // Gebruiker gevonden, update de status
+            await db.promise().query(
+                'UPDATE gebruikers SET is_verified = TRUE, verification_token = NULL WHERE verification_token = ?', [token]
+            );
+            return res.status(200).json({ message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.' });
+        }
+
+        // Als niet in gebruikers, probeer de 'bedrijven' tabel
+        let [bedrijfResult] = await db.promise().query(
+            'SELECT * FROM bedrijven WHERE verification_token = ?', [token]
+        );
+
+        if (bedrijfResult.length > 0) {
+            // Bedrijf gevonden, update de status
+            await db.promise().query(
+                'UPDATE bedrijven SET is_verified = TRUE, verification_token = NULL WHERE verification_token = ?', [token]
+            );
+            return res.status(200).json({ message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.' });
+        }
+
+        // Als in geen van beide tabellen gevonden
+        return res.status(404).json({ error: 'Ongeldige of verlopen verificatietoken.' });
+
+    } catch (err) {
+        console.error('Error during verification:', err);
+        res.status(500).json({ error: 'Databasefout tijdens verificatieproces.' });
+    }
 });
 
 app.listen(PORT, () => {
