@@ -36,6 +36,7 @@ export default function BedrijfFooter() {
           </div>
         </div>
       </div>
+      <p>&copy; {new Date().getFullYear()} Careerlaunch. Alle rechten voorbehouden.</p>
     </footer>
   );
 }

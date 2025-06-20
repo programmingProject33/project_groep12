@@ -63,8 +63,10 @@ export default function Footer() {
               <FaTiktok />
             </a>
           </div>
+          
         </div>
       </div>
+      <p>&copy; {new Date().getFullYear()} Careerlaunch. Alle rechten voorbehouden.</p>
     </footer>
   );
 } 

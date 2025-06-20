@@ -15,6 +15,22 @@
   font-weight: 700;
   font-size: 2rem;
   letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.navbar-logo img {
+  height: 38px;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+
+.navbar-logo span {
+  color: #667eea;
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: -0.5px;
 }
 
 .navbar-spacer {
