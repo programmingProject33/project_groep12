@@ -52,7 +52,7 @@ const Login = () => {
       
       // Redirect based on user type
       if (data.user.type === 'student') {
-        navigate('/student-dashboard');
+        navigate('/student/dashboard');
       } else {
         navigate('/bedrijf/home');
       }

@@ -7,9 +7,11 @@ export default function GuestRoute({ children }) {
   
   if (isAuthLoading) return null; // of een loader
   
-  if (user) {
+  // Only redirect if user is properly authenticated and has a valid type
+  if (user && user.type && (user.type === 'student' || user.type === 'bedrijf')) {
     // Redirect naar het juiste dashboard op basis van het type gebruiker
-    return <Navigate to={user.type === 'student' ? '/student-dashboard' : '/bedrijf/home'} replace />;
+    const redirectPath = user.type === 'student' ? '/student/dashboard' : '/bedrijf/home';
+    return <Navigate to={redirectPath} replace />;
   }
   
   return children;

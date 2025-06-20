@@ -115,8 +115,8 @@ export default function StudentDashboard() {
           </div>
         </div>
         <div className="hero-actions">
-          <button className="hero-btn bedrijven" onClick={() => navigate("/bedrijven")}> <FaBuilding className="btn-icon" /> Bekijk bedrijven</button>
-          <button className="hero-btn reservaties" onClick={() => navigate("/reservaties")}> <FaCalendarAlt className="btn-icon" /> Bekijk reservaties</button>
+          <button className="hero-btn bedrijven" onClick={() => navigate("/student/bedrijven")}> <FaBuilding className="btn-icon" /> Bekijk bedrijven</button>
+          <button className="hero-btn reservaties" onClick={() => navigate("/student/reservaties")}> <FaCalendarAlt className="btn-icon" /> Bekijk reservaties</button>
         </div>
       </motion.section>
 

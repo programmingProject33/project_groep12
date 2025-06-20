@@ -74,7 +74,7 @@ function Bedrijven() {
 
   const handleReserveerClick = (bedrijfId) => {
     if (user) {
-      navigate(`/speeddate/${bedrijfId}`);
+      navigate(`/student/speeddate/${bedrijfId}`);
     } else {
       setPendingBedrijfId(bedrijfId);
       setShowLoginModal(true);

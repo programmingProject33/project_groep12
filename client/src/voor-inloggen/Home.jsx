@@ -107,13 +107,22 @@ export default function Home() {
   const navigate = useNavigate();
   const [showLocationMap, setShowLocationMap] = useState(false);
 
-  // Redirect direct bij elke render als user is ingelogd
+  // Redirect only once on component mount if user is logged in
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      navigate("/student-dashboard", { replace: true });
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      try {
+        const user = JSON.parse(userString);
+        // Bepaal de juiste bestemming op basis van gebruikerstype
+        const destination = user.type === 'student' ? '/student/dashboard' : '/bedrijf/home';
+        navigate(destination, { replace: true });
+      } catch (e) {
+        // Vang fouten op als de data in localStorage corrupt is
+        console.error("Kon gebruiker niet parsen uit localStorage", e);
+        localStorage.removeItem("user");
+      }
     }
-  });
+  }, [navigate]); // De dependency array voorkomt de oneindige lus
 
   const toggleLocationMap = () => {
     setShowLocationMap(!showLocationMap);

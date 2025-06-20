@@ -34,19 +34,37 @@ import StudentProfiel from "./inloggen-bedrijf/StudentProfiel.jsx";
 // Context
 import { useAuth } from "./AuthContext.jsx";
 
-// Custom hook voor role-based redirects
-function useRoleRedirect() {
-  const { user } = useAuth();
+// Custom hook voor role-based redirects, nu een geldige component
+function RoleRedirect() {
+  const { user, isAuthLoading } = useAuth();
+  
+  if (isAuthLoading) return null; // of een loader
+  
   if (!user) return <Navigate to="/login" replace />;
-  return <Navigate to={user.type === 'student' ? '/student-dashboard' : '/bedrijf/home'} replace />;
+  
+  // Only redirect if user has a valid type
+  if (user.type === 'student') {
+    return <Navigate to="/student/dashboard" replace />;
+  } else if (user.type === 'bedrijf') {
+    return <Navigate to="/bedrijf/home" replace />;
+  }
+  
+  // Fallback voor onbekende gebruikerstypes - clear invalid user data
+  localStorage.removeItem('user');
+  return <Navigate to="/login" replace />;
 }
 
 function BedrijvenRedirectWrapper() {
   const { user, isAuthLoading } = useAuth();
+  
   if (isAuthLoading) return null; // of een loader
+  
+  // Only redirect if user is logged in and is a student
   if (user && user.type === 'student') {
     return <Navigate to="/student/bedrijven" replace />;
   }
+  
+  // For non-logged in users or companies, show the public bedrijven page
   return <Bedrijven />;
 }
 
@@ -80,14 +98,13 @@ function App() {
         <Route path="/verify" element={<VerificationPage />} />
 
         {/* Student routes met UserLayout als parent */}
-        <Route path="/" element={
+        <Route path="/student" element={
           <ProtectedRoute allowedRoles={['student']}>
             <UserLayout />
           </ProtectedRoute>
         }>
-          <Route path="student-dashboard" element={<StudentDashboard />} />
-          <Route path="student/bedrijven" element={<StudentBedrijven />} />
-          <Route path="bedrijven" element={<Bedrijven />} />
+          <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="bedrijven" element={<StudentBedrijven />} />
           <Route path="reservaties" element={<Reservaties />} />
           <Route path="profiel" element={<Profiel />} />
           <Route path="contact" element={<Contact />} />
@@ -111,7 +128,7 @@ function App() {
         </Route>
 
         {/* Catch-all route voor ongeldige paden */}
-        <Route path="*" element={<useRoleRedirect />} />
+        <Route path="*" element={<RoleRedirect />} />
       </Routes>
     </Router>
   );

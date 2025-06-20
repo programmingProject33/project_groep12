@@ -109,7 +109,7 @@ export default function SpeeddatePage() {
       const data = await res.json();
       if (res.ok) {
         alert("Reservering bevestigd!");
-        navigate("/");
+        navigate("/student/reservaties");
       } else {
         setErrorMessage(data.error || "Er is een fout opgetreden bij het reserveren.");
       }

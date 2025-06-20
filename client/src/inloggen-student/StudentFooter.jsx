@@ -21,10 +21,10 @@ export default function StudentFooter() {
         </div>
         <div className="footer-col middle">
           <ul className="footer-menu">
-            <li><Link to="/student-dashboard">Home</Link></li>
+            <li><Link to="/student/dashboard">Home</Link></li>
             <li><Link to="/student/bedrijven">Bedrijven</Link></li>
-            <li><Link to="/reservaties">Reservaties</Link></li>
-            <li><Link to="/contact">Contact</Link></li>
+            <li><Link to="/student/reservaties">Reservaties</Link></li>
+            <li><Link to="/student/contact">Contact</Link></li>
           </ul>
         </div>
         <div className="footer-col right">

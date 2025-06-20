@@ -244,7 +244,7 @@ function StudentBedrijven() {
           <button
             className="reserveer-btn modern"
             style={{marginTop: 'auto', width: '100%', fontSize: '1.13rem', padding: '1rem 0', borderRadius: '1rem', fontWeight: 700, background: 'linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%)', color: '#fff', border: 'none', boxShadow: '0 2px 12px rgba(59,130,246,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.7rem', cursor: 'pointer', alignSelf: 'center'}}
-            onClick={() => navigate(`/speeddate/${bedrijf.bedrijf_id}`)}
+            onClick={() => navigate(`/student/speeddate/${bedrijf.bedrijf_id}`)}
           >
             <FaCalendarAlt className="btn-icon" style={{ marginRight: 8 }} /> Reserveer speeddate
           </button>

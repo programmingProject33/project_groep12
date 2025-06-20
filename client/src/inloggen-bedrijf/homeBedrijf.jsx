@@ -47,7 +47,13 @@ export default function HomeBedrijf() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showLocationMap, setShowLocationMap] = useState(false);
-  const bedrijfsnaam = user?.naam || user?.bedrijfsnaam || "[Bedrijf]";
+
+  // Voeg een expliciete controle toe om de component te beschermen tegen een null user-object
+  if (!user) {
+    return null; // Of een <Loader /> component
+  }
+
+  const bedrijfsnaam = user.naam || user.bedrijfsnaam || "[Bedrijf]";
 
   const handleLogout = () => {
     localStorage.removeItem("user");

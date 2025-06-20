@@ -6,11 +6,8 @@ import ehbLogo from "../assets/favicon_io/ehb-logo.png";
 
 export default function BedrijfNavbar() {
   const location = useLocation();
-  const { user, isAuthLoading } = useAuth();
+  const { isAuthLoading } = useAuth();
   if (isAuthLoading) return null;
-  if (!user || user.type !== 'bedrijf') {
-    return null;
-  }
 
   return (
     <nav className="navbar bedrijf-navbar">

@@ -13,7 +13,7 @@ export default function StudentHeader() {
 
   return (
     <nav className="navbar student-navbar">
-      <div className="navbar-logo" onClick={() => handleNavigation("/student-dashboard")}>
+      <div className="navbar-logo" onClick={() => handleNavigation("/student/dashboard")}>
         <img
           src={ehbLogo}
           alt="EHB logo"
@@ -24,9 +24,9 @@ export default function StudentHeader() {
       </div>
       <ul className="navbar-links">
         <li 
-          className={location.pathname === "/student-dashboard" ? "active" : ""}
+          className={location.pathname === "/student/dashboard" ? "active" : ""}
         >
-          <Link to="/student-dashboard">Home</Link>
+          <Link to="/student/dashboard">Home</Link>
         </li>
         <li 
           className={location.pathname === "/student/bedrijven" ? "active" : ""}
@@ -34,19 +34,19 @@ export default function StudentHeader() {
           <Link to="/student/bedrijven">Bedrijven</Link>
         </li>
         <li 
-          className={location.pathname === "/reservaties" ? "active" : ""}
+          className={location.pathname === "/student/reservaties" ? "active" : ""}
         >
-          <Link to="/reservaties">Reservaties</Link>
+          <Link to="/student/reservaties">Reservaties</Link>
         </li>
         <li 
-          className={location.pathname === "/contact" ? "active" : ""}
+          className={location.pathname === "/student/contact" ? "active" : ""}
         >
-          <Link to="/contact">Contact</Link>
+          <Link to="/student/contact">Contact</Link>
         </li>
         <li 
-          className={location.pathname === "/profiel" ? "active" : ""}
+          className={location.pathname === "/student/profiel" ? "active" : ""}
         >
-          <Link to="/profiel">Profiel</Link>
+          <Link to="/student/profiel">Profiel</Link>
         </li>
       </ul>
     </nav>
