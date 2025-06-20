@@ -1,12 +1,12 @@
 -- Create database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS careerlaunch;
+CREATE DATABASE IF NOT EXISTS 2425PROGPROJ02;
 
 -- Use the database
-USE careerlaunch;
+USE 2425PROGPROJ02;
 
 -- Create gebruikers table
 CREATE TABLE IF NOT EXISTS gebruikers (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    gebruiker_id INT AUTO_INCREMENT PRIMARY KEY,
     voornaam VARCHAR(50) NOT NULL,
     naam VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -14,8 +14,11 @@ CREATE TABLE IF NOT EXISTS gebruikers (
     wachtwoord VARCHAR(255) NOT NULL,
     opleiding VARCHAR(100),
     opleiding_jaar INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     dienstverbanden TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    is_verified TINYINT(1) DEFAULT 0,
+    verification_token VARCHAR(255) DEFAULT NULL,
+    linkedin VARCHAR(255)
 );
 
 -- Verwijder de bestaande bedrijven tabel als die bestaat
@@ -54,12 +57,17 @@ DELETE FROM speeddates;
 CREATE TABLE IF NOT EXISTS speeddates (
     speed_id INT AUTO_INCREMENT PRIMARY KEY,
     bedrijf_id INT NOT NULL,
-    user_id INT,
     starttijd DATETIME NOT NULL,
     eindtijd DATETIME NOT NULL,
     is_bezet BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (bedrijf_id) REFERENCES bedrijven(id),
-    FOREIGN KEY (user_id) REFERENCES gebruikers(id)
+    gebruiker_id INT,
+    capacity INT,
+    reserved_count INT,
+    FOREIGN KEY (bedrijf_id) REFERENCES bedrijven(bedrijf_id),
+    FOREIGN KEY (gebruiker_id) REFERENCES gebruikers(gebruiker_id)
 );
+
+-- Add linkedin column to existing gebruikers table if it doesn't exist
+ALTER TABLE gebruikers ADD COLUMN IF NOT EXISTS linkedin VARCHAR(255);
 

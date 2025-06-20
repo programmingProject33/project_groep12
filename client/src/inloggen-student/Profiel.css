@@ -201,118 +201,152 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 0.2rem;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem;
 }
 
 .profiel-naam-new {
-  font-size: 1.35rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #1e293b;
-  margin-bottom: 0.2rem;
   text-align: center;
 }
 
 .profiel-linkedin-btn-new {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1.2rem;
-  font-size: 1.05rem;
-  font-weight: 500;
-  margin-top: 0.5rem;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  background: #0077b5;
+  color: #fff;
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.18s;
   text-decoration: none;
+  transition: background 0.2s;
 }
 .profiel-linkedin-btn-new:hover {
-  background: #1d4ed8;
+  background: #005885;
 }
 
 .profiel-edit-btn-new {
-  align-self: flex-end;
-  background: #e0e7ff;
-  color: #2563eb;
+  background: #3b82f6;
+  color: #fff;
   border: none;
-  border-radius: 0.5rem;
-  padding: 0.4rem 1.1rem;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
   cursor: pointer;
-  transition: background 0.18s;
+  transition: background 0.2s;
+  margin-bottom: 0.5rem;
 }
 .profiel-edit-btn-new:hover {
-  background: #c7d2fe;
+  background: #2563eb;
 }
 
 .profiel-save-btn-new {
-  background: #2563eb;
+  background: #10b981;
   color: #fff;
   border: none;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1.3rem;
-  font-size: 1.08rem;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
   font-weight: 600;
-  margin-top: 0.7rem;
   cursor: pointer;
-  transition: background 0.18s;
+  transition: background 0.2s;
+  width: 100%;
 }
 .profiel-save-btn-new:hover {
-  background: #1d4ed8;
+  background: #059669;
 }
 
 .profiel-info-list-new {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
-  margin-top: 0.2rem;
+  gap: 1rem;
+  margin-top: 0.5rem;
 }
 
 .profiel-info-item-new {
+  background: #f8fafc;
+  border-radius: 0.8rem;
+  padding: 1rem 1.2rem;
   display: flex;
-  align-items: flex-start;
-  gap: 1.1rem;
-  background: #f3f4f6;
-  border-radius: 0.7rem;
-  padding: 0.7rem 1.1rem;
-  box-shadow: 0 1px 4px rgba(30,41,59,0.04);
-}
-
-.profiel-label-new {
-  font-size: 1.01rem;
-  color: #2563eb;
-  font-weight: 600;
-  margin-bottom: 0.1rem;
-}
-
-.profiel-value-new {
-  font-size: 1.08rem;
-  color: #1e293b;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1rem;
+  color: #374151;
   font-weight: 500;
 }
 
-.profiel-logout-btn-new {
-  background: #ef4444;
-  color: #fff;
+.profiel-label-new {
+  color: #3b82f6;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.profiel-value-new {
+  color: #1f2937;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* Password input container */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
   border: none;
-  border-radius: 0.5rem;
-  padding: 0.55rem 1.5rem;
-  font-size: 1.08rem;
-  font-weight: 600;
-  margin-top: 2.2rem;
   cursor: pointer;
-  transition: background 0.18s;
-  box-shadow: 0 2px 8px rgba(239,68,68,0.08);
-  display: block;
-  width: fit-content;
+  color: #64748b;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  z-index: 2;
+}
+
+.password-toggle-btn:hover {
+  color: #3b82f6;
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+  color: #3b82f6;
+}
+
+/* Extra padding for password inputs to make room for the eye icon */
+.password-input-container input[type="text"],
+.password-input-container input[type="password"] {
+  padding-right: 3rem;
+}
+
+.profiel-logout-btn-new {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
 }
 .profiel-logout-btn-new:hover {
-  background: #b91c1c;
+  background: #fecaca;
 }
 
 @media (max-width: 600px) {

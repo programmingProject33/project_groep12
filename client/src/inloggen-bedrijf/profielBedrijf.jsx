@@ -4,7 +4,7 @@ import BedrijfFooter from "./bedrijfFooter";
 import "./profielBedrijf.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext.jsx";
-import { FaBuilding } from "react-icons/fa";
+import { FaBuilding, FaEye, FaEyeSlash } from "react-icons/fa";
 
 // Mapping functie voor lokaal/klas naar aula
 function mapKlasToAula(val) {
@@ -22,6 +22,7 @@ export default function Profiel() {
   const [editMode, setEditMode] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const fileInputRef = useRef();
 
   // Alle bedrijfsvelden
@@ -91,6 +92,13 @@ export default function Profiel() {
     e.preventDefault();
     setSuccess("");
     setError("");
+
+    // Validate password length if it's being changed
+    if (profile.wachtwoord && profile.wachtwoord.length < 6) {
+      setError("Wachtwoord moet minimaal 6 tekens bevatten");
+      return;
+    }
+
     const postData = { ...profile, gebruikerId: parseInt(profile.bedrijf_id, 10) };
     console.log('POST profiel:', postData);
     try {
@@ -149,6 +157,26 @@ export default function Profiel() {
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact e-mail</span><input name="contact_email" value={profile.contact_email} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact telefoon</span><input name="contact_telefoon" value={profile.contact_telefoon} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Gebruikersnaam</span><input name="gebruikersnaam" value={profile.gebruikersnaam} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item">
+                <span className="bedrijfprofiel-label">Wachtwoord</span>
+                <div className="password-input-container">
+                  <input 
+                    type={showPassword ? "text" : "password"}
+                    name="wachtwoord" 
+                    value={profile.wachtwoord} 
+                    onChange={handleChange}
+                    placeholder="Laat leeg om niet te wijzigen"
+                    minLength="6"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Sector</span><input name="sector" value={profile.sector} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Beschrijving</span><textarea name="beschrijving" value={profile.beschrijving} onChange={handleChange} /></div>
               <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Wat zoeken we?</span><textarea name="zoeken_we" value={profile.zoeken_we} onChange={handleChange} /></div>

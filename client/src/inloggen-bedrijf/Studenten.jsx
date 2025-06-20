@@ -101,8 +101,9 @@ export default function Studenten() {
   const filteredStudenten = studenten.filter(student => {
     const dienstverbandRaw = student.dienstverbanden || student.dienstverband || '';
     const dienstverbandArr = normalizeDienstverband(dienstverbandRaw);
+    const fullName = `${student.voornaam || ''} ${student.naam || ''}`.toLowerCase();
     const matchesSearch = 
-      student.naam.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fullName.includes(searchTerm.toLowerCase()) ||
       student.opleiding.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesOpleiding =
       filterOpleiding === '' || filterOpleiding === 'alle' || student.opleiding.toLowerCase() === filterOpleiding.toLowerCase();
@@ -229,7 +230,7 @@ export default function Studenten() {
                 {arr.length ? (
                   <span className="dienstverband-badge"><strong>Dienstverband:</strong> {arr[0]}</span>
                 ) : null}
-                <div className="student-naam"><strong>Naam:</strong> {student.naam}</div>
+                <div className="student-naam"><strong>Naam:</strong> {student.voornaam} {student.naam}</div>
                 <div className="student-opleiding"><strong>Opleiding:</strong> {student.opleiding}</div>
                 <button
                   className="studenten-action-btn"
@@ -249,36 +250,36 @@ export default function Studenten() {
               {studentLoading ? (
                 <div>Laden...</div>
               ) : studentError ? (
-                <div style={{color:'red'}}>{studentError}</div>
+                <div>{studentError}</div>
               ) : (
                 <>
-                  <h2 style={{marginBottom:'1.2rem',color:'#2563eb'}}>Studentenprofiel</h2>
-                  <p><strong>Naam:</strong> {selectedStudent.voornaam} {selectedStudent.naam}</p>
-                  <p><strong>E-mail:</strong> {selectedStudent.email}</p>
-                  <p><strong>Opleiding:</strong> {selectedStudent.opleiding}</p>
-                  <p><strong>Opleiding jaar:</strong> {selectedStudent.opleiding_jaar}</p>
-                  <div style={{marginTop:'1.2rem'}}>
-                    <strong>Dienstverbanden:</strong>
-                    <ul style={{marginTop:'0.5rem'}}>
-                      {(() => {
-                        if (!selectedStudent.dienstverbanden) return <li style={{color:'#aaa'}}>Niet opgegeven</li>;
-                        let arr = selectedStudent.dienstverbanden;
-                        if (typeof arr === 'string') {
-                          try {
-                            arr = JSON.parse(arr);
-                          } catch {
-                            arr = arr.replace(/\[|\]|"/g, '').split(',').map(d => d.trim()).filter(Boolean);
-                          }
-                        }
-                        if (!Array.isArray(arr)) arr = [String(arr)];
-                        return arr.map((d, i) => <li key={i}>{d.trim()}</li>);
-                      })()}
-                    </ul>
+                  <h2 style={{ fontSize: '1.8rem', fontWeight: 600, marginBottom: '1.5rem', textAlign: 'center' }}>
+                    {selectedStudent.voornaam} {selectedStudent.naam}
+                  </h2>
+                  <div className="student-detail-grid">
+                    <p><strong>Email:</strong> {selectedStudent.email}</p>
+                    <p><strong>Opleiding:</strong> {selectedStudent.opleiding}</p>
+                    <p><strong>Jaar:</strong> {selectedStudent.opleiding_jaar}</p>
+                    <p><strong>Dienstverband:</strong> {
+                      (normalizeDienstverband(selectedStudent.dienstverbanden || selectedStudent.dienstverband || '')).join(', ') || 'N.v.t.'
+                    }</p>
                   </div>
+                  {selectedStudent.linkedin && (
+                    <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+                      <a
+                        href={selectedStudent.linkedin.startsWith('http') ? selectedStudent.linkedin : `https://${selectedStudent.linkedin}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="linkedin-profiel-btn"
+                      >
+                        <FaLinkedin style={{ marginRight: '8px' }} />
+                        Bekijk LinkedIn Profiel
+                      </a>
+                    </div>
+                  )}
                 </>
               )}
             </div>
-            <div className="modal-backdrop" onClick={() => setSelectedStudent(null)}></div>
           </div>
         )}
       </main>

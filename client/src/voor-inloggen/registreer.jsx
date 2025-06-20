@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./registreer.css"; // Dit importeert de styling (kleuren, lay-out, lettertypes) van de pagina.
-import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
+import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok, FaEye, FaEyeSlash } from "react-icons/fa6";
 // Dit importeert iconen van sociale media die je kan gebruiken in de pagina.
 import { useNavigate } from "react-router-dom";
 // useNavigate is een hook (speciale functie) die je gebruikt om te navigeren (pagina veranderen) zonder dat de pagina helemaal opnieuw laadt.
@@ -26,6 +26,12 @@ export default function Registreer()   // Dit is een functionele component in Re
   };  // Deze functie zorgt ervoor dat je naar de startpagina ("/") wordt gebracht 
   // als je deze functie gebruikt. 'navigate' is een manier om van pagina te veranderen 
   // binnen je app zonder dat je de hele website opnieuw hoeft te laden.
+
+  // State for password visibility
+  const [showStudentPassword, setShowStudentPassword] = useState(false);
+  const [showStudentPassword2, setShowStudentPassword2] = useState(false);
+  const [showCompanyPassword, setShowCompanyPassword] = useState(false);
+  const [showCompanyPassword2, setShowCompanyPassword2] = useState(false);
 
   // State for student form
   const [studentForm, setStudentForm] = useState({
@@ -79,6 +85,19 @@ export default function Registreer()   // Dit is een functionele component in Re
     });
   };
 
+  // LinkedIn URL validation function
+  const validateLinkedInUrl = (url) => {
+    if (!url) return true; // Empty is valid (optional field)
+    
+    // Remove whitespace
+    const trimmedUrl = url.trim();
+    if (!trimmedUrl) return true;
+    
+    // Check if it's a valid LinkedIn URL
+    const linkedInPattern = /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/;
+    return linkedInPattern.test(trimmedUrl);
+  };
+
   const handleStudentSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -86,6 +105,18 @@ export default function Registreer()   // Dit is een functionele component in Re
     // Validate passwords match
     if (studentForm.wachtwoord !== studentForm.wachtwoord2) {
       setError('Wachtwoorden komen niet overeen');
+      return;
+    }
+
+    // Validate password length
+    if (studentForm.wachtwoord.length < 6) {
+      setError('Wachtwoord moet minimaal 6 tekens bevatten');
+      return;
+    }
+
+    // Validate LinkedIn URL
+    if (!validateLinkedInUrl(studentForm.linkedin)) {
+      setError('Voer een geldige LinkedIn URL in (bijvoorbeeld: https://www.linkedin.com/in/voornaam-achternaam)');
       return;
     }
 
@@ -122,6 +153,12 @@ export default function Registreer()   // Dit is een functionele component in Re
     // Validate passwords match
     if (companyForm.wachtwoord_bedrijf !== companyForm.wachtwoord2_bedrijf) {
       setError('Wachtwoorden komen niet overeen');
+      return;
+    }
+
+    // Validate password length
+    if (companyForm.wachtwoord_bedrijf.length < 6) {
+      setError('Wachtwoord moet minimaal 6 tekens bevatten');
       return;
     }
 
@@ -262,23 +299,43 @@ export default function Registreer()   // Dit is een functionele component in Re
               </label>
               <label>
                 Wachtwoord:
-                <input 
-                  type="password" 
-                  name="wachtwoord" 
-                  value={studentForm.wachtwoord}
-                  onChange={handleStudentChange}
-                  required
-                />
+                <div className="password-input-container">
+                  <input 
+                    type={showStudentPassword ? "text" : "password"}
+                    name="wachtwoord" 
+                    value={studentForm.wachtwoord}
+                    onChange={handleStudentChange}
+                    required
+                    minLength="6"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowStudentPassword(!showStudentPassword)}
+                  >
+                    {showStudentPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </label>
               <label>
                 Wachtwoord bevestiging:
-                <input 
-                  type="password" 
-                  name="wachtwoord2" 
-                  value={studentForm.wachtwoord2}
-                  onChange={handleStudentChange}
-                  required
-                />
+                <div className="password-input-container">
+                  <input 
+                    type={showStudentPassword2 ? "text" : "password"}
+                    name="wachtwoord2" 
+                    value={studentForm.wachtwoord2}
+                    onChange={handleStudentChange}
+                    required
+                    minLength="6"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowStudentPassword2(!showStudentPassword2)}
+                  >
+                    {showStudentPassword2 ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </label>
               <label>
                 LinkedIn-profiel (optioneel):
@@ -287,7 +344,6 @@ export default function Registreer()   // Dit is een functionele component in Re
                   name="linkedin"
                   value={studentForm.linkedin || ''}
                   onChange={handleStudentChange}
-                  pattern="https://www.linkedin.com/*"
                   placeholder="Bijvoorbeeld: https://www.linkedin.com/in/voornaam-achternaam"
                   className="registerstudent-form input"
                 />
@@ -472,23 +528,43 @@ export default function Registreer()   // Dit is een functionele component in Re
               </label>
               <label>
                 Wachtwoord:
-                <input 
-                  type="password" 
-                  name="wachtwoord_bedrijf" 
-                  value={companyForm.wachtwoord_bedrijf}
-                  onChange={handleCompanyChange}
-                  required
-                />
+                <div className="password-input-container">
+                  <input 
+                    type={showCompanyPassword ? "text" : "password"}
+                    name="wachtwoord_bedrijf" 
+                    value={companyForm.wachtwoord_bedrijf}
+                    onChange={handleCompanyChange}
+                    required
+                    minLength="6"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowCompanyPassword(!showCompanyPassword)}
+                  >
+                    {showCompanyPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </label>
               <label>
                 Wachtwoord bevestiging:
-                <input 
-                  type="password" 
-                  name="wachtwoord2_bedrijf" 
-                  value={companyForm.wachtwoord2_bedrijf}
-                  onChange={handleCompanyChange}
-                  required
-                />
+                <div className="password-input-container">
+                  <input 
+                    type={showCompanyPassword2 ? "text" : "password"}
+                    name="wachtwoord2_bedrijf" 
+                    value={companyForm.wachtwoord2_bedrijf}
+                    onChange={handleCompanyChange}
+                    required
+                    minLength="6"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowCompanyPassword2(!showCompanyPassword2)}
+                  >
+                    {showCompanyPassword2 ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </label>
 
               <button type="submit" className="registerbedrijf-btn bedrijf-btn">
