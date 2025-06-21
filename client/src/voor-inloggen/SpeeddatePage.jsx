@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext.jsx";
 import "./SpeeddatePage.css";
@@ -14,6 +14,7 @@ export default function SpeeddatePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [userReservations, setUserReservations] = useState([]);
+  const reservationSectionRef = useRef(null);
 
   const fetchTimeslots = async () => {
     setLoadingSlots(true);
@@ -120,6 +121,14 @@ export default function SpeeddatePage() {
     }
   };
 
+  const handleSlotClick = (slot) => {
+    setSelectedSlot(slot);
+    // Use setTimeout to ensure the element is rendered before scrolling
+    setTimeout(() => {
+      reservationSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  };
+
   // Helper to format SQL datetime string to HH:mm
   function formatTime(datetimeString) {
     const date = new Date(datetimeString);
@@ -209,7 +218,7 @@ export default function SpeeddatePage() {
                         <button
                           key={slot.speed_id}
                           className={`speeddate-slot-btn${slot.is_bezet || isOwnReserved ? " reserved" : ""}${selectedSlot && selectedSlot.speed_id === slot.speed_id ? " selected" : ""}`}
-                          onClick={() => !slot.is_bezet && !isOwnReserved && !isTakenByOther && setSelectedSlot(slot)}
+                          onClick={() => !slot.is_bezet && !isOwnReserved && !isTakenByOther && handleSlotClick(slot)}
                           type="button"
                           disabled={slot.is_bezet || isOwnReserved || isTakenByOther}
                         >
@@ -220,7 +229,7 @@ export default function SpeeddatePage() {
                   )}
                 </div>
                 {selectedSlot && (
-                  <>
+                  <div ref={reservationSectionRef}>
                     <div style={{ marginTop: 24, fontSize: "1.1rem" }}>
                       Geselecteerd tijdslot: <b>{formatTime(selectedSlot.starttijd)} - {formatTime(selectedSlot.eindtijd)}</b>
                     </div>
@@ -232,7 +241,7 @@ export default function SpeeddatePage() {
                     >
                       {loading ? 'Reserveren...' : 'Bevestig reservering'}
                     </button>
-                  </>
+                  </div>
                 )}
               </>
             )}
