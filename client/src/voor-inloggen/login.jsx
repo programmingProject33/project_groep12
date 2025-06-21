@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
+import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok, FaEye, FaEyeSlash } from "react-icons/fa6";
 import "./login.css";
 import { useAuth } from "../AuthContext.jsx";
 
@@ -9,6 +9,7 @@ const Login = () => {
   const [wachtwoord, setWachtwoord] = useState("");
   const [type, setType] = useState("student");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
@@ -24,6 +25,11 @@ const Login = () => {
     }
     if(!wachtwoord) {
       return setError("wachtwoord is verplicht")
+    }
+
+    // Minimum wachtwoordlengte validatie
+    if (wachtwoord.length < 6) {
+      return setError("Wachtwoord moet minimaal 6 tekens bevatten");
     }
 
     try {
@@ -101,13 +107,23 @@ const Login = () => {
             </label>
             <label>
               Wachtwoord:
-              <input
-                type="password"
-                value={wachtwoord}
-                onChange={(e) => setWachtwoord(e.target.value)}
-                required
-                placeholder="••••••••"
-              />
+              <div className="password-input-container">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={wachtwoord}
+                  onChange={(e) => setWachtwoord(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  minLength="6"
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </label>
             {error && <p className="error">{error}</p>}
             <button type="submit" className="btn primary login-btn">Inloggen</button>

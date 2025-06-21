@@ -111,12 +111,18 @@ export default function Reservaties() {
                         <td>{formatDate(reservatie.starttijd)}</td>
                         <td>{formatTime(reservatie.starttijd)}</td>
                         <td>
-                          {reservatie.linkedin && reservatie.linkedin.startsWith("https://www.linkedin.com/") ? (
-                            <a href={reservatie.linkedin} target="_blank" rel="noopener noreferrer" title="Bekijk LinkedIn-profiel">
-                              LinkedIn
+                          {reservatie.linkedin ? (
+                            <a 
+                              href={reservatie.linkedin.startsWith('http') ? reservatie.linkedin : `https://${reservatie.linkedin}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="linkedin-table-link"
+                            >
+                              <FaLinkedin />
+                              <span className="linkedin-link-text">Profiel</span>
                             </a>
                           ) : (
-                            <span style={{ color: '#aaa', fontStyle: 'italic' }}>Geen profiel beschikbaar</span>
+                            <span style={{ color: '#aaa', fontStyle: 'italic' }}>Geen profiel</span>
                           )}
                         </td>
                       </tr>

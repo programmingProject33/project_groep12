@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./Profiel.css";
 import { useAuth } from "../AuthContext.jsx";
 import { MdPerson, MdEmail, MdSchool } from "react-icons/md";
-import { FaLinkedin, FaStar, FaPuzzlePiece } from "react-icons/fa6";
+import { FaLinkedin, FaStar, FaPuzzlePiece, FaEye, FaEyeSlash } from "react-icons/fa6";
 
 const OPLEIDINGEN = [
   "Multimedia & Creatieve Technologie (bachelor)",
@@ -24,6 +24,7 @@ const DIENSTVERBANDEN = [
 const Profiel = () => {
   const { user, setUser, isAuthLoading } = useAuth();
   const [editMode, setEditMode] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [profile, setProfile] = useState({
     voornaam: "",
     naam: "",
@@ -33,9 +34,8 @@ const Profiel = () => {
     email: "",
     dienstverbanden: [],
     linkedin: "",
-    foto: ""
+    wachtwoord: ""
   });
-  const fileInputRef = useRef();
 
   useEffect(() => {
     if (user) {
@@ -48,7 +48,7 @@ const Profiel = () => {
         email: user.email || "",
         dienstverbanden: user.dienstverbanden || [],
         linkedin: user.linkedin || "",
-        foto: user.foto || ""
+        wachtwoord: ""
       });
     }
   }, [user]);
@@ -57,19 +57,14 @@ const Profiel = () => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
-  const handleFotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfile((prev) => ({ ...prev, foto: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSave = async () => {
     try {
+      // Validate password length if it's being changed
+      if (profile.wachtwoord && profile.wachtwoord.length < 6) {
+        alert("Wachtwoord moet minimaal 6 tekens bevatten");
+        return;
+      }
+
       const res = await fetch(`/api/profiel/${user.gebruiker_id || user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -82,21 +77,24 @@ const Profiel = () => {
           email: profile.email,
           dienstverbanden: profile.dienstverbanden,
           linkedin: profile.linkedin,
-          foto: profile.foto
+          wachtwoord: profile.wachtwoord
         })
       });
       if (res.ok) {
-        const updated = await res.json();
-        setUser({ ...user, ...profile }); // optioneel: setUser(updated)
+        const updatedUser = { ...user, ...profile };
+        if (!profile.wachtwoord) {
+          delete updatedUser.wachtwoord;
+        }
+        setUser(updatedUser);
       }
     } catch (e) {}
     setEditMode(false);
   };
 
-  // Avatar: profielfoto of eerste letter
-  const avatar = profile.foto
-    ? <img src={profile.foto} alt="Profielfoto" className="profiel-avatar-img" />
-    : <div className="profiel-avatar-letter">{(profile.voornaam || profile.naam || "").charAt(0).toUpperCase()}</div>;
+  // Avatar: eerste letter
+  const avatar = (
+    <div className="profiel-avatar-letter">{(profile.voornaam || profile.naam || "").charAt(0).toUpperCase()}</div>
+  );
 
   // Dienstverbanden altijd als array parsen
   const getDienstverbandenArray = (val) => {
@@ -122,20 +120,6 @@ const Profiel = () => {
       <div className="profiel-card-new">
         <div className="profiel-avatar-box">
           {avatar}
-          {editMode && (
-            <>
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                ref={fileInputRef}
-                onChange={handleFotoChange}
-              />
-              <button className="profiel-foto-btn" onClick={() => fileInputRef.current.click()}>
-                Profielfoto wijzigen
-              </button>
-            </>
-          )}
         </div>
         <div className="profiel-naam-box">
           <div className="profiel-naam-new">{profile.voornaam} {profile.naam}</div>
@@ -205,6 +189,32 @@ const Profiel = () => {
               )}
             </div>
           </div>
+          {editMode && (
+            <div className="profiel-info-item-new">
+              <MdPerson size={22} color="#3b82f6" />
+              <div>
+                <div className="profiel-label-new">Wachtwoord</div>
+                <div className="password-input-container">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="wachtwoord"
+                    value={profile.wachtwoord}
+                    onChange={handleChange}
+                    className="profiel-input"
+                    placeholder="Laat leeg om niet te wijzigen"
+                    minLength="6"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="profiel-info-item-new">
             <MdSchool size={22} color="#3b82f6" />
             <div>

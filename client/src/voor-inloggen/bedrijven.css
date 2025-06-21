@@ -39,13 +39,11 @@
 
 .bedrijven-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 2.5rem;
-  max-width: 1200px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  z-index: 1;
-  position: relative;
-  padding-inline: 1.5rem;
 }
 
 @media (min-width: 1024px) {
@@ -750,117 +748,106 @@
   }
 }
 
-/* Speeddate Modal */
-.speeddate-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+/* --- Filter Container --- */
+.filters-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-
-.speeddate-content {
-  background: #fff;
-  padding: 2.5rem;
-  border-radius: 1.25rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  max-width: 500px;
-  width: 90%;
-  text-align: center;
-  position: relative;
-  animation: modalFadeIn 0.3s ease-out;
-}
-
-.speeddate-content h2 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 1rem;
-}
-
-.speeddate-content p {
-  font-size: 1.1rem;
-  color: #64748b;
-  line-height: 1.6;
-  margin-bottom: 2rem;
-}
-
-.speeddate-content .button-container {
-  display: flex;
+  flex-direction: column;
   gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+  border: 1px solid #eef2f7;
+  width: 100%;
 }
 
-.speeddate-content button {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.8rem;
+.search-box {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 1.2rem 1.5rem 1.2rem 4rem;
+  border: 1px solid #dde4ee;
+  border-radius: 1.5rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #ffffff;
+  color: #334155;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 1.2rem 1.5rem;
+  border: 1px solid #dde4ee;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #f8fafc;
+  color: #334155;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1em 1em;
+}
+
+.search-input:focus,
+.filter-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.clear-filters-btn {
+  padding: 1rem 1.5rem;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 1rem;
+  cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  min-width: 120px;
+  color: #334155;
+  transition: background-color 0.2s, color 0.2s;
 }
 
-.speeddate-content button:first-child {
-  background: #f1f5f9;
-  color: #64748b;
+.clear-filters-btn:hover {
+  background-color: #e2e8f0;
 }
 
-.speeddate-content button:first-child:hover {
-  background: #e2e8f0;
-  transform: translateY(-1px);
+/* Resultatenteller */
+.result-count {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #475569;
+  font-size: 1.1rem;
+  font-weight: 500;
 }
 
-.speeddate-content button:last-child {
-  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
-  color: #fff;
+.bedrijf-card.modern {
+  background: #ffffff;
+  border-radius: 1.5rem;
 }
 
-.speeddate-content button:last-child:hover {
-  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* Responsive modal */
-@media (max-width: 600px) {
-  .speeddate-content {
-    padding: 2rem 1.5rem;
-    margin: 1rem;
-  }
-  
-  .speeddate-content h2 {
-    font-size: 1.5rem;
-  }
-  
-  .speeddate-content p {
-    font-size: 1rem;
-  }
-  
-  .speeddate-content .button-container {
-    flex-direction: column;
-  }
-  
-  .speeddate-content button {
-    width: 100%;
-  }
+.search-filter-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 2rem auto;
 } 

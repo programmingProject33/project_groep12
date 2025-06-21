@@ -224,7 +224,7 @@ app.post('/api/register', async (req, res) => {
 
   if (type === 'student') {
     try {
-      const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden } = userData;
+      const { voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden, linkedin } = userData;
       const dienstverbandenStr = dienstverbanden ? JSON.stringify(dienstverbanden) : null;
       const opleidingJaarValue = opleiding_jaar === '' ? null : opleiding_jaar;
       
@@ -237,8 +237,8 @@ app.post('/api/register', async (req, res) => {
       }
 
       const [result] = await db.promise().query(
-        'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden, is_verified, verification_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleidingJaarValue, dienstverbandenStr, false, verificationToken]
+        'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden, linkedin, is_verified, verification_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleidingJaarValue, dienstverbandenStr, linkedin, false, verificationToken]
       );
       
       await sendVerificationEmail(email, verificationToken);
@@ -434,13 +434,24 @@ app.delete('/api/reservations/:speed_id', async (req, res) => {
 app.patch('/api/profiel/:gebruikerId', async (req, res) => {
   try {
     const { gebruikerId } = req.params;
-    const { voornaam, naam, email, opleiding, opleiding_jaar, dienstverbanden } = req.body;
+    const { voornaam, naam, email, gebruikersnaam, opleiding, opleiding_jaar, dienstverbanden, linkedin, wachtwoord } = req.body;
     // dienstverbanden als JSON-string opslaan
     const dienstverbandenStr = dienstverbanden ? JSON.stringify(dienstverbanden) : null;
-    const [result] = await db.promise().query(
-      `UPDATE gebruikers SET voornaam = ?, naam = ?, email = ?, opleiding = ?, opleiding_jaar = ?, dienstverbanden = ? WHERE gebruiker_id = ?`,
-      [voornaam, naam, email, opleiding, opleiding_jaar, dienstverbandenStr, gebruikerId]
-    );
+    
+    // Build dynamic query based on which fields are provided
+    let query = 'UPDATE gebruikers SET voornaam = ?, naam = ?, email = ?, gebruikersnaam = ?, opleiding = ?, opleiding_jaar = ?, dienstverbanden = ?, linkedin = ?';
+    let params = [voornaam, naam, email, gebruikersnaam, opleiding, opleiding_jaar, dienstverbandenStr, linkedin];
+    
+    // Add wachtwoord to update if provided
+    if (wachtwoord && wachtwoord.trim() !== '') {
+      query += ', wachtwoord = ?';
+      params.push(wachtwoord);
+    }
+    
+    query += ' WHERE gebruiker_id = ?';
+    params.push(gebruikerId);
+    
+    const [result] = await db.promise().query(query, params);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Gebruiker niet gevonden.' });
     }
@@ -665,7 +676,7 @@ app.post('/api/bedrijf/update', async (req, res) => {
 app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
   try {
     const [reservaties] = await db.promise().query(
-      `SELECT s.*, g.voornaam, g.naam, g.gebruikersnaam, g.email, b.lokaal, b.verdieping 
+      `SELECT s.*, g.voornaam, g.naam, g.linkedin, b.lokaal, b.verdieping 
        FROM speeddates s 
        JOIN gebruikers g ON s.gebruiker_id = g.gebruiker_id 
        JOIN bedrijven b ON s.bedrijf_id = b.bedrijf_id 

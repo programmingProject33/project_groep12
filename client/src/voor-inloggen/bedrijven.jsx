@@ -37,6 +37,8 @@ function Bedrijven() {
   const [bedrijven, setBedrijven] = useState([]);
   const [filteredBedrijven, setFilteredBedrijven] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSector, setSelectedSector] = useState("");
+  const [selectedDienstverband, setSelectedDienstverband] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pendingBedrijfId, setPendingBedrijfId] = useState(null);
@@ -57,20 +59,29 @@ function Bedrijven() {
 
   // Filter bedrijven based on search term
   useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setFilteredBedrijven(bedrijven);
-      setVisibleCount(9);
-    } else {
-      const filtered = bedrijven.filter(bedrijf =>
+    let filtered = bedrijven;
+
+    if (searchTerm.trim() !== "") {
+      filtered = filtered.filter(bedrijf =>
         bedrijf.naam.toLowerCase().includes(searchTerm.toLowerCase()) ||
         bedrijf.gemeente.toLowerCase().includes(searchTerm.toLowerCase()) ||
         bedrijf.sector?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         bedrijf.beschrijving?.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setFilteredBedrijven(filtered);
-      setVisibleCount(9);
     }
-  }, [searchTerm, bedrijven]);
+    
+    if (selectedSector) {
+      filtered = filtered.filter(bedrijf => bedrijf.sector === selectedSector);
+    }
+    
+    if (selectedDienstverband) {
+      filtered = filtered.filter(bedrijf => bedrijf.zoeken_we && bedrijf.zoeken_we.toLowerCase().includes(selectedDienstverband.toLowerCase()));
+    }
+
+    setFilteredBedrijven(filtered);
+    setVisibleCount(9); // Reset zichtbare items bij elke filterwijziging
+
+  }, [searchTerm, selectedSector, selectedDienstverband, bedrijven]);
 
   const handleReserveerClick = (bedrijfId) => {
     if (user) {
@@ -86,6 +97,9 @@ function Bedrijven() {
     setPendingBedrijfId(null);
   };
 
+  const uniekeSectoren = [...new Set(bedrijven.map(b => b.sector).filter(Boolean))];
+  const dienstverbandOpties = ['Voltijds', 'Deeltijds', 'Freelance', 'Stage'];
+
   return (
     <div className="page-container bedrijven-modern-bg">
       {/* Hero golfvorm bovenaan */}
@@ -99,81 +113,47 @@ function Bedrijven() {
           <h1 className="bedrijven-title"><span dangerouslySetInnerHTML={{__html: "&#128269;"}} /> Ontdek onze partnerbedrijven</h1>
           <p className="bedrijven-subtitle">Kies je favoriet en plan je speeddates</p>
           
-          {/* Zoekbalk */}
-          <div className="search-container" style={{
-            marginBottom: '2rem',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '1rem'
-          }}>
-            <div className="search-box" style={{
-              position: 'relative',
-              width: '100%',
-              maxWidth: '500px'
-            }}>
-              <FaSearch style={{
-                position: 'absolute',
-                left: '1rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#64748b',
-                fontSize: '1.1rem'
-              }} />
+          <div className="search-filter-section">
+            <div className="search-box">
+              <FaSearch className="search-icon" />
               <input
                 type="text"
-                placeholder="Zoek op bedrijfsnaam, plaats, sector of beschrijving..."
+                placeholder="Zoek op naam, plaats, sector..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '1rem 1rem 1rem 3rem',
-                  border: '2px solid #e2e8f0',
-                  borderRadius: '1rem',
-                  fontSize: '1rem',
-                  outline: 'none',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  background: '#fff'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#3b82f6';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
+                className="search-input"
               />
             </div>
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm("")}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: '#f1f5f9',
-                  border: '1px solid #cbd5e1',
-                  borderRadius: '0.5rem',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  color: '#64748b'
-                }}
+
+            <div className="filters-container">
+              <select 
+                className="filter-select"
+                value={selectedSector}
+                onChange={(e) => setSelectedSector(e.target.value)}
               >
-                Wissen
-              </button>
-            )}
+                <option value="">Alle Sectoren</option>
+                {uniekeSectoren.map(sector => (
+                  <option key={sector} value={sector}>{sector}</option>
+                ))}
+              </select>
+
+              <select
+                className="filter-select"
+                value={selectedDienstverband}
+                onChange={(e) => setSelectedDienstverband(e.target.value)}
+              >
+                <option value="">Alle Dienstverbanden</option>
+                {dienstverbandOpties.map(dienst => (
+                  <option key={dienst} value={dienst}>{dienst}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Resultaten teller */}
-          {searchTerm && (
-            <div style={{
-              textAlign: 'center',
-              marginBottom: '1.5rem',
-              color: '#64748b',
-              fontSize: '1rem'
-            }}>
-              {filteredBedrijven.length} bedrijf{filteredBedrijven.length !== 1 ? 'en' : ''} gevonden
-            </div>
-          )}
+          <div className="result-count">
+            {filteredBedrijven.length} bedrijf{filteredBedrijven.length !== 1 ? 'en' : ''} gevonden
+          </div>
 
           <div className="bedrijven-grid">
             {filteredBedrijven
