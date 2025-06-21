@@ -14,7 +14,24 @@ const studentenRoutes = require('./routes/studenten');       // GET /api/admin/s
 const speeddatesRoutes = require('./routes/speeddates');     // GET/POST/PUT /api/admin/speeddates
 const statistiekenRoutes = require('./routes/stats');        // GET /api/admin/stats
 
+// --- START CONFIGURATIE VOOR AUTOMATISCHE TOEWIJZING ---
 
+// Definieer hier de beschikbare lokalen en hun verdieping.
+const BESCHIKBARE_LOCATIES = [
+  { lokaal: 'Aula 1', verdieping: 'Gelijkvloers' },
+  { lokaal: 'Aula 2', verdieping: 'Gelijkvloers' },
+  { lokaal: 'Aula 3', verdieping: 'Gelijkvloers' },
+  { lokaal: 'Aula 4', verdieping: 'Gelijkvloers' },
+  { lokaal: 'Aula 5', verdieping: 'Eerste verdieping' },
+  { lokaal: 'Aula 6', verdieping: 'Eerste verdieping' },
+  { lokaal: 'Aula 7', verdieping: 'Eerste verdieping' },
+  { lokaal: 'Aula 8', verdieping: 'Eerste verdieping' },
+];
+
+// De vaste datum voor het speeddate-evenement.
+const EVENEMENT_DATUM = '2024-11-28';
+
+// --- EINDE CONFIGURATIE ---
 
 const app = express();
 app.use(cors());
@@ -236,9 +253,10 @@ app.post('/api/register', async (req, res) => {
         const {
             bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email,
             contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
-            gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, lokaal, verdieping, number_of_representatives
+            gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, number_of_representatives
         } = userData;
 
+        // 1. Controleer of email of gebruikersnaam al bestaat
         const [existingBedrijven] = await db.promise().query(
             'SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?',
             [email, gebruikersnaam]
@@ -247,15 +265,31 @@ app.post('/api/register', async (req, res) => {
             return res.status(400).json({ error: 'Email of gebruikersnaam voor bedrijf bestaat al' });
         }
 
+        // 2. Zoek een vrije locatie
+        const [gebruikteLokalen] = await db.promise().query('SELECT lokaal FROM bedrijven WHERE lokaal IS NOT NULL');
+        const gebruikteLokaalNamen = gebruikteLokalen.map(b => b.lokaal);
+        const vrijeLocatie = BESCHIKBARE_LOCATIES.find(loc => !gebruikteLokaalNamen.includes(loc.lokaal));
+
+        if (!vrijeLocatie) {
+            return res.status(500).json({ error: 'Geen vrije locaties meer beschikbaar voor het evenement.' });
+        }
+
+        // 3. Voeg bedrijf toe aan de database met de toegewezen locatie
         const [result] = await db.promise().query(
             `INSERT INTO bedrijven (bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, lokaal, verdieping, number_of_representatives, is_verified, verification_token) 
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, lokaal, verdieping, number_of_representatives, false, verificationToken]
+            [bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, vrijeLocatie.lokaal, vrijeLocatie.verdieping, number_of_representatives, false, verificationToken]
         );
+        
+        const nieuwBedrijfId = result.insertId;
 
+        // 4. Maak tijdsloten aan voor het nieuwe bedrijf
+        await createTimeslotsForBedrijf(nieuwBedrijfId, EVENEMENT_DATUM);
+        
+        // 5. Stuur verificatie-email
         await sendVerificationEmail(email, verificationToken);
 
-        res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt. Controleer je e-mail voor de verificatielink.' });
+        res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt. Een locatie en tijdsloten zijn toegewezen. Controleer je e-mail voor de verificatielink.' });
     } catch (err) {
         console.error('Error in bedrijf registration:', err);
         res.status(500).json({ error: 'Database error', details: err.message });
