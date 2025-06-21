@@ -213,16 +213,18 @@ function Bedrijven() {
         </div>
       </main>
       {showLoginModal && (
-        <div className="login-modal-overlay">
-          <div className="login-modal-box">
-            <div className="login-modal-title">Reserveer een speeddate</div>
-            <div className="login-modal-content">
+        <div className="speeddate-modal">
+          <div className="speeddate-content">
+            <h2>Reserveer een speeddate</h2>
+            <p>
               Log in om beschikbare tijdsloten te zien en een speeddate te reserveren.
+            </p>
+            <div className="button-container">
+              <button onClick={closeModal}>Annuleren</button>
+              <button onClick={() => navigate('/login')}>
+                Inloggen
+              </button>
             </div>
-            <button className="login-modal-btn" onClick={() => navigate('/login')}>
-              Inloggen
-            </button>
-            <button className="login-modal-close" onClick={closeModal} title="Sluiten">&times;</button>
           </div>
         </div>
       )}
