@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaCalendarAlt, FaBuilding, FaHeartbeat, FaTools, FaChalkboardTeacher, FaBullhorn, FaMoneyBillWave, FaSearch } from "react-icons/fa";
 import "../voor-inloggen/bedrijven.css";
 import { useAuth } from "../AuthContext.jsx";
+import "./StudentBedrijven.css";
 
 const sectorColors = [
   "#3b82f6", "#22c55e", "#a78bfa", "#f59e42", "#f43f5e", "#06b6d4"
@@ -110,8 +111,13 @@ function StudentBedrijven() {
   const [filteredRecommendedBedrijven, setFilteredRecommendedBedrijven] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [visibleCount, setVisibleCount] = useState(9);
+  const [selectedSector, setSelectedSector] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedDienstverband, setSelectedDienstverband] = useState("");
   const bedrijvenOverzichtRef = useRef(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
   console.log('user:', user, 'isAuthLoading:', isAuthLoading);
 
   useEffect(() => {
@@ -150,9 +156,9 @@ function StudentBedrijven() {
       .catch((err) => console.error("Fout bij ophalen:", err));
   }, [user]);
 
-  // Filter bedrijven based on search term
+  // Filter bedrijven based on search term and filters
   useEffect(() => {
-    if (searchTerm.trim() === "") {
+    if (searchTerm.trim() === "" && selectedSector === "" && selectedLocation === "" && selectedDienstverband === "") {
       setFilteredBedrijven(bedrijven);
       setFilteredRecommendedBedrijven(recommendedBedrijven);
       setVisibleCount(9);
@@ -160,25 +166,173 @@ function StudentBedrijven() {
       const searchLower = searchTerm.toLowerCase();
       
       // Filter alle bedrijven
-      const filtered = bedrijven.filter(bedrijf =>
-        bedrijf.naam.toLowerCase().includes(searchLower) ||
-        bedrijf.gemeente.toLowerCase().includes(searchLower) ||
-        bedrijf.sector?.toLowerCase().includes(searchLower) ||
-        bedrijf.beschrijving?.toLowerCase().includes(searchLower)
-      );
+      const filtered = bedrijven.filter(bedrijf => {
+        // Search term filter
+        const matchesSearch = searchTerm.trim() === "" || 
+          bedrijf.naam.toLowerCase().includes(searchLower) ||
+          bedrijf.gemeente.toLowerCase().includes(searchLower) ||
+          bedrijf.sector?.toLowerCase().includes(searchLower) ||
+          bedrijf.beschrijving?.toLowerCase().includes(searchLower);
+        
+        // Sector filter
+        const matchesSector = selectedSector === "" || 
+          bedrijf.sector?.toLowerCase() === selectedSector.toLowerCase();
+        
+        // Location filter
+        const matchesLocation = selectedLocation === "" || 
+          bedrijf.gemeente?.toLowerCase() === selectedLocation.toLowerCase();
+        
+        // Dienstverband filter
+        let matchesDienstverband = true;
+        if (selectedDienstverband !== "") {
+          try {
+            const zoekenWe = typeof bedrijf.zoeken_we === 'string' ? JSON.parse(bedrijf.zoeken_we) : bedrijf.zoeken_we;
+            if (Array.isArray(zoekenWe)) {
+              matchesDienstverband = zoekenWe.some(item => {
+                const itemLower = item.toLowerCase();
+                const selectedLower = selectedDienstverband.toLowerCase();
+                
+                // Direct match
+                if (itemLower.includes(selectedLower) || selectedLower.includes(itemLower)) {
+                  return true;
+                }
+                
+                // Common variations
+                const variations = {
+                  'voltijds': ['voltijds', 'voltijd', 'fulltime', 'full-time', 'full time', 'voltijds werk'],
+                  'deeltijds': ['deeltijds', 'deeltijd', 'parttime', 'part-time', 'part time', 'deeltijds werk'],
+                  'freelance': ['freelance', 'freelancer', 'zelfstandige', 'zelfstandig', 'freelance werk'],
+                  'stage': ['stage', 'stages', 'internship', 'intern', 'stageplaats', 'stage plaats']
+                };
+                
+                if (variations[selectedLower]) {
+                  return variations[selectedLower].some(variation => 
+                    itemLower.includes(variation)
+                  );
+                }
+                
+                return false;
+              });
+            } else {
+              const zoekenWeLower = bedrijf.zoeken_we?.toLowerCase() || '';
+              const selectedLower = selectedDienstverband.toLowerCase();
+              
+              // Direct match
+              if (zoekenWeLower.includes(selectedLower)) {
+                matchesDienstverband = true;
+              } else {
+                // Common variations
+                const variations = {
+                  'voltijds': ['voltijds', 'voltijd', 'fulltime', 'full-time', 'full time', 'voltijds werk'],
+                  'deeltijds': ['deeltijds', 'deeltijd', 'parttime', 'part-time', 'part time', 'deeltijds werk'],
+                  'freelance': ['freelance', 'freelancer', 'zelfstandige', 'zelfstandig', 'freelance werk'],
+                  'stage': ['stage', 'stages', 'internship', 'intern', 'stageplaats', 'stage plaats']
+                };
+                
+                if (variations[selectedLower]) {
+                  matchesDienstverband = variations[selectedLower].some(variation => 
+                    zoekenWeLower.includes(variation)
+                  );
+                } else {
+                  matchesDienstverband = false;
+                }
+              }
+            }
+          } catch (e) {
+            // Fallback: simple string matching
+            const zoekenWeLower = bedrijf.zoeken_we?.toLowerCase() || '';
+            const selectedLower = selectedDienstverband.toLowerCase();
+            matchesDienstverband = zoekenWeLower.includes(selectedLower);
+          }
+        }
+        
+        return matchesSearch && matchesSector && matchesLocation && matchesDienstverband;
+      });
       setFilteredBedrijven(filtered);
       
       // Filter aanbevolen bedrijven
-      const filteredRecommended = recommendedBedrijven.filter(bedrijf =>
-        bedrijf.naam.toLowerCase().includes(searchLower) ||
-        bedrijf.gemeente.toLowerCase().includes(searchLower) ||
-        bedrijf.sector?.toLowerCase().includes(searchLower) ||
-        bedrijf.beschrijving?.toLowerCase().includes(searchLower)
-      );
+      const filteredRecommended = recommendedBedrijven.filter(bedrijf => {
+        const matchesSearch = searchTerm.trim() === "" || 
+          bedrijf.naam.toLowerCase().includes(searchLower) ||
+          bedrijf.gemeente.toLowerCase().includes(searchLower) ||
+          bedrijf.sector?.toLowerCase().includes(searchLower) ||
+          bedrijf.beschrijving?.toLowerCase().includes(searchLower);
+        
+        const matchesSector = selectedSector === "" || 
+          bedrijf.sector?.toLowerCase() === selectedSector.toLowerCase();
+        
+        const matchesLocation = selectedLocation === "" || 
+          bedrijf.gemeente?.toLowerCase() === selectedLocation.toLowerCase();
+        
+        let matchesDienstverband = true;
+        if (selectedDienstverband !== "") {
+          try {
+            const zoekenWe = typeof bedrijf.zoeken_we === 'string' ? JSON.parse(bedrijf.zoeken_we) : bedrijf.zoeken_we;
+            if (Array.isArray(zoekenWe)) {
+              matchesDienstverband = zoekenWe.some(item => {
+                const itemLower = item.toLowerCase();
+                const selectedLower = selectedDienstverband.toLowerCase();
+                
+                // Direct match
+                if (itemLower.includes(selectedLower) || selectedLower.includes(itemLower)) {
+                  return true;
+                }
+                
+                // Common variations
+                const variations = {
+                  'voltijds': ['voltijds', 'voltijd', 'fulltime', 'full-time', 'full time', 'voltijds werk'],
+                  'deeltijds': ['deeltijds', 'deeltijd', 'parttime', 'part-time', 'part time', 'deeltijds werk'],
+                  'freelance': ['freelance', 'freelancer', 'zelfstandige', 'zelfstandig', 'freelance werk'],
+                  'stage': ['stage', 'stages', 'internship', 'intern', 'stageplaats', 'stage plaats']
+                };
+                
+                if (variations[selectedLower]) {
+                  return variations[selectedLower].some(variation => 
+                    itemLower.includes(variation)
+                  );
+                }
+                
+                return false;
+              });
+            } else {
+              const zoekenWeLower = bedrijf.zoeken_we?.toLowerCase() || '';
+              const selectedLower = selectedDienstverband.toLowerCase();
+              
+              // Direct match
+              if (zoekenWeLower.includes(selectedLower)) {
+                matchesDienstverband = true;
+              } else {
+                // Common variations
+                const variations = {
+                  'voltijds': ['voltijds', 'voltijd', 'fulltime', 'full-time', 'full time', 'voltijds werk'],
+                  'deeltijds': ['deeltijds', 'deeltijd', 'parttime', 'part-time', 'part time', 'deeltijds werk'],
+                  'freelance': ['freelance', 'freelancer', 'zelfstandige', 'zelfstandig', 'freelance werk'],
+                  'stage': ['stage', 'stages', 'internship', 'intern', 'stageplaats', 'stage plaats']
+                };
+                
+                if (variations[selectedLower]) {
+                  matchesDienstverband = variations[selectedLower].some(variation => 
+                    zoekenWeLower.includes(variation)
+                  );
+                } else {
+                  matchesDienstverband = false;
+                }
+              }
+            }
+          } catch (e) {
+            // Fallback: simple string matching
+            const zoekenWeLower = bedrijf.zoeken_we?.toLowerCase() || '';
+            const selectedLower = selectedDienstverband.toLowerCase();
+            matchesDienstverband = zoekenWeLower.includes(selectedLower);
+          }
+        }
+        
+        return matchesSearch && matchesSector && matchesLocation && matchesDienstverband;
+      });
       setFilteredRecommendedBedrijven(filteredRecommended);
       setVisibleCount(9);
     }
-  }, [searchTerm, bedrijven, recommendedBedrijven]);
+  }, [searchTerm, selectedSector, selectedLocation, selectedDienstverband, bedrijven, recommendedBedrijven]);
 
   // Splits bedrijven in recommended en overige
   const recommendedIds = new Set(filteredRecommendedBedrijven.map(b => b.bedrijf_id));
@@ -329,8 +483,131 @@ function StudentBedrijven() {
             )}
           </div>
 
+          {/* Filters */}
+          <div className="filters-container" style={{
+            marginBottom: '2rem',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '1rem',
+            flexWrap: 'wrap'
+          }}>
+            {/* Sector Filter */}
+            <select
+              value={selectedSector}
+              onChange={(e) => setSelectedSector(e.target.value)}
+              style={{
+                padding: '0.75rem 1rem',
+                border: '2px solid #e2e8f0',
+                borderRadius: '0.8rem',
+                fontSize: '1rem',
+                outline: 'none',
+                transition: 'border-color 0.2s, box-shadow 0.2s',
+                background: '#fff',
+                minWidth: '150px',
+                cursor: 'pointer'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#3b82f6';
+                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e2e8f0';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              <option value="">Alle sectoren</option>
+              {[...new Set(bedrijven.map(b => b.sector).filter(Boolean))].sort().map(sector => (
+                <option key={sector} value={sector}>{sector}</option>
+              ))}
+            </select>
+
+            {/* Locatie Filter */}
+            <select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              style={{
+                padding: '0.75rem 1rem',
+                border: '2px solid #e2e8f0',
+                borderRadius: '0.8rem',
+                fontSize: '1rem',
+                outline: 'none',
+                transition: 'border-color 0.2s, box-shadow 0.2s',
+                background: '#fff',
+                minWidth: '150px',
+                cursor: 'pointer'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#3b82f6';
+                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e2e8f0';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              <option value="">Alle locaties</option>
+              {[...new Set(bedrijven.map(b => b.gemeente).filter(Boolean))].sort().map(gemeente => (
+                <option key={gemeente} value={gemeente}>{gemeente}</option>
+              ))}
+            </select>
+
+            {/* Dienstverband Filter */}
+            <select
+              value={selectedDienstverband}
+              onChange={(e) => setSelectedDienstverband(e.target.value)}
+              style={{
+                padding: '0.75rem 1rem',
+                border: '2px solid #e2e8f0',
+                borderRadius: '0.8rem',
+                fontSize: '1rem',
+                outline: 'none',
+                transition: 'border-color 0.2s, box-shadow 0.2s',
+                background: '#fff',
+                minWidth: '150px',
+                cursor: 'pointer'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#3b82f6';
+                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e2e8f0';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              <option value="">Alle dienstverbanden</option>
+              <option value="voltijds">Voltijds</option>
+              <option value="deeltijds">Deeltijds</option>
+              <option value="freelance">Freelance</option>
+              <option value="stage">Stage</option>
+            </select>
+
+            {/* Clear Filters Button */}
+            {(selectedSector || selectedLocation || selectedDienstverband) && (
+              <button
+                onClick={() => {
+                  setSelectedSector("");
+                  setSelectedLocation("");
+                  setSelectedDienstverband("");
+                }}
+                style={{
+                  padding: '0.75rem 1rem',
+                  background: '#f1f5f9',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '0.8rem',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  color: '#64748b'
+                }}
+              >
+                Filters wissen
+              </button>
+            )}
+          </div>
+
           {/* Resultaten teller */}
-          {searchTerm && (
+          {(searchTerm || selectedSector || selectedLocation || selectedDienstverband) && (
             <div style={{
               textAlign: 'center',
               marginBottom: '1.5rem',
@@ -342,6 +619,13 @@ function StudentBedrijven() {
                 <span style={{ marginLeft: '0.5rem', color: '#3b82f6' }}>
                   ({filteredRecommendedBedrijven.length} aanbevolen)
                 </span>
+              )}
+              {(selectedSector || selectedLocation || selectedDienstverband) && (
+                <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#94a3b8' }}>
+                  {selectedSector && <span style={{ marginRight: '1rem' }}>Sector: {selectedSector}</span>}
+                  {selectedLocation && <span style={{ marginRight: '1rem' }}>Locatie: {selectedLocation}</span>}
+                  {selectedDienstverband && <span>Dienstverband: {selectedDienstverband}</span>}
+                </div>
               )}
             </div>
           )}
@@ -381,6 +665,11 @@ function StudentBedrijven() {
             {visibleCount < overigeBedrijven.length && (
               <button className="toon-meer-btn" onClick={() => setVisibleCount(v => v + 9)}>
                 Toon meer
+              </button>
+            )}
+            {visibleCount > 9 && (
+              <button className="toon-meer-btn" style={{background: '#f1f5f9', color: '#2563eb', marginTop: '1rem'}} onClick={() => setVisibleCount(9)}>
+                Toon minder
               </button>
             )}
           </div>

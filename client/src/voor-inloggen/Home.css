@@ -552,3 +552,30 @@ html {
     display: none;
   }
 }
+
+.public-transport-info {
+  margin-top: 1rem;
+  text-align: left;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.public-transport-info h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.public-transport-info ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  color: #4b5563;
+}
+
+.public-transport-info li {
+  margin-bottom: 0.25rem;
+}

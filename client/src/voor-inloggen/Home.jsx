@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "./Home.css";
-import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok, FaLocationDot } from "react-icons/fa6";
+import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok, FaLocationDot, FaBus } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 
 // Animation variants
@@ -212,11 +212,19 @@ export default function Home() {
                     Campus Kaai, Erasmushogeschool Brussel
                   </h3>
                   <p>Nijverheidskaai 170, 1070 Brussel, België</p>
+                  <div className="public-transport-info">
+                    <h4><FaBus style={{ marginRight: '0.5rem' }}/>Openbaar Vervoer:</h4>
+                    <ul>
+                      <li><strong>Metro:</strong> Lijn 2 & 6 - Halte Delacroix (10 min. wandelen)</li>
+                      <li><strong>Bus:</strong> Lijn 46 (Halte Albert I) of Lijn 89 (Halte Jacques Brel)</li>
+                      <li><strong>Tram:</strong> Lijn 81 (Halte Conseil)</li>
+                    </ul>
+                  </div>
                 </div>
                 <div className="location-map-wrapper">
                   <iframe
                     title="Campus Kaai, Erasmushogeschool Brussel"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2519.574553427701!2d4.322502415745261!3d50.83641137953037!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c3c48f5080d5b7%3A0x7fe25458db7a38ab!2sErasmushogeschool%20Brussel%20-%20Campus%20Kaai!5e0!3m2!1snl!2sbe!4v1687031759742!5m2!1snl!2sbe"
+                    src="https://maps.google.com/maps?q=Nijverheidskaai%20170,%201070%20Brussel,%20Belgi%C3%AB&z=17&output=embed"
                     width="100%"
                     height="300"
                     style={{ border: 0, borderRadius: '1rem' }}
