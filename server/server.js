@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./db');
 const crypto = require('crypto');
-const { sendVerificationEmail } = require('./mailer');
+const { sendVerificationEmail, sendReservationNotificationEmail } = require('./mailer');
 
 // admin routes importeren 
 const adminLogin = require('./routes/adminLogin');           // POST /api/admin/login
@@ -351,7 +351,26 @@ app.post('/api/speeddate', async (req, res) => {
       'UPDATE speeddates SET is_bezet = 1, gebruiker_id = ? WHERE speed_id = ?',
       [gebruiker_id, speed_id]
     );
+    
+    // Stuur bevestiging naar de student
     res.json({ message: 'Speeddate succesvol gereserveerd', speed_id: slot.speed_id });
+
+    // Verstuur notificatie naar het bedrijf op de achtergrond
+    (async () => {
+      try {
+        const [bedrijven] = await db.promise().query('SELECT * FROM bedrijven WHERE bedrijf_id = ?', [bedrijf_id]);
+        const [studenten] = await db.promise().query('SELECT * FROM gebruikers WHERE gebruiker_id = ?', [gebruiker_id]);
+
+        if (bedrijven.length > 0 && studenten.length > 0) {
+          const bedrijf = bedrijven[0];
+          const student = studenten[0];
+          await sendReservationNotificationEmail(bedrijf, student, slot);
+        }
+      } catch (emailError) {
+        console.error('Fout bij het versturen van de reservatie-notificatie e-mail:', emailError);
+      }
+    })();
+
   } catch (err) {
     console.error('Error reserving speeddate:', err);
     res.status(500).json({ error: 'Database error', details: err.message });

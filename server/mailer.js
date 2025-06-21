@@ -109,7 +109,65 @@ const sendVerificationEmail = async (userEmail, token) => {
     }
 };
 
+const sendReservationNotificationEmail = async (bedrijf, student, slot) => {
+    if (!transport) {
+        await initializeMailer();
+        if (!transport) {
+            console.error('❌ FATAL: Email transport could not be initialized for reservation email.');
+            return;
+        }
+    }
+
+    // Formatteer de datums netjes
+    const eventDate = new Date(slot.starttijd).toLocaleDateString('nl-BE', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+    const startTime = new Date(slot.starttijd).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+    const endTime = new Date(slot.eindtijd).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+
+    try {
+        const info = await transport.sendMail({
+            from: process.env.EMAIL_USER || '"Career Launch" <noreply@careerlaunch.com>',
+            to: bedrijf.email,
+            subject: `Nieuwe Speeddate Reservering: ${student.voornaam} ${student.naam}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9fafb;">
+                    <div style="background-color: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
+                        <h1 style="color: #1a202c; text-align: center;">Nieuwe Speeddate Reservering</h1>
+                        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">
+                            Hallo ${bedrijf.naam},
+                        </p>
+                        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">
+                            Een student heeft zojuist een speeddate met jullie gereserveerd. Hieronder vindt u de details.
+                        </p>
+                        <div style="background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                            <h2 style="color: #2d3748; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">Details van de Reservering</h2>
+                            <p style="font-size: 16px; color: #2d3748;"><strong>Student:</strong> ${student.voornaam} ${student.naam}</p>
+                            <p style="font-size: 16px; color: #2d3748;"><strong>E-mail Student:</strong> <a href="mailto:${student.email}" style="color: #3884ff;">${student.email}</a></p>
+                            <p style="font-size: 16px; color: #2d3748;"><strong>Datum:</strong> ${eventDate}</p>
+                            <p style="font-size: 16px; color: #2d3748;"><strong>Tijdslot:</strong> ${startTime} - ${endTime}</p>
+                            <p style="font-size: 16px; color: #2d3748;"><strong>Locatie:</strong> Lokaal ${bedrijf.lokaal} (${bedrijf.verdieping})</p>
+                        </div>
+                        <p style="color: #718096; font-size: 14px;">
+                            Met vriendelijke groet,<br>
+                            Het Career Launch Team
+                        </p>
+                    </div>
+                </div>
+            `
+        });
+
+        console.log('✅ Reservation notification email sent successfully to:', bedrijf.email);
+        if (nodemailer.getTestMessageUrl(info)) {
+            console.log('📧 Ethereal preview URL:', nodemailer.getTestMessageUrl(info));
+        }
+
+    } catch (error) {
+        console.error(`❌ Error sending reservation notification to ${bedrijf.email}:`, error);
+    }
+};
+
 // Start de initialisatie direct wanneer de module geladen wordt.
 initializeMailer();
 
-module.exports = { sendVerificationEmail }; 
+module.exports = { sendVerificationEmail, sendReservationNotificationEmail }; 
