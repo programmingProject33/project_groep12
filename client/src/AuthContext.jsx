@@ -1,12 +1,26 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useMemo } from 'react';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
+    try {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        const parsedUser = JSON.parse(stored);
+        // Validate that the user has required properties
+        if (parsedUser && parsedUser.type && (parsedUser.type === 'student' || parsedUser.type === 'bedrijf')) {
+          return parsedUser;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error);
+      localStorage.removeItem('user');
+      return null;
+    }
   });
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -16,8 +30,16 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    user,
+    setUser,
+    isAuthLoading,
+    setIsAuthLoading
+  }), [user, isAuthLoading]);
+
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

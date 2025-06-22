@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Loader from "./Loader.jsx";
+import ScrollToTop from './ScrollToTop';
+import VerificationPage from './pages/VerificationPage';
 
 // Guest/Public Components
 import GuestLayout from "./voor-inloggen/GuestLayout";
@@ -16,7 +18,7 @@ import SpeeddatePage from "./voor-inloggen/SpeeddatePage.jsx";
 import UserLayout from "./inloggen-student/UserLayout";
 import ProtectedRoute from "./inloggen-student/ProtectedRoute";
 import StudentDashboard from "./inloggen-student/StudentDashboard";
-import Reservaties from "./na-inloggen/Reservaties";
+import Reservaties from "./inloggen-student/Reservaties";
 import Profiel from "./inloggen-student/Profiel";
 import Contact from "./inloggen-student/Contact";
 import StudentBedrijven from "./inloggen-student/StudentBedrijven";
@@ -32,19 +34,37 @@ import StudentProfiel from "./inloggen-bedrijf/StudentProfiel.jsx";
 // Context
 import { useAuth } from "./AuthContext.jsx";
 
-// Custom hook voor role-based redirects
-function useRoleRedirect() {
-  const { user } = useAuth();
+// Custom hook voor role-based redirects, nu een geldige component
+function RoleRedirect() {
+  const { user, isAuthLoading } = useAuth();
+  
+  if (isAuthLoading) return null; // of een loader
+  
   if (!user) return <Navigate to="/login" replace />;
-  return <Navigate to={user.type === 'student' ? '/student-dashboard' : '/bedrijf/home'} replace />;
+  
+  // Only redirect if user has a valid type
+  if (user.type === 'student') {
+    return <Navigate to="/student/dashboard" replace />;
+  } else if (user.type === 'bedrijf') {
+    return <Navigate to="/bedrijf/home" replace />;
+  }
+  
+  // Fallback voor onbekende gebruikerstypes - clear invalid user data
+  localStorage.removeItem('user');
+  return <Navigate to="/login" replace />;
 }
 
 function BedrijvenRedirectWrapper() {
   const { user, isAuthLoading } = useAuth();
+  
   if (isAuthLoading) return null; // of een loader
+  
+  // Only redirect if user is logged in and is a student
   if (user && user.type === 'student') {
     return <Navigate to="/student/bedrijven" replace />;
   }
+  
+  // For non-logged in users or companies, show the public bedrijven page
   return <Bedrijven />;
 }
 
@@ -55,6 +75,7 @@ function App() {
   }
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Publieke routes */}
         <Route path="/" element={<GuestLayout />}>
@@ -73,15 +94,17 @@ function App() {
           <Route path="bedrijven" element={<BedrijvenRedirectWrapper />} />
         </Route>
 
+        {/* Route voor e-mail verificatie */}
+        <Route path="/verify" element={<VerificationPage />} />
+
         {/* Student routes met UserLayout als parent */}
-        <Route path="/" element={
+        <Route path="/student" element={
           <ProtectedRoute allowedRoles={['student']}>
             <UserLayout />
           </ProtectedRoute>
         }>
-          <Route path="student-dashboard" element={<StudentDashboard />} />
-          <Route path="student/bedrijven" element={<StudentBedrijven />} />
-          <Route path="bedrijven" element={<Bedrijven />} />
+          <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="bedrijven" element={<StudentBedrijven />} />
           <Route path="reservaties" element={<Reservaties />} />
           <Route path="profiel" element={<Profiel />} />
           <Route path="contact" element={<Contact />} />
@@ -105,7 +128,7 @@ function App() {
         </Route>
 
         {/* Catch-all route voor ongeldige paden */}
-        <Route path="*" element={<useRoleRedirect />} />
+        <Route path="*" element={<RoleRedirect />} />
       </Routes>
     </Router>
   );

@@ -6,9 +6,8 @@ import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
 
 export default function BedrijfFooter() {
   const location = useLocation();
-  const { user, isAuthLoading } = useAuth();
+  const { isAuthLoading } = useAuth();
   if (isAuthLoading) return null;
-  if (!user || user.type !== 'bedrijf') return null;
 
   return (
     <footer className="footer">
@@ -36,6 +35,7 @@ export default function BedrijfFooter() {
           </div>
         </div>
       </div>
+      <p>&copy; {new Date().getFullYear()} Careerlaunch. Alle rechten voorbehouden.</p>
     </footer>
   );
 }

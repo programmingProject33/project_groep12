@@ -89,3 +89,18 @@
   border-radius: 0.375rem;
   margin-bottom: 1rem;
 }
+
+.linkedin-table-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #0077b5;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.linkedin-table-link:hover {
+  color: #005e94;
+  text-decoration: underline;
+}

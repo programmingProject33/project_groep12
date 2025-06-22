@@ -2,27 +2,29 @@ import React, { useState, useEffect, useRef } from "react";
 import "./Profiel.css";
 import { useAuth } from "../AuthContext.jsx";
 import { MdPerson, MdEmail, MdSchool } from "react-icons/md";
-import { FaLinkedin, FaStar, FaPuzzlePiece } from "react-icons/fa6";
+import { FaLinkedin, FaStar, FaPuzzlePiece, FaEye, FaEyeSlash } from "react-icons/fa6";
 
-const DIENSTVERBAND_OPTIES = [
+const OPLEIDINGEN = [
+  "Multimedia & Creatieve Technologie (bachelor)",
+  "Toegepaste Informatica (bachelor)",
+  "Graduaat Elektromechanische Systemen",
+  "Graduaat Programmeren",
+  "Graduaat Systeem- en Netwerkbeheer",
+  "Postgraduaat Coding (online)",
+  "Postgraduaat Toegepaste Artificial Intelligence"
+];
+
+const DIENSTVERBANDEN = [
   "Voltijds",
   "Deeltijds",
   "Freelance",
-  "Stage",
-  "Geen voorkeur"
-];
-
-const OPLEIDING_OPTIES = [
-  "Bachelor Toegepaste Informatica",
-  "Internet of Things",
-  "Toegepaste Artificiële Intelligentie",
-  "Multimedia & Creatieve Technologie",
-  "Elektromechanische Systemen"
+  "Stage"
 ];
 
 const Profiel = () => {
   const { user, setUser, isAuthLoading } = useAuth();
   const [editMode, setEditMode] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [profile, setProfile] = useState({
     voornaam: "",
     naam: "",
@@ -32,9 +34,8 @@ const Profiel = () => {
     email: "",
     dienstverbanden: [],
     linkedin: "",
-    foto: ""
+    wachtwoord: ""
   });
-  const fileInputRef = useRef();
 
   useEffect(() => {
     if (user) {
@@ -47,7 +48,7 @@ const Profiel = () => {
         email: user.email || "",
         dienstverbanden: user.dienstverbanden || [],
         linkedin: user.linkedin || "",
-        foto: user.foto || ""
+        wachtwoord: ""
       });
     }
   }, [user]);
@@ -56,27 +57,44 @@ const Profiel = () => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
-  const handleFotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfile((prev) => ({ ...prev, foto: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSave = async () => {
-    // PATCH-ready: stuur profiel naar backend
-    setUser({ ...user, ...profile });
+    try {
+      // Validate password length if it's being changed
+      if (profile.wachtwoord && profile.wachtwoord.length < 6) {
+        alert("Wachtwoord moet minimaal 6 tekens bevatten");
+        return;
+      }
+
+      const res = await fetch(`/api/profiel/${user.gebruiker_id || user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          voornaam: profile.voornaam,
+          naam: profile.naam,
+          gebruikersnaam: profile.gebruikersnaam,
+          opleiding: profile.opleiding,
+          opleiding_jaar: profile.opleiding_jaar,
+          email: profile.email,
+          dienstverbanden: profile.dienstverbanden,
+          linkedin: profile.linkedin,
+          wachtwoord: profile.wachtwoord
+        })
+      });
+      if (res.ok) {
+        const updatedUser = { ...user, ...profile };
+        if (!profile.wachtwoord) {
+          delete updatedUser.wachtwoord;
+        }
+        setUser(updatedUser);
+      }
+    } catch (e) {}
     setEditMode(false);
   };
 
-  // Avatar: profielfoto of eerste letter
-  const avatar = profile.foto
-    ? <img src={profile.foto} alt="Profielfoto" className="profiel-avatar-img" />
-    : <div className="profiel-avatar-letter">{(profile.voornaam || profile.naam || "").charAt(0).toUpperCase()}</div>;
+  // Avatar: eerste letter
+  const avatar = (
+    <div className="profiel-avatar-letter">{(profile.voornaam || profile.naam || "").charAt(0).toUpperCase()}</div>
+  );
 
   // Dienstverbanden altijd als array parsen
   const getDienstverbandenArray = (val) => {
@@ -102,20 +120,6 @@ const Profiel = () => {
       <div className="profiel-card-new">
         <div className="profiel-avatar-box">
           {avatar}
-          {editMode && (
-            <>
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                ref={fileInputRef}
-                onChange={handleFotoChange}
-              />
-              <button className="profiel-foto-btn" onClick={() => fileInputRef.current.click()}>
-                Profielfoto wijzigen
-              </button>
-            </>
-          )}
         </div>
         <div className="profiel-naam-box">
           <div className="profiel-naam-new">{profile.voornaam} {profile.naam}</div>
@@ -185,6 +189,32 @@ const Profiel = () => {
               )}
             </div>
           </div>
+          {editMode && (
+            <div className="profiel-info-item-new">
+              <MdPerson size={22} color="#3b82f6" />
+              <div>
+                <div className="profiel-label-new">Wachtwoord</div>
+                <div className="password-input-container">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="wachtwoord"
+                    value={profile.wachtwoord}
+                    onChange={handleChange}
+                    className="profiel-input"
+                    placeholder="Laat leeg om niet te wijzigen"
+                    minLength="6"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="profiel-info-item-new">
             <MdSchool size={22} color="#3b82f6" />
             <div>
@@ -197,7 +227,7 @@ const Profiel = () => {
                   className="profiel-input"
                 >
                   <option value="">Kies je opleiding</option>
-                  {OPLEIDING_OPTIES.map(opt => (
+                  {OPLEIDINGEN.map(opt => (
                     <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>
@@ -238,7 +268,7 @@ const Profiel = () => {
               <div>
                 <div className="profiel-label-new">Dienstverband</div>
                 <div className="profiel-dienstverbanden-edit-new">
-                  {['Voltijds','Deeltijds','Freelance','Stage','Geen voorkeur'].map(opt => (
+                  {DIENSTVERBANDEN.map(opt => (
                     <label key={opt} className="profiel-checkbox-label-new">
                       <input
                         type="checkbox"

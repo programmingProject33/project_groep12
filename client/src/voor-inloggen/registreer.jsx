@@ -1,16 +1,29 @@
 import React, { useState } from "react";
 import "./registreer.css"; // Dit importeert de styling (kleuren, lay-out, lettertypes) van de pagina.
-import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
+import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok, FaEye, FaEyeSlash } from "react-icons/fa6";
 // Dit importeert iconen van sociale media die je kan gebruiken in de pagina.
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 // useNavigate is een hook (speciale functie) die je gebruikt om te navigeren (pagina veranderen) zonder dat de pagina helemaal opnieuw laadt.
 
-const STUDIE_OPLEIDINGEN = [
-  "Bachelor Toegepaste Informatica",
-  "Internet of Things",
-  "Toegepaste Artificiële Intelligentie",
-  "Multimedia & Creatieve Technologie",
-  "Elektromechanische Systemen"
+const OPLEIDINGEN = [
+  "Multimedia & Creatieve Technologie (bachelor)",
+  "Toegepaste Informatica (bachelor)",
+  "Graduaat Elektromechanische Systemen",
+  "Graduaat Programmeren",
+  "Graduaat Systeem- en Netwerkbeheer",
+  "Postgraduaat Coding (online)",
+  "Postgraduaat Toegepaste Artificial Intelligence"
+];
+
+const opleidingOpties = [
+  "Toegepaste Informatica (Bachelor)",
+  "Postgraduaat Coding (online)",
+  "Multimedia & Creatieve Technologie (Bachelor)",
+  "Digitale Vormgeving (Bachelor)",
+  "Elektronica-ICT (Bachelor)",
+  "Bedrijfsmanagement (Bachelor)",
+  "Communicatie (Bachelor)",
+  "Toerisme- en Recreatiemanagement (Bachelor)",
 ];
 
 export default function Registreer()   // Dit is een functionele component in React. Het maakt de registratiepagina.
@@ -24,6 +37,12 @@ export default function Registreer()   // Dit is een functionele component in Re
   };  // Deze functie zorgt ervoor dat je naar de startpagina ("/") wordt gebracht 
   // als je deze functie gebruikt. 'navigate' is een manier om van pagina te veranderen 
   // binnen je app zonder dat je de hele website opnieuw hoeft te laden.
+
+  // State for password visibility
+  const [showStudentPassword, setShowStudentPassword] = useState(false);
+  const [showStudentPassword2, setShowStudentPassword2] = useState(false);
+  const [showCompanyPassword, setShowCompanyPassword] = useState(false);
+  const [showCompanyPassword2, setShowCompanyPassword2] = useState(false);
 
   // State for student form
   const [studentForm, setStudentForm] = useState({
@@ -57,11 +76,14 @@ export default function Registreer()   // Dit is een functionele component in Re
     wachtwoord2_bedrijf: '',
     sector: '',
     beschrijving: '',
-    zoeken_we: ''
+    gezocht_profiel_omschrijving: '',
+    gezochte_opleidingen: [],
+    dienstverbanden: [],
   });
 
   // Error state
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState(''); // State voor succesbericht
 
   const handleStudentChange = (e) => {
     setStudentForm({
@@ -71,19 +93,67 @@ export default function Registreer()   // Dit is een functionele component in Re
   };
 
   const handleCompanyChange = (e) => {
-    setCompanyForm({
-      ...companyForm,
-      [e.target.name]: e.target.value
-    });
+    const { name, value, type, checked } = e.target;
+    if (name === "gezochte_opleidingen") {
+      const updatedOpleidingen = checked
+        ? [...companyForm.gezochte_opleidingen, value]
+        : companyForm.gezochte_opleidingen.filter((item) => item !== value);
+      setCompanyForm({ ...companyForm, gezochte_opleidingen: updatedOpleidingen });
+    } else {
+      setCompanyForm({ ...companyForm, [name]: value });
+    }
+  };
+
+  const handleDienstverbandChange = (e) => {
+    const { value, checked } = e.target;
+    const { dienstverbanden } = companyForm;
+
+    if (checked) {
+      setCompanyForm({
+        ...companyForm,
+        dienstverbanden: [...dienstverbanden, value],
+      });
+    } else {
+      setCompanyForm({
+        ...companyForm,
+        dienstverbanden: dienstverbanden.filter((item) => item !== value),
+      });
+    }
+  };
+
+  // LinkedIn URL validation function
+  const validateLinkedInUrl = (url) => {
+    if (!url) return true; // Empty is valid (optional field)
+    
+    // Remove whitespace
+    const trimmedUrl = url.trim();
+    if (!trimmedUrl) return true;
+    
+    // Check if it's a valid LinkedIn URL
+    const linkedInPattern = /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/;
+    return linkedInPattern.test(trimmedUrl);
   };
 
   const handleStudentSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage(''); // Reset berichten bij nieuwe poging
 
     // Validate passwords match
     if (studentForm.wachtwoord !== studentForm.wachtwoord2) {
       setError('Wachtwoorden komen niet overeen');
+      return;
+    }
+
+    // Validate password length
+    if (studentForm.wachtwoord.length < 6) {
+      setError('Wachtwoord moet minimaal 6 tekens bevatten');
+      return;
+    }
+
+    // Validate LinkedIn URL
+    if (!validateLinkedInUrl(studentForm.linkedin)) {
+      setError('Voer een geldige LinkedIn URL in (bijvoorbeeld: https://www.linkedin.com/in/voornaam-achternaam)');
       return;
     }
 
@@ -106,8 +176,18 @@ export default function Registreer()   // Dit is een functionele component in Re
       }
 
       // Registration successful
-      alert('Account succesvol aangemaakt!');
-      navigate('/login');
+      setSuccessMessage('Bijna klaar! We hebben een verificatie-e-mail gestuurd. Controleer je inbox om je registratie te voltooien.');
+      setStudentForm({
+        voornaam: '',
+        naam: '',
+        email: '',
+        gebruikersnaam: '',
+        wachtwoord: '',
+        wachtwoord2: '',
+        opleiding: '',
+        opleiding_jaar: '',
+        linkedin: ''
+      });
     } catch (err) {
       setError(err.message);
     }
@@ -116,10 +196,17 @@ export default function Registreer()   // Dit is een functionele component in Re
   const handleCompanySubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage(''); // Reset berichten bij nieuwe poging
 
     // Validate passwords match
     if (companyForm.wachtwoord_bedrijf !== companyForm.wachtwoord2_bedrijf) {
       setError('Wachtwoorden komen niet overeen');
+      return;
+    }
+
+    // Validate password length
+    if (companyForm.wachtwoord_bedrijf.length < 6) {
+      setError('Wachtwoord moet minimaal 6 tekens bevatten');
       return;
     }
 
@@ -146,8 +233,29 @@ export default function Registreer()   // Dit is een functionele component in Re
       }
 
       // Registration successful
-      alert('Bedrijfsaccount succesvol aangemaakt!');
-      navigate('/login');
+      setSuccessMessage('Bijna klaar! We hebben een verificatie-e-mail gestuurd. Controleer je inbox om je registratie te voltooien.');
+      setCompanyForm({
+        bedrijfsnaam: '',
+        kvk: '',
+        btw: '',
+        straat: '',
+        gemeente: '',
+        telbedrijf: '',
+        emailbedrijf: '',
+        voornaam_contact: '',
+        naam_contact: '',
+        specialisatie: '',
+        email_contact: '',
+        tel_contact: '',
+        gebruikersnaam_bedrijf: '',
+        wachtwoord_bedrijf: '',
+        wachtwoord2_bedrijf: '',
+        sector: '',
+        beschrijving: '',
+        gezocht_profiel_omschrijving: '',
+        gezochte_opleidingen: [],
+        dienstverbanden: [],
+      });
     } catch (err) {
       setError(err.message);
     }
@@ -239,10 +347,9 @@ export default function Registreer()   // Dit is een functionele component in Re
                   required
                   className="registerstudent-form select"
                 >
-                  {STUDIE_OPLEIDINGEN.map((opleiding) => (
-                    <option key={opleiding} value={opleiding}>
-                      {opleiding}
-                    </option>
+                  <option value="">Kies je opleiding</option>
+                  {OPLEIDINGEN.map((opleiding) => (
+                    <option key={opleiding} value={opleiding}>{opleiding}</option>
                   ))}
                 </select>
               </label>
@@ -261,23 +368,43 @@ export default function Registreer()   // Dit is een functionele component in Re
               </label>
               <label>
                 Wachtwoord:
-                <input 
-                  type="password" 
-                  name="wachtwoord" 
-                  value={studentForm.wachtwoord}
-                  onChange={handleStudentChange}
-                  required
-                />
+                <div className="password-input-container">
+                  <input 
+                    type={showStudentPassword ? "text" : "password"}
+                    name="wachtwoord" 
+                    value={studentForm.wachtwoord}
+                    onChange={handleStudentChange}
+                    required
+                    minLength="6"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowStudentPassword(!showStudentPassword)}
+                  >
+                    {showStudentPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </label>
               <label>
                 Wachtwoord bevestiging:
-                <input 
-                  type="password" 
-                  name="wachtwoord2" 
-                  value={studentForm.wachtwoord2}
-                  onChange={handleStudentChange}
-                  required
-                />
+                <div className="password-input-container">
+                  <input 
+                    type={showStudentPassword2 ? "text" : "password"}
+                    name="wachtwoord2" 
+                    value={studentForm.wachtwoord2}
+                    onChange={handleStudentChange}
+                    required
+                    minLength="6"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowStudentPassword2(!showStudentPassword2)}
+                  >
+                    {showStudentPassword2 ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </label>
               <label>
                 LinkedIn-profiel (optioneel):
@@ -286,7 +413,6 @@ export default function Registreer()   // Dit is een functionele component in Re
                   name="linkedin"
                   value={studentForm.linkedin || ''}
                   onChange={handleStudentChange}
-                  pattern="https://www.linkedin.com/*"
                   placeholder="Bijvoorbeeld: https://www.linkedin.com/in/voornaam-achternaam"
                   className="registerstudent-form input"
                 />
@@ -301,265 +427,169 @@ export default function Registreer()   // Dit is een functionele component in Re
  
           {activeTab === "bedrijf" && (
             <form className="registerbedrijf-form" onSubmit={handleCompanySubmit}>
-              {/* Formulier voor bedrijf registratie */}
-              <h1 className="registerbedrijf-title">Account maken als Bedrijf</h1>
+              <h2 className="registerbedrijf-title">Registreer je Bedrijf</h2>
 
-              <h2 className="registerbedrijf-section-title">Bedrijfsgegevens:</h2>
-              <label>
-                Bedrijfsnaam:
-                <input 
-                  type="text" 
-                  name="bedrijfsnaam" 
-                  value={companyForm.bedrijfsnaam}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Sector:
-                <input
-                  type="text"
-                  name="sector"
-                  value={companyForm.sector}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Wie zijn we:
-                <textarea
-                  name="beschrijving"
-                  value={companyForm.beschrijving}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Dit zoeken we:
-                <textarea
-                  name="zoeken_we"
-                  value={companyForm.zoeken_we}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                KVK-nummer:
-                <input 
-                  type="text" 
-                  name="kvk" 
-                  value={companyForm.kvk}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                BTW-nummer:
-                <input 
-                  type="text" 
-                  name="btw" 
-                  value={companyForm.btw}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <div className="registerbedrijf-address-row">
+              {/* --- Bedrijfsinformatie --- */}
+              <h3 className="registerbedrijf-section-title">Bedrijfsinformatie</h3>
+              <div className="registreer-form-grid">
                 <label>
-                  Straatnaam en huisnummer:
-                  <input 
-                    type="text" 
-                    name="straat" 
-                    value={companyForm.straat}
-                    onChange={handleCompanyChange}
-                    required
-                  />
+                  Officiële bedrijfsnaam
+                  <input type="text" name="bedrijfsnaam" value={companyForm.bedrijfsnaam} onChange={handleCompanyChange} required />
                 </label>
                 <label>
-                  Gemeente en postcode:
-                  <input 
-                    type="text" 
-                    name="gemeente" 
-                    value={companyForm.gemeente}
-                    onChange={handleCompanyChange}
-                    required
-                  />
+                  BTW-nummer
+                  <input type="text" name="btw" value={companyForm.btw} onChange={handleCompanyChange} required />
+                </label>
+                <div className="registerbedrijf-address-row">
+                  <label>
+                    Straatnaam
+                    <input type="text" name="straat" value={companyForm.straat} onChange={handleCompanyChange} required />
+                  </label>
+                  <label>
+                    Gemeente
+                    <input type="text" name="gemeente" value={companyForm.gemeente} onChange={handleCompanyChange} required />
+                  </label>
+                </div>
+                <label>
+                  Telefoonnummer
+                  <input type="tel" name="telbedrijf" value={companyForm.telbedrijf} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  E-mailadres
+                  <input type="email" name="emailbedrijf" value={companyForm.emailbedrijf} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  Sector
+                  <input type="text" name="sector" value={companyForm.sector} onChange={handleCompanyChange} />
                 </label>
               </div>
-              <label>
-                Telefoonnummer:
-                <input 
-                  type="text" 
-                  name="telbedrijf" 
-                  value={companyForm.telbedrijf}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Bedrijf e-mailadres:
-                <input 
-                  type="email" 
-                  name="emailbedrijf" 
-                  value={companyForm.emailbedrijf}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
 
-              <h2 className="registerbedrijf-section-title">Contactpersoon:</h2>
-              <label>
-                Voornaam:
-                <input 
-                  type="text" 
-                  name="voornaam_contact" 
-                  value={companyForm.voornaam_contact}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Naam:
-                <input 
-                  type="text" 
-                  name="naam_contact" 
-                  value={companyForm.naam_contact}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Specialisatie:
-                <input 
-                  type="text" 
-                  name="specialisatie" 
-                  value={companyForm.specialisatie}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                E-mailadres:
-                <input 
-                  type="email" 
-                  name="email_contact" 
-                  value={companyForm.email_contact}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Telefoonnummer:
-                <input 
-                  type="text" 
-                  name="tel_contact" 
-                  value={companyForm.tel_contact}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
+              {/* --- Profielinformatie --- */}
+              <h3 className="registerbedrijf-section-title">Profielinformatie voor studenten</h3>
+              <div className="registreer-form-grid">
+                <label>
+                  Bedrijfsbeschrijving
+                  <textarea name="beschrijving" value={companyForm.beschrijving} onChange={handleCompanyChange} placeholder="Een korte beschrijving van jullie bedrijf..." />
+                  <p className="form-helper">Deze tekst is zichtbaar voor studenten op je bedrijfspagina.</p>
+                </label>
+                <label>
+                  Omschrijving gezocht profiel
+                  <textarea name="gezocht_profiel_omschrijving" value={companyForm.gezocht_profiel_omschrijving} onChange={handleCompanyChange} placeholder="Beschrijf de ideale kandidaat, bv. kennis van Java, teamplayer..." />
+                  <p className="form-helper">Deze tekst is ook zichtbaar voor studenten.</p>
+                </label>
+                <label>
+                  Gezochte opleidingen
+                  <div className="checkbox-group">
+                    {opleidingOpties.map((opleiding) => (
+                      <div key={opleiding} className="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id={`opleiding-${opleiding}`}
+                          name="gezochte_opleidingen"
+                          value={opleiding}
+                          checked={companyForm.gezochte_opleidingen.includes(opleiding)}
+                          onChange={handleCompanyChange}
+                        />
+                        <label htmlFor={`opleiding-${opleiding}`}>{opleiding}</label>
+                      </div>
+                    ))}
+                  </div>
+                </label>
+                <div className="registreer-form-group full-width">
+                  <label>Welk soort dienstverband bieden jullie aan?</label>
+                  <div className="checkbox-group">
+                    {['Voltijds', 'Deeltijds', 'Freelance', 'Stage'].map((dienstverband) => (
+                      <label key={dienstverband} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          name="dienstverbanden"
+                          value={dienstverband}
+                          checked={companyForm.dienstverbanden.includes(dienstverband)}
+                          onChange={handleDienstverbandChange}
+                        />
+                        {dienstverband}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-              <h2 className="registerbedrijf-section-title">Accountgegevens</h2>
-              <label>
-                Gebruikersnaam:
-                <input 
-                  type="text" 
-                  name="gebruikersnaam_bedrijf" 
-                  value={companyForm.gebruikersnaam_bedrijf}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Wachtwoord:
-                <input 
-                  type="password" 
-                  name="wachtwoord_bedrijf" 
-                  value={companyForm.wachtwoord_bedrijf}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Wachtwoord bevestiging:
-                <input 
-                  type="password" 
-                  name="wachtwoord2_bedrijf" 
-                  value={companyForm.wachtwoord2_bedrijf}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
+              {/* --- Contactpersoon --- */}
+              <h3 className="registerbedrijf-section-title">Contactpersoon</h3>
+              <div className="registreer-form-grid">
+                <label>
+                  Voornaam contactpersoon
+                  <input type="text" name="voornaam_contact" value={companyForm.voornaam_contact} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  Naam contactpersoon
+                  <input type="text" name="naam_contact" value={companyForm.naam_contact} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  Specialisatie contactpersoon
+                  <input type="text" name="specialisatie" value={companyForm.specialisatie} onChange={handleCompanyChange} />
+                </label>
+                <label>
+                  E-mailadres contactpersoon
+                  <input type="email" name="email_contact" value={companyForm.email_contact} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  Telefoonnummer contactpersoon
+                  <input type="tel" name="tel_contact" value={companyForm.tel_contact} onChange={handleCompanyChange} />
+                </label>
+              </div>
 
-              <button type="submit" className="registerbedrijf-btn bedrijf-btn">
-                Account maken
-              </button>
+              {/* --- Accountgegevens --- */}
+              <h3 className="registerbedrijf-section-title">Accountgegevens</h3>
+              <div className="registreer-form-grid">
+                <label>
+                  Gebruikersnaam
+                  <input type="text" name="gebruikersnaam_bedrijf" value={companyForm.gebruikersnaam_bedrijf} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  Wachtwoord
+                  <div className="password-input-container">
+                    <input
+                      type={showCompanyPassword ? 'text' : 'password'}
+                      name="wachtwoord_bedrijf"
+                      value={companyForm.wachtwoord_bedrijf}
+                      onChange={handleCompanyChange}
+                      required
+                    />
+                    <button type="button" className="password-toggle-btn" onClick={() => setShowCompanyPassword(!showCompanyPassword)}>
+                      {showCompanyPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </label>
+                <label>
+                  Herhaal wachtwoord
+                  <div className="password-input-container">
+                    <input
+                      type={showCompanyPassword2 ? 'text' : 'password'}
+                      name="wachtwoord2_bedrijf"
+                      value={companyForm.wachtwoord2_bedrijf}
+                      onChange={handleCompanyChange}
+                      required
+                    />
+                    <button type="button" className="password-toggle-btn" onClick={() => setShowCompanyPassword2(!showCompanyPassword2)}>
+                      {showCompanyPassword2 ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </label>
+              </div>
+              <button type="submit" className="registerbedrijf-btn">Account Aanmaken</button>
             </form>
           )}
         </div>
+
+        {successMessage && (
+          <div className="registreer-success-container">
+            <h2>✅ Registratie aangevraagd!</h2>
+            <p>{successMessage}</p>
+            <p>Je kunt dit venster nu sluiten.</p>
+          </div>
+        )}
       </main>
-
-      {/* FOOTER onderaan de pagina */}
-      <footer className="footer">
-        <div className="footer-row">
-          <div className="footer-col left">
-            <div className="footer-logo-box"></div>
-            <div className="footer-mail">
-              E-mailadres: support-careerlaunch@ehb.be<br />
-              Telefoonnummer: +32 494 77 08 550
-            </div>
-          </div>
-
-          <div className="footer-col middle">
-            <ul className="footer-menu">
-              <li onClick={goToHome} style={{ cursor: "pointer" }}>Home</li>
-              <li onClick={() => navigate("/registreer")} style={{ cursor: "pointer" }}>Registreer</li>
-              <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>Contact</li>
-              <li onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>Login</li>
-            </ul>
-          </div>
-
-           <div className="footer-col right">
-                      <div className="footer-socials">
-                        <a
-                          href="https://www.linkedin.com/company/meterasmusplus/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="icon"
-                          title="LinkedIn"
-                        >
-                          <FaLinkedin />
-                        </a>
-                        <a
-                          href="https://www.instagram.com/erasmushogeschool/?hl=en"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="icon"
-                          title="Instagram"
-                        >
-                          <FaInstagram />
-                        </a>
-                        <a
-                          href="https://x.com/EUErasmusPlus?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="icon"
-                          title="X"
-                        >
-                          <FaXTwitter />
-                        </a>
-                        <a
-                          href="https://www.tiktok.com/@erasmushogeschool"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="icon"
-                          title="TikTok"
-                        >
-                          <FaTiktok />
-                        </a>
-                      </div>
-                    </div>
-        </div>
-      </footer>
     </div>
   );
 }

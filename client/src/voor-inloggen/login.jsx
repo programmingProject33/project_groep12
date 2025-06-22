@@ -1,88 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok } from "react-icons/fa6";
+import { FaLinkedin, FaInstagram, FaXTwitter, FaTiktok, FaEye, FaEyeSlash } from "react-icons/fa6";
 import "./login.css";
 import { useAuth } from "../AuthContext.jsx";
-
-function Footer() {
-  const navigate = useNavigate();
-  
-  return (
-    <footer className="footer">
-      <div className="footer-row">
-        <div className="footer-col left">
-          <div className="footer-logo-box"></div>
-          <div className="footer-mail">
-            E-mailadres: pp-test@ehb.be<br />
-            +32 494 77 08 550
-          </div>
-        </div>
-        <div className="footer-col middle">
-          <ul className="footer-menu">
-            <li onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-              Home
-            </li>
-            <li onClick={() => navigate("/registreer")} style={{ cursor: "pointer" }}>
-              Registreer
-            </li>
-            <li onClick={() => navigate("/contactNavbalk")} style={{ cursor: "pointer" }}>
-              Contact
-            </li>
-            <li onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>
-              Login
-            </li>
-          </ul>
-        </div>
-        <div className="footer-col right">
-          <div className="footer-socials">
-            <a
-              href="https://www.linkedin.com/company/meterasmusplus/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="icon"
-              title="LinkedIn"
-            >
-              <FaLinkedin />
-            </a>
-            <a
-              href="https://www.instagram.com/erasmushogeschool/?hl=en"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="icon"
-              title="Instagram"
-            >
-              <FaInstagram />
-            </a>
-            <a
-              href="https://x.com/EUErasmusPlus?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="icon"
-              title="X"
-            >
-              <FaXTwitter />
-            </a>
-            <a
-              href="https://www.tiktok.com/@erasmushogeschool"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="icon"
-              title="TikTok"
-            >
-              <FaTiktok />
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 const Login = () => {
   const [gebruikersnaam, setGebruikersnaam] = useState("");
   const [wachtwoord, setWachtwoord] = useState("");
   const [type, setType] = useState("student");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
@@ -98,6 +25,11 @@ const Login = () => {
     }
     if(!wachtwoord) {
       return setError("wachtwoord is verplicht")
+    }
+
+    // Minimum wachtwoordlengte validatie
+    if (wachtwoord.length < 6) {
+      return setError("Wachtwoord moet minimaal 6 tekens bevatten");
     }
 
     try {
@@ -126,7 +58,7 @@ const Login = () => {
       
       // Redirect based on user type
       if (data.user.type === 'student') {
-        navigate('/student-dashboard');
+        navigate('/student/dashboard');
       } else {
         navigate('/bedrijf/home');
       }
@@ -175,13 +107,23 @@ const Login = () => {
             </label>
             <label>
               Wachtwoord:
-              <input
-                type="password"
-                value={wachtwoord}
-                onChange={(e) => setWachtwoord(e.target.value)}
-                required
-                placeholder="••••••••"
-              />
+              <div className="password-input-container">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={wachtwoord}
+                  onChange={(e) => setWachtwoord(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  minLength="6"
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </label>
             {error && <p className="error">{error}</p>}
             <button type="submit" className="btn primary login-btn">Inloggen</button>
@@ -191,7 +133,6 @@ const Login = () => {
           </form>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

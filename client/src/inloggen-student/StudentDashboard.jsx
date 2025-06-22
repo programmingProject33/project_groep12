@@ -1,9 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./StudentDashboard.css";
 import { useAuth } from "../AuthContext.jsx";
-import { FaBuilding, FaCalendarAlt } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import { FaBuilding, FaCalendarAlt, FaBus } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Location map variants
+const mapVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 20,
+    scale: 0.95
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut"
+    }
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    scale: 0.95,
+    transition: {
+      duration: 0.4,
+      ease: "easeIn"
+    }
+  }
+};
 
 const events = [
   {
@@ -50,9 +77,15 @@ const tips = [
 export default function StudentDashboard() {
   const { user, isAuthLoading } = useAuth();
   const navigate = useNavigate();
+  const [showLocationMap, setShowLocationMap] = useState(false);
+  
   if (isAuthLoading) return null;
   const voornaam = user?.voornaam || "Student";
   const initiaal = voornaam[0]?.toUpperCase() || "S";
+
+  const toggleLocationMap = () => {
+    setShowLocationMap(!showLocationMap);
+  };
 
   return (
     <div className="student-dashboard clean-hero">
@@ -82,10 +115,77 @@ export default function StudentDashboard() {
           </div>
         </div>
         <div className="hero-actions">
-          <button className="hero-btn bedrijven" onClick={() => navigate("/bedrijven")}> <FaBuilding className="btn-icon" /> Bekijk bedrijven</button>
-          <button className="hero-btn reservaties" onClick={() => navigate("/reservaties")}> <FaCalendarAlt className="btn-icon" /> Bekijk reservaties</button>
+          <button className="hero-btn bedrijven" onClick={() => navigate("/student/bedrijven")}> <FaBuilding className="btn-icon" /> Bekijk bedrijven</button>
+          <button className="hero-btn reservaties" onClick={() => navigate("/student/reservaties")}> <FaCalendarAlt className="btn-icon" /> Bekijk reservaties</button>
         </div>
       </motion.section>
+
+      {/* LOCATION BUTTON SECTION */}
+      <motion.section 
+        className="location-button-section"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <div className="location-button-container">
+          <motion.button
+            className="location-toggle-btn"
+            onClick={toggleLocationMap}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <span style={{ marginRight: '0.5rem' }}>📍</span>
+            {showLocationMap ? 'Verberg locatie' : 'Toon locatie'}
+          </motion.button>
+          
+          <AnimatePresence>
+            {showLocationMap && (
+              <motion.div
+                className="location-map-container"
+                variants={mapVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                layout
+              >
+                <div className="location-map-info">
+                  <h3>
+                    <span style={{ marginRight: '0.5rem', color: '#3b82f6' }}>📍</span>
+                    Campus Kaai, Erasmushogeschool Brussel
+                  </h3>
+                  <p>Nijverheidskaai 170, 1070 Brussel, België</p>
+                  <div className="public-transport-info">
+                    <h4><FaBus style={{ marginRight: '0.5rem' }}/>Openbaar Vervoer:</h4>
+                    <ul>
+                      <li><strong>Metro:</strong> Lijn 2 & 6 - Halte Delacroix (10 min. wandelen)</li>
+                      <li><strong>Bus:</strong> Lijn 46 (Halte Albert I) of Lijn 89 (Halte Jacques Brel)</li>
+                      <li><strong>Tram:</strong> Lijn 81 (Halte Conseil)</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="location-map-wrapper">
+                  <iframe
+                    title="Campus Kaai, Erasmushogeschool Brussel"
+                    src="https://maps.google.com/maps?q=Nijverheidskaai%20170,%201070%20Brussel,%20Belgi%C3%AB&z=17&output=embed"
+                    width="100%"
+                    height="300"
+                    style={{ border: 0, borderRadius: '1rem' }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.section>
+
       <section className="tips-section career-tips-block">
         <h2>&#128161; Carrière Tips</h2>
         <ul className="career-tips-list with-images">

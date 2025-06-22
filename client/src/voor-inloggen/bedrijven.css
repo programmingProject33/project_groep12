@@ -3,12 +3,33 @@
   display: flex;
   flex-direction: column;
   font-family: 'Segoe UI', sans-serif;
+  background: #f9fafe;
+  position: relative;
 }
 
 .content-wrap {
   flex: 1;
-  background-color: #f5f7fa;
   padding: 2rem 1rem;
+}
+
+/* --- Hero & Titles --- */
+.bedrijven-hero-wave {
+  width: 100vw;
+  min-width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  height: 180px;
+  overflow: hidden;
+}
+
+.bedrijven-hero-wave svg {
+  width: 100vw;
+  min-width: 100%;
+  height: 180px;
+  display: block;
 }
 
 .bedrijven-container {
@@ -37,137 +58,150 @@
   position: relative;
 }
 
+
+/* --- Search & Filter Section --- */
+.search-filter-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 2rem auto;
+  z-index: 1;
+  position: relative;
+}
+
+.filters-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 1.1rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.search-input {
+  flex: 1;
+  padding: 1.2rem 1.5rem 1.2rem 4rem;
+  border: 1px solid #dde4ee;
+  border-radius: 1.5rem 0 0 1.5rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #ffffff;
+  color: #334155;
+}
+
+.search-button {
+  padding: 1.2rem 2rem;
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 0 1.5rem 1.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.search-button:hover {
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.filter-select {
+  width: auto;
+  min-width: 150px;
+  padding: 1rem 1.5rem;
+  border: 1px solid #dde4ee;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #ffffff;
+  color: #334155;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1em 1em;
+  cursor: pointer;
+}
+
+.search-input:focus,
+.filter-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.search-input:focus {
+  border-right-color: #3b82f6;
+}
+
+.result-count {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #475569;
+  font-size: 1.1rem;
+  font-weight: 500;
+  z-index: 1;
+  position: relative;
+}
+
+
+/* --- Bedrijven Grid & Cards --- */
 .bedrijven-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
   z-index: 1;
   position: relative;
 }
 
-@media (min-width: 1024px) {
-  .bedrijven-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-.bedrijven-modern-bg {
-  background: #f9fafe;
-  min-height: 100vh;
-  position: relative;
-}
-
 .bedrijf-card {
-  background: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(.4,0,.2,1);
-  cursor: pointer;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.bedrijf-card:hover {
-  transform: scale(1.03) translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: rgba(37, 99, 235, 0.1);
-}
-
-.bedrijf-card.modern.no-bg {
-  position: relative;
-  border-radius: 1.3rem;
-  min-height: 340px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  overflow: hidden;
+  background: #fff;
+  border-radius: 16px;
+  min-height: 370px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  background: #fff;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  align-self: stretch;
   transition: transform 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s cubic-bezier(.4,0,.2,1);
-  animation: fadeInUp 0.5s ease forwards, float 3s ease-in-out infinite;
-  animation-delay: calc(var(--animation-order) * 0.1s), 0s;
+  overflow: hidden;
   border-top: 7px solid var(--accent-color, #3b82f6);
 }
 
-.bedrijf-card.modern.no-bg:hover {
+.bedrijf-card:hover {
   transform: scale(1.025) translateY(-4px);
   box-shadow: 0 10px 32px rgba(0,0,0,0.16);
   z-index: 2;
-}
-
-.bedrijf-card.modern.no-bg .bedrijf-icon {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 40px;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.bedrijf-card.modern.no-bg:hover .bedrijf-icon {
-  transform: translateX(-50%) translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-.bedrijf-card.modern.no-bg h3 {
-  margin: 0.5rem 0;
-  color: #1e293b;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.bedrijf-card.modern.no-bg p {
-  margin: 0.5rem 0;
-  color: #64748b;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.bedrijf-card.modern.no-bg .bedrijf-link {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background: #2563eb;
-  color: white;
-  border-radius: 0.5rem;
-  text-decoration: none;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.bedrijf-card.modern.no-bg .bedrijf-link:hover {
-  background: #1d4ed8;
-  transform: translateY(-2px);
-}
-
-.bedrijf-card-accent {
-  width: 100%;
-  height: 0.7rem;
-  background: var(--accent-color, #3b82f6);
-  position: absolute;
-  top: 0;
-  left: 0;
-  border-radius: 1.3rem 1.3rem 0 0;
 }
 
 .bedrijf-card-content {
@@ -177,8 +211,7 @@
   padding: 2.2rem 1.5rem 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  justify-content: flex-end;
+  flex-grow: 1;
   align-items: center;
 }
 
@@ -209,174 +242,158 @@
   flex-direction: column;
   gap: 1.2rem;
   width: 100%;
+  text-align: center;
 }
 
 .bedrijf-details {
-  margin-bottom: 0.7rem;
-}
-
-.bedrijf-details p {
-  margin: 0.3rem 0;
-  color: #334155;
-  font-size: 1.05rem;
-  line-height: 1.5;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 0.5rem;
-}
-
-.bedrijf-details a {
-  color: #2563eb;
-  text-decoration: underline;
-  transition: color 0.2s;
-}
-
-.bedrijf-details a:hover {
-  color: #93c5fd;
-}
-
-.reserveer-btn.modern {
   width: 100%;
+  align-items: center;
+}
+
+.reserveer-btn {
+  margin-top: auto;
+  width: 100%;
+  font-size: 1.13rem;
+  padding: 1rem 0;
+  border-radius: 1rem;
+  font-weight: 700;
   background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
   color: #fff;
   border: none;
-  border-radius: 0.8rem;
-  padding: 1rem 0;
-  font-size: 1.13rem;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 0.7rem;
   box-shadow: 0 2px 12px rgba(59,130,246,0.10);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.7rem;
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1), box-shadow 0.3s cubic-bezier(.4,0,.2,1), background 0.3s cubic-bezier(.4,0,.2,1);
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
 }
 
-.reserveer-btn.modern:hover {
+.reserveer-btn:hover {
   background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
   transform: scale(1.05);
   box-shadow: 0 10px 20px rgba(0,0,0,0.20);
 }
 
-.btn-icon {
-  font-size: 1.25em;
-}
 
-.navbar {
-  background-color: white;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-logo {
-  cursor: pointer;
-}
-
-.navbar-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1a365d;
-}
-
-.navbar-links {
+/* --- Speeddate Modal --- */
+.speeddate-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  gap: 2rem;
+  justify-content: center;
   align-items: center;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
-.nav-link {
-  color: #4a5568;
-  text-decoration: none;
-  transition: color 0.2s ease;
+.speeddate-content {
+  background: #fff;
+  padding: 2.5rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  animation: modalFadeIn 0.3s ease-out;
 }
 
-.nav-link:hover {
-  color: #2563eb;
+.speeddate-content h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
 }
 
-.navbar-btn {
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.speeddate-content p {
+  font-size: 1.1rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 2rem;
 }
 
-.navbar-btn.register {
-  background-color: #2563eb;
-  color: white;
-  border: none;
-}
-
-.navbar-btn.register:hover {
-  background-color: #1d4ed8;
-}
-
-.navbar-btn.login {
-  background-color: transparent;
-  color: #2563eb;
-  border: 1px solid #2563eb;
-}
-
-.navbar-btn.login:hover {
-  background-color: #f0f7ff;
-}
-
-.footer {
-  background-color: #1a365d;
-  color: white;
-  padding: 2rem 0;
-  margin-top: auto;
-}
-
-.footer-row {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 2rem;
-}
-
-.footer-col {
-  flex: 1;
-}
-
-.footer-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.footer-menu li {
-  margin: 0.5rem 0;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.footer-menu li:hover {
-  color: #93c5fd;
-}
-
-.footer-socials {
+.speeddate-content .button-container {
   display: flex;
   gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.footer-socials .icon {
-  color: white;
-  font-size: 1.5rem;
-  transition: color 0.2s ease;
+.speeddate-content button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  min-width: 120px;
 }
 
-.footer-socials .icon:hover {
-  color: #93c5fd;
+.speeddate-content button:first-child {
+  background: #f1f5f9;
+  color: #64748b;
 }
 
+.speeddate-content button:first-child:hover {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.speeddate-content button:last-child {
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  color: #fff;
+}
+
+.speeddate-content button:last-child:hover {
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+
+/* --- Toon Meer Button --- */
+.toon-meer-btn {
+  display: block;
+  margin: 2.5rem auto 0 auto;
+  padding: 0.7rem 2.2rem;
+  background: #e0e7ef;
+  color: #1e293b;
+  border: none;
+  border-radius: 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.08);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.toon-meer-btn:hover {
+  background: #3b82f6;
+  color: #fff;
+  transform: translateY(-2px) scale(1.04);
+}
+
+
+/* --- Responsive Styles --- */
 @media (max-width: 900px) {
   .bedrijven-grid {
     grid-template-columns: 1fr 1fr;
@@ -388,148 +405,27 @@
     grid-template-columns: 1fr;
     gap: 1.2rem;
   }
-  .bedrijf-card-content {
-    padding: 1.3rem 0.7rem 1rem 0.7rem;
+}
+
+@media (max-width: 600px) {
+  .speeddate-content {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
   }
-  .bedrijf-card-icon {
-    width: 44px;
-    height: 44px;
-    font-size: 1.3rem;
-    margin-bottom: 0.7rem;
+  
+  .speeddate-content h2 {
+    font-size: 1.5rem;
   }
-}
-
-/* Hero golfvorm bovenaan */
-.bedrijven-hero-wave {
-  width: 100vw;
-  min-width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 0;
-  pointer-events: none;
-  height: 180px;
-  overflow: hidden;
-}
-
-.bedrijven-hero-wave svg {
-  width: 100vw;
-  min-width: 100%;
-  height: 180px;
-  display: block;
-}
-
-.login-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(30, 41, 59, 0.25);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-modal-box {
-  background: #f8fafc;
-  border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(30,41,59,0.18);
-  padding: 2.5rem 2.5rem 2rem 2.5rem;
-  min-width: 340px;
-  max-width: 95vw;
-  text-align: center;
-  position: relative;
-  animation: fadeSlideUp 0.2s ease;
-}
-
-.login-modal-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 1.2rem;
-}
-
-.login-modal-content {
-  font-size: 1.08rem;
-  color: #222;
-  margin-bottom: 2.2rem;
-}
-
-.login-modal-btn {
-  background: #4f6bed;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 1rem 2.5rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  margin-bottom: 0.7rem;
-  transition: background 0.2s, transform 0.2s;
-  box-shadow: 0 2px 8px rgba(30,41,59,0.08);
-}
-.login-modal-btn:hover {
-  background: #3b4fd6;
-  transform: scale(1.04);
-}
-
-.login-modal-close {
-  position: absolute;
-  top: 0.7rem;
-  right: 1.1rem;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: #888;
-  cursor: pointer;
-  line-height: 1;
-  padding: 0;
-  transition: color 0.18s;
-}
-.login-modal-close:hover {
-  color: #222;
-}
-
-@keyframes bedrijfFadeInUp {
-  from {
-    transform: translateY(30px);
+  
+  .speeddate-content p {
+    font-size: 1rem;
   }
-  to {
-    transform: translateY(0);
+  
+  .speeddate-content .button-container {
+    flex-direction: column;
+  }
+  
+  .speeddate-content button {
+    width: 100%;
   }
 }
-
-.bedrijf-fadein {
-  animation: bedrijfFadeInUp 0.6s cubic-bezier(.4,0,.2,1) forwards;
-  animation-delay: var(--animation-order, 0) * 0.09s;
-}
-
-.loading-spinner {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  width: 100%;
-  background: #f9fafe;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-}
-
-.loading-spinner .spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid #dbeafe;
-  border-top: 4px solid #2563eb;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-} 

@@ -3,7 +3,7 @@ const router = express.Router();
 const adminAuth = require('../middleware/adminAuth');
 const db = require('../db');
 
-// ✅ Alle bedrijven ophalen
+//  Alle bedrijven ophalen
 router.get('/bedrijven', adminAuth, (req, res) => {
   db.query('SELECT * FROM bedrijven', (err, results) => {
     if (err) {
@@ -14,7 +14,7 @@ router.get('/bedrijven', adminAuth, (req, res) => {
   });
 });
 
-// ✅ Eén specifiek bedrijf ophalen via ID
+//  Eén specifiek bedrijf ophalen via ID
 router.get('/bedrijven/:id', adminAuth, (req, res) => {
   const id = req.params.id;
 

@@ -62,6 +62,44 @@
   resize: vertical;
 }
 
+/* Password input container */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  z-index: 2;
+}
+
+.password-toggle-btn:hover {
+  color: #2563eb;
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+  color: #2563eb;
+}
+
+/* Extra padding for password inputs to make room for the eye icon */
+.password-input-container input[type="text"],
+.password-input-container input[type="password"] {
+  padding-right: 3rem;
+}
+
 .profielbedrijf-edit-btn,
 .profielbedrijf-save-btn {
   background: #2563eb;
@@ -171,31 +209,39 @@
   flex-direction: column;
   gap: 1.1rem;
   margin-top: 1.2rem;
+  box-sizing: border-box;
 }
 
 .bedrijfprofiel-info-item {
-  background: #f5f7fa;
-  border-radius: 0.7rem;
-  padding: 1.1rem 1.2rem;
+  background: #f4f7fd;
+  border-radius: 0.8rem;
+  padding: 1.2rem 1.4rem;
   display: flex;
   align-items: center;
   gap: 1.1rem;
-  font-size: 1.08rem;
+  font-size: 1.09rem;
   color: #222;
   font-weight: 500;
+  min-height: 56px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .bedrijfprofiel-label {
   color: #2563eb;
   font-weight: 700;
   margin-right: 0.7rem;
-  min-width: 120px;
+  min-width: 140px;
+  max-width: 180px;
   display: inline-block;
+  font-size: 1.09rem;
 }
 
 .bedrijfprofiel-value {
   color: #222;
   font-weight: 500;
+  word-break: break-word;
+  flex: 1;
 }
 
 .bedrijfprofiel-edit-btn {
@@ -231,7 +277,9 @@
   transition: background 0.18s;
 }
 .bedrijfprofiel-save-btn:hover {
-  background: #1d4ed8;
+  background: #2574e8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
 }
 
 .bedrijfprofiel-success {
@@ -369,5 +417,221 @@
     flex-direction: column;
     gap: 0.7rem;
     align-items: stretch;
+  }
+}
+@media (min-width: 768px) {
+  .bedrijfprofiel-card {
+    max-width: 800px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .profiel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem 2.2rem;
+    align-items: start;
+    width: 100%;
+  }
+  .profiel-grid-full {
+    grid-column: 1 / -1;
+  }
+  .profiel-tweecol-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem 2.2rem;
+    align-items: stretch;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .profiel-tweecol-col {
+    display: block;
+    width: 100%;
+  }
+  .bedrijfprofiel-info-item {
+    min-width: 0;
+    max-width: 100%;
+    height: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    display: flex;
+    align-items: center;
+  }
+  .bedrijfprofiel-label {
+    white-space: nowrap;
+    min-width: 140px;
+    max-width: 180px;
+  }
+  .bedrijfprofiel-value {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+.profiel-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.profiel-tweecol-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: 100%;
+}
+.profiel-tweecol-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: 100%;
+}
+
+/* --- Checkbox Group --- */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem; /* Iets meer ruimte */
+  background-color: #f8fafc;
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  margin-top: 0.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 1.25em;
+  height: 1.25em;
+  border-radius: 0.25rem;
+  border: 2px solid #cbd5e1;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.checkbox-label input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.checkbox-label input[type="checkbox"]:checked::before {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.profile-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.profile-header h1 {
+  font-size: 2.5rem;
+  color: #111827;
+  font-weight: 700;
+}
+
+.profile-header p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: box-shadow 0.3s ease;
+}
+
+.info-item:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.info-label {
+  font-weight: 600;
+  color: #3b82f6;
+  width: 250px;
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
+
+.info-value {
+  color: #374151;
+  word-break: break-word;
+  flex-grow: 1;
+}
+
+.logout-button {
+  display: block;
+  width: fit-content;
+  margin: 3rem auto 1rem;
+  padding: 0.75rem 2rem;
+  background-color: #fca5a5;
+  color: #991b1b;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #f87171;
+  color: #7f1d1d;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -2,19 +2,23 @@ import React from "react";
 import { useLocation, Link } from "react-router-dom";
 import "./BedrijfNavbar.css";
 import { useAuth } from "../AuthContext.jsx";
+import ehbLogo from "../assets/favicon_io/ehb-logo.png";
 
 export default function BedrijfNavbar() {
   const location = useLocation();
-  const { user, isAuthLoading } = useAuth();
+  const { isAuthLoading } = useAuth();
   if (isAuthLoading) return null;
-  if (!user || user.type !== 'bedrijf') {
-    return null;
-  }
 
   return (
     <nav className="navbar bedrijf-navbar">
       <div className="navbar-logo">
-        Careerlaunch
+        <img
+          src={ehbLogo}
+          alt="EHB logo"
+        />
+        <span>
+          Careerlaunch
+        </span>
       </div>
       <div className="navbar-spacer" />
       <ul className="navbar-links">

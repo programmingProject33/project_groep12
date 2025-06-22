@@ -1,0 +1,214 @@
+/* Footer.css - Styling voor de footer component */
+
+.footer {
+  background: linear-gradient(135deg, #3b82f6 0%, #34495e 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-top: auto;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  gap: 2rem;
+}
+
+.footer-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.footer-col.left {
+  flex: 1.5;
+}
+
+.footer-col.middle {
+  flex: 1;
+  align-items: center;
+}
+
+.footer-col.right {
+  flex: 1;
+  align-items: flex-end;
+}
+
+
+
+.footer-mail {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #ecf0f1;
+}
+
+.footer-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.footer-menu li {
+  color: #ecf0f1;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 0.3rem 0;
+}
+
+.footer-menu li::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+}
+
+.footer-menu li:hover::after {
+  width: 100%;
+}
+
+.footer-menu li:hover {
+  color: #667eea;
+  transform: translateX(5px);
+}
+
+.footer-socials {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.footer-socials .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: white;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.footer-socials .icon:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .footer-row {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .footer-col {
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-col.right {
+    align-items: center;
+  }
+
+  .footer-menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .footer-menu li {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+  }
+
+  .footer-menu li::after {
+    display: none;
+  }
+
+  .footer-menu li:hover {
+    background: rgba(102, 126, 234, 0.3);
+    transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 1.5rem 0;
+  }
+
+  .footer-row {
+    padding: 0 0.8rem;
+    gap: 1rem;
+  }
+
+  .footer-mail {
+    font-size: 0.8rem;
+  }
+
+  .footer-menu {
+    gap: 0.5rem;
+  }
+
+  .footer-menu li {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .footer-socials {
+    gap: 0.8rem;
+  }
+
+  .footer-socials .icon {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+}
+
+/* Animation for page load */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.footer {
+  animation: slideUp 0.5s ease-out;
+}
+
+/* Focus states for accessibility */
+.footer-menu li:focus {
+  outline: 2px solid rgba(102, 126, 234, 0.5);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.footer-socials .icon:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+} 
