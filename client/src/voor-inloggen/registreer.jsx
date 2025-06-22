@@ -427,169 +427,136 @@ export default function Registreer()   // Dit is een functionele component in Re
           )}
  
           {activeTab === "bedrijf" && (
-            <form className="registerbedrijf-form" onSubmit={handleCompanySubmit}>
-              <h2 className="registerbedrijf-title">Registreer je Bedrijf</h2>
+            <div className="register-form-container"> {/* Extra container voor de layout */}
+              <form className="register-form" onSubmit={handleCompanySubmit}>
+                <h1 className="form-title">Account maken als Bedrijf</h1>
 
-              {/* --- Bedrijfsinformatie --- */}
-              <h3 className="registerbedrijf-section-title">Bedrijfsinformatie</h3>
-              <div className="registreer-form-grid">
-                <label>
-                  Officiële bedrijfsnaam
-                  <input type="text" name="bedrijfsnaam" value={companyForm.bedrijfsnaam} onChange={handleCompanyChange} required />
-                </label>
-                <label>
-                  BTW-nummer
-                  <input type="text" name="btw" value={companyForm.btw} onChange={handleCompanyChange} required />
-                </label>
-                <div className="registerbedrijf-address-row">
-                  <label>
-                    Straatnaam
-                    <input type="text" name="straat" value={companyForm.straat} onChange={handleCompanyChange} required />
-                  </label>
-                  <label>
-                    Gemeente
-                    <input type="text" name="gemeente" value={companyForm.gemeente} onChange={handleCompanyChange} required />
-                  </label>
-                </div>
-                <label>
-                  Telefoonnummer
-                  <input type="tel" name="telbedrijf" value={companyForm.telbedrijf} onChange={handleCompanyChange} required />
-                </label>
-                <label>
-                  E-mailadres
-                  <input type="email" name="emailbedrijf" value={companyForm.emailbedrijf} onChange={handleCompanyChange} required />
-                </label>
-                <label>
-                  Sector
-                  <input type="text" name="sector" value={companyForm.sector} onChange={handleCompanyChange} />
-                </label>
-              </div>
+                <fieldset className="form-fieldset">
+                  <legend className="fieldset-legend">Bedrijfsgegevens</legend>
+                  <div className="form-grid">
+                    <label className="form-label grid-col-span-2">
+                      <span>Officiële bedrijfsnaam:</span>
+                      <input type="text" name="bedrijfsnaam" value={companyForm.bedrijfsnaam} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>BTW-nummer:</span>
+                      <input type="text" name="btw" value={companyForm.btw} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Telefoonnummer bedrijf:</span>
+                      <input type="tel" name="telbedrijf" value={companyForm.telbedrijf} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                  </div>
+                </fieldset>
+                
+                <fieldset className="form-fieldset">
+                  <legend className="fieldset-legend">Adresgegevens</legend>
+                  <div className="form-grid">
+                    <label className="form-label">
+                      <span>Straat & nummer:</span>
+                      <input type="text" name="straat" value={companyForm.straat} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Gemeente & postcode:</span>
+                      <input type="text" name="gemeente" value={companyForm.gemeente} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                  </div>
+                </fieldset>
 
-              {/* --- Profielinformatie --- */}
-              <h3 className="registerbedrijf-section-title">Profielinformatie voor studenten</h3>
-              <div className="registreer-form-grid">
-                <label>
-                  Bedrijfsbeschrijving
-                  <textarea name="beschrijving" value={companyForm.beschrijving} onChange={handleCompanyChange} placeholder="Een korte beschrijving van jullie bedrijf..." />
-                  <p className="form-helper">Deze tekst is zichtbaar voor studenten op je bedrijfspagina.</p>
-                </label>
-                <label>
-                  Omschrijving gezocht profiel
-                  <textarea name="gezocht_profiel_omschrijving" value={companyForm.gezocht_profiel_omschrijving} onChange={handleCompanyChange} placeholder="Beschrijf de ideale kandidaat, bv. kennis van Java, teamplayer..." />
-                  <p className="form-helper">Deze tekst is ook zichtbaar voor studenten.</p>
-                </label>
-                <label>
-                  Gezochte opleidingen
-                  <div className="checkbox-group">
-                    {opleidingOpties.map((opleiding) => (
-                      <div key={opleiding} className="checkbox-item">
-                        <input
-                          type="checkbox"
-                          id={`opleiding-${opleiding}`}
-                          name="gezochte_opleidingen"
-                          value={opleiding}
-                          checked={companyForm.gezochte_opleidingen.includes(opleiding)}
-                          onChange={handleCompanyChange}
-                        />
-                        <label htmlFor={`opleiding-${opleiding}`}>{opleiding}</label>
+                <fieldset className="form-fieldset">
+                  <legend className="fieldset-legend">Profiel voor Studenten</legend>
+                  <p className="fieldset-description">Deze informatie is zichtbaar op jullie bedrijfspagina voor de studenten.</p>
+                  <div className="form-grid">
+                    <label className="form-label grid-col-span-2">
+                      <span>Korte bedrijfsbeschrijving:</span>
+                      <textarea name="beschrijving" value={companyForm.beschrijving} onChange={handleCompanyChange} className="form-input" rows="4" placeholder="Wat doet jullie bedrijf?"></textarea>
+                    </label>
+                    <label className="form-label grid-col-span-2">
+                      <span>Omschrijving gezocht profiel:</span>
+                      <textarea name="gezocht_profiel_omschrijving" value={companyForm.gezocht_profiel_omschrijving} onChange={handleCompanyChange} className="form-input" rows="4" placeholder="Naar welke vaardigheden en persoonlijkheid zijn jullie op zoek?"></textarea>
+                    </label>
+                    <div className="form-label grid-col-span-2">
+                      <span>In welke opleidingen hebben jullie interesse?</span>
+                      <div className="checkbox-group">
+                        {opleidingOpties.map((opleiding) => (
+                          <label key={opleiding} className="checkbox-label">
+                            <input type="checkbox" name="gezochte_opleidingen" value={opleiding} checked={companyForm.gezochte_opleidingen.includes(opleiding)} onChange={handleCompanyChange} />
+                            {opleiding}
+                          </label>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+                    <div className="form-label grid-col-span-2">
+                      <span>Welk type dienstverband bieden jullie aan?</span>
+                      <div className="checkbox-group">
+                        {['Voltijds', 'Deeltijds', 'Freelance', 'Stage'].map((dienstverband) => (
+                          <label key={dienstverband} className="checkbox-label">
+                            <input type="checkbox" name="dienstverbanden" value={dienstverband} checked={companyForm.dienstverbanden.includes(dienstverband)} onChange={handleDienstverbandChange} />
+                            {dienstverband}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </label>
-                <div className="registreer-form-group full-width">
-                  <label>Welk soort dienstverband bieden jullie aan?</label>
-                  <div className="checkbox-group">
-                    {['Voltijds', 'Deeltijds', 'Freelance', 'Stage'].map((dienstverband) => (
-                      <label key={dienstverband} className="checkbox-label">
-                        <input
-                          type="checkbox"
-                          name="dienstverbanden"
-                          value={dienstverband}
-                          checked={companyForm.dienstverbanden.includes(dienstverband)}
-                          onChange={handleDienstverbandChange}
-                        />
-                        {dienstverband}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
+                </fieldset>
 
-              {/* --- Contactpersoon --- */}
-              <h3 className="registerbedrijf-section-title">Contactpersoon</h3>
-              <div className="registreer-form-grid">
-                <label>
-                  Voornaam contactpersoon
-                  <input type="text" name="voornaam_contact" value={companyForm.voornaam_contact} onChange={handleCompanyChange} required />
-                </label>
-                <label>
-                  Naam contactpersoon
-                  <input type="text" name="naam_contact" value={companyForm.naam_contact} onChange={handleCompanyChange} required />
-                </label>
-                <label>
-                  Specialisatie contactpersoon
-                  <input type="text" name="specialisatie" value={companyForm.specialisatie} onChange={handleCompanyChange} />
-                </label>
-                <label>
-                  E-mailadres contactpersoon
-                  <input type="email" name="email_contact" value={companyForm.email_contact} onChange={handleCompanyChange} required />
-                </label>
-                <label>
-                  Telefoonnummer contactpersoon
-                  <input type="tel" name="tel_contact" value={companyForm.tel_contact} onChange={handleCompanyChange} />
-                </label>
-              </div>
+                <fieldset className="form-fieldset">
+                  <legend className="fieldset-legend">Contactpersoon voor Speeddates</legend>
+                  <p className="fieldset-description">Deze persoon zal de primaire contactpersoon zijn voor studenten en de organisatie.</p>
+                  <div className="form-grid">
+                    <label className="form-label">
+                      <span>Voornaam:</span>
+                      <input type="text" name="voornaam_contact" value={companyForm.voornaam_contact} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Naam:</span>
+                      <input type="text" name="naam_contact" value={companyForm.naam_contact} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Functie/Specialisatie:</span>
+                      <input type="text" name="specialisatie" value={companyForm.specialisatie} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Professioneel E-mailadres:</span>
+                      <input type="email" name="email_contact" value={companyForm.email_contact} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Telefoonnummer (optioneel):</span>
+                      <input type="tel" name="tel_contact" value={companyForm.tel_contact} onChange={handleCompanyChange} className="form-input" />
+                    </label>
+                  </div>
+                </fieldset>
 
-              {/* --- Accountgegevens --- */}
-              <h3 className="registerbedrijf-section-title">Accountgegevens</h3>
-              <div className="registreer-form-grid">
-                <label>
-                  Gebruikersnaam
-                  <input type="text" name="gebruikersnaam_bedrijf" value={companyForm.gebruikersnaam_bedrijf} onChange={handleCompanyChange} required />
-                </label>
-                <label>
-                  Wachtwoord
-                  <div className="password-input-container">
-                    <input
-                      type={showCompanyPassword ? 'text' : 'password'}
-                      name="wachtwoord_bedrijf"
-                      value={companyForm.wachtwoord_bedrijf}
-                      onChange={handleCompanyChange}
-                      required
-                    />
-                    <button type="button" className="password-toggle-btn" onClick={() => setShowCompanyPassword(!showCompanyPassword)}>
-                      {showCompanyPassword ? <FaEyeSlash /> : <FaEye />}
-                    </button>
+                <fieldset className="form-fieldset">
+                  <legend className="fieldset-legend">Accountgegevens</legend>
+                  <p className="fieldset-description">Deze gegevens worden gebruikt om in te loggen op het Career Launch platform.</p>
+                  <div className="form-grid">
+                    <label className="form-label">
+                      <span>Algemeen e-mailadres (voor verificatie):</span>
+                      <input type="email" name="emailbedrijf" value={companyForm.emailbedrijf} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Gebruikersnaam:</span>
+                      <input type="text" name="gebruikersnaam_bedrijf" value={companyForm.gebruikersnaam_bedrijf} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Wachtwoord:</span>
+                      <input type="password" name="wachtwoord_bedrijf" value={companyForm.wachtwoord_bedrijf} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Herhaal wachtwoord:</span>
+                      <input type="password" name="wachtwoord2_bedrijf" value={companyForm.wachtwoord2_bedrijf} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
                   </div>
-                </label>
-                <label>
-                  Herhaal wachtwoord
-                  <div className="password-input-container">
-                    <input
-                      type={showCompanyPassword2 ? 'text' : 'password'}
-                      name="wachtwoord2_bedrijf"
-                      value={companyForm.wachtwoord2_bedrijf}
-                      onChange={handleCompanyChange}
-                      required
-                    />
-                    <button type="button" className="password-toggle-btn" onClick={() => setShowCompanyPassword2(!showCompanyPassword2)}>
-                      {showCompanyPassword2 ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                  </div>
-                </label>
-              </div>
-              <button type="submit" className="registerbedrijf-btn">Account Aanmaken</button>
-            </form>
+                </fieldset>
+                
+                {successMessage && <div className="success-message">{successMessage}</div>}
+
+                <button type="submit" className="registreer-button">Registreren</button>
+              </form>
+            </div>
           )}
         </div>
-
-        {successMessage && (
-          <div className="registreer-success-container">
-            <h2>✅ Registratie aangevraagd!</h2>
-            <p>{successMessage}</p>
-            <p>Je kunt dit venster nu sluiten.</p>
-          </div>
-        )}
       </main>
     </div>
   );
