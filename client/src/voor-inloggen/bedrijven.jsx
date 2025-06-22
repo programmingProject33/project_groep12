@@ -122,7 +122,7 @@ function Bedrijven() {
               <FaSearch className="search-icon" />
               <input
                 type="text"
-                placeholder="Zoek op naam, plaats, sector..."
+                placeholder="Zoek op eerste letter van bedrijfsnaam..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"

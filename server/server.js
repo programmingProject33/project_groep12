@@ -2,7 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./db');
 const crypto = require('crypto');
-const { sendVerificationEmail, sendReservationNotificationEmail } = require('./mailer');
+const { 
+  sendVerificationEmail, 
+  sendReservationNotificationEmail,
+  sendReservationStatusUpdateEmail,
+  sendAlternativeProposalEmail,
+  sendAlternativeResponseEmail,
+  sendCancellationNotificationEmail
+} = require('./mailer');
 
 // admin routes importeren 
 const adminLogin = require('./routes/adminLogin');           // POST /api/admin/login
@@ -299,21 +306,21 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Reserve a speeddate
-app.post('/api/speeddate', async (req, res) => {
+// Reserve a speeddate (nieuwe implementatie met reserveringen tabel)
+app.post('/api/reserveren', async (req, res) => {
   try {
-    const { gebruiker_id, bedrijf_id, speed_id } = req.body;
-    if (!gebruiker_id || !bedrijf_id || !speed_id) {
-      return res.status(400).json({ error: 'gebruiker_id, bedrijf_id en speed_id zijn verplicht' });
+    const { student_id, bedrijf_id, speed_id } = req.body;
+    if (!student_id || !bedrijf_id || !speed_id) {
+      return res.status(400).json({ error: 'student_id, bedrijf_id en speed_id zijn verplicht' });
     }
 
-    // Controleer of de student al een actieve reservatie heeft bij dit bedrijf
+    // Controleer of de student al een actieve reservering heeft bij dit bedrijf
     const [existing] = await db.promise().query(
-      'SELECT * FROM speeddates WHERE gebruiker_id = ? AND bedrijf_id = ? AND is_bezet = 1',
-      [gebruiker_id, bedrijf_id]
+      'SELECT * FROM reserveringen WHERE student_id = ? AND bedrijf_id = ? AND status IN ("pending", "accepted", "alternative")',
+      [student_id, bedrijf_id]
     );
     if (existing.length > 0) {
-      return res.status(400).json({ error: 'Je hebt al een reservatie bij dit bedrijf. Annuleer eerst je bestaande reservatie om een nieuwe te maken.' });
+      return res.status(400).json({ error: 'Je hebt al een reservering bij dit bedrijf. Annuleer eerst je bestaande reservering om een nieuwe te maken.' });
     }
 
     // Haal het tijdstip van het gewenste slot op
@@ -326,16 +333,18 @@ app.post('/api/speeddate', async (req, res) => {
     }
     const { starttijd } = slotRows[0];
 
-    // Controleer of de student op dit tijdstip al ergens anders een reservatie heeft
+    // Controleer of de student op dit tijdstip al ergens anders een reservering heeft
     const [conflict] = await db.promise().query(
-      'SELECT * FROM speeddates WHERE gebruiker_id = ? AND starttijd = ? AND is_bezet = 1',
-      [gebruiker_id, starttijd]
+      `SELECT r.* FROM reserveringen r 
+       JOIN speeddates s ON r.speed_id = s.speed_id 
+       WHERE r.student_id = ? AND s.starttijd = ? AND r.status IN ("pending", "accepted", "alternative")`,
+      [student_id, starttijd]
     );
     if (conflict.length > 0) {
-      return res.status(400).json({ error: 'Je hebt al een reservatie bij een ander bedrijf op dit tijdstip.' });
+      return res.status(400).json({ error: 'Je hebt al een reservering bij een ander bedrijf op dit tijdstip.' });
     }
 
-    // Find the exact slot by speed_id
+    // Controleer of het tijdslot nog beschikbaar is
     const [slots] = await db.promise().query(
       'SELECT * FROM speeddates WHERE speed_id = ? AND bedrijf_id = ? AND is_bezet = 0',
       [speed_id, bedrijf_id]
@@ -346,20 +355,31 @@ app.post('/api/speeddate', async (req, res) => {
     }
 
     const slot = slots[0];
-    // Reserve the exact slot
+
+    // Maak een nieuwe reservering aan met status 'pending'
+    const [result] = await db.promise().query(
+      'INSERT INTO reserveringen (student_id, bedrijf_id, speed_id, status, created_at, updated_at) VALUES (?, ?, ?, "pending", NOW(), NOW())',
+      [student_id, bedrijf_id, speed_id]
+    );
+
+    // Markeer het tijdslot als bezet
     await db.promise().query(
-      'UPDATE speeddates SET is_bezet = 1, gebruiker_id = ? WHERE speed_id = ?',
-      [gebruiker_id, speed_id]
+      'UPDATE speeddates SET is_bezet = 1 WHERE speed_id = ?',
+      [speed_id]
     );
     
     // Stuur bevestiging naar de student
-    res.json({ message: 'Speeddate succesvol gereserveerd', speed_id: slot.speed_id });
+    res.json({ 
+      message: 'Reservering succesvol aangemaakt en wacht op bevestiging van het bedrijf', 
+      reservering_id: result.insertId,
+      speed_id: slot.speed_id 
+    });
 
     // Verstuur notificatie naar het bedrijf op de achtergrond
     (async () => {
       try {
         const [bedrijven] = await db.promise().query('SELECT * FROM bedrijven WHERE bedrijf_id = ?', [bedrijf_id]);
-        const [studenten] = await db.promise().query('SELECT * FROM gebruikers WHERE gebruiker_id = ?', [gebruiker_id]);
+        const [studenten] = await db.promise().query('SELECT * FROM gebruikers WHERE gebruiker_id = ?', [student_id]);
 
         if (bedrijven.length > 0 && studenten.length > 0) {
           const bedrijf = bedrijven[0];
@@ -367,43 +387,30 @@ app.post('/api/speeddate', async (req, res) => {
           await sendReservationNotificationEmail(bedrijf, student, slot);
         }
       } catch (emailError) {
-        console.error('Fout bij het versturen van de reservatie-notificatie e-mail:', emailError);
+        console.error('Fout bij het versturen van de reservering-notificatie e-mail:', emailError);
       }
     })();
 
   } catch (err) {
-    console.error('Error reserving speeddate:', err);
+    console.error('Error creating reservation:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
 
-// Get all timeslots for a specific bedrijf
-app.get('/api/speeddates/:bedrijfId', async (req, res) => {
+// Get user's reservations (nieuwe implementatie)
+app.get('/api/reservaties/:studentId', async (req, res) => {
   try {
-    const { bedrijfId } = req.params;
-    const [slots] = await db.promise().query(
-      'SELECT * FROM speeddates WHERE bedrijf_id = ? ORDER BY starttijd',
-      [bedrijfId]
-    );
-    console.log("bedrijfId", bedrijfId);
-    res.json(slots);
-  } catch (err) {
-    console.error('Error fetching speeddates:', err);
-    res.status(500).json({ error: 'Database error', details: err.message });
-  }
-});
-
-// Get user's reservations
-app.get('/api/reservations/:gebruikerId', async (req, res) => {
-  try {
-    const { gebruikerId } = req.params;
+    const { studentId } = req.params;
     const [reservations] = await db.promise().query(
-      `SELECT s.*, b.naam as bedrijfsnaam, b.sector, b.beschrijving, b.lokaal, b.verdieping 
-       FROM speeddates s 
-       JOIN bedrijven b ON s.bedrijf_id = b.bedrijf_id 
-       WHERE s.gebruiker_id = ? AND s.is_bezet = 1 
+      `SELECT r.*, s.starttijd, s.eindtijd, b.naam as bedrijfsnaam, b.sector, b.beschrijving, b.lokaal, b.verdieping,
+              alt_s.starttijd as alt_starttijd, alt_s.eindtijd as alt_eindtijd
+       FROM reserveringen r 
+       JOIN speeddates s ON r.speed_id = s.speed_id 
+       JOIN bedrijven b ON r.bedrijf_id = b.bedrijf_id 
+       LEFT JOIN speeddates alt_s ON r.alternative_speed_id = alt_s.speed_id
+       WHERE r.student_id = ? 
        ORDER BY s.starttijd`,
-      [gebruikerId]
+      [studentId]
     );
     res.json(reservations);
   } catch (err) {
@@ -412,20 +419,395 @@ app.get('/api/reservations/:gebruikerId', async (req, res) => {
   }
 });
 
-// Annuleer een reservering
-app.delete('/api/reservations/:speed_id', async (req, res) => {
+// Get reservations for a company (nieuwe implementatie)
+app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
   try {
-    const { speed_id } = req.params;
-    const [result] = await db.promise().query(
-      'UPDATE speeddates SET is_bezet = 0, gebruiker_id = NULL WHERE speed_id = ?',
-      [speed_id]
+    const [reservaties] = await db.promise().query(
+      `SELECT r.*, g.voornaam, g.naam, g.email, g.linkedin, b.lokaal, b.verdieping,
+              s.starttijd, s.eindtijd, alt_s.starttijd as alt_starttijd, alt_s.eindtijd as alt_eindtijd
+       FROM reserveringen r 
+       JOIN gebruikers g ON r.student_id = g.gebruiker_id 
+       JOIN bedrijven b ON r.bedrijf_id = b.bedrijf_id 
+       JOIN speeddates s ON r.speed_id = s.speed_id
+       LEFT JOIN speeddates alt_s ON r.alternative_speed_id = alt_s.speed_id
+       WHERE r.bedrijf_id = ? AND r.status != 'rejected'
+       ORDER BY s.starttijd ASC`,
+      [req.params.bedrijfId]
     );
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Reservering niet gevonden.' });
-    }
-    res.json({ success: true });
+    res.json(reservaties);
   } catch (err) {
-    console.error('Error annuleer reservering:', err);
+    console.error('Error fetching company reservations:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Accept a reservation
+app.post('/api/reservaties/:reserveringId/accepteren', async (req, res) => {
+  try {
+    const { reserveringId } = req.params;
+    
+    // Haal de reservering op
+    const [reservations] = await db.promise().query(
+      `SELECT r.*, s.starttijd, s.eindtijd, g.email, g.voornaam, g.naam, b.naam as bedrijfsnaam
+       FROM reserveringen r 
+       JOIN speeddates s ON r.speed_id = s.speed_id 
+       JOIN gebruikers g ON r.student_id = g.gebruiker_id 
+       JOIN bedrijven b ON r.bedrijf_id = b.bedrijf_id 
+       WHERE r.reservering_id = ?`,
+      [reserveringId]
+    );
+
+    if (reservations.length === 0) {
+      return res.status(404).json({ error: 'Reservering niet gevonden' });
+    }
+
+    const reservation = reservations[0];
+    
+    if (reservation.status !== 'pending' && reservation.status !== 'alternative') {
+      return res.status(400).json({ error: 'Reservering kan niet meer geaccepteerd worden' });
+    }
+
+    // Controleer of er al een geaccepteerde reservering is voor dit tijdslot
+    const [existingAccepted] = await db.promise().query(
+      `SELECT COUNT(*) as count FROM reserveringen 
+       WHERE speed_id = ? AND status = 'accepted' AND reservering_id != ?`,
+      [reservation.speed_id, reserveringId]
+    );
+
+    if (existingAccepted[0].count > 0) {
+      return res.status(400).json({ error: 'Dit tijdslot is al geaccepteerd door een andere reservering' });
+    }
+
+    // Update de status naar 'accepted'
+    await db.promise().query(
+      'UPDATE reserveringen SET status = "accepted", updated_at = NOW() WHERE reservering_id = ?',
+      [reserveringId]
+    );
+
+    // Markeer het tijdslot als bezet
+    await db.promise().query(
+      'UPDATE speeddates SET is_bezet = 1 WHERE speed_id = ?',
+      [reservation.speed_id]
+    );
+
+    // Stuur e-mailnotificatie naar de student
+    try {
+      await sendReservationStatusUpdateEmail(
+        reservation.email, 
+        reservation.bedrijfsnaam, 
+        { starttijd: reservation.starttijd, eindtijd: reservation.eindtijd }, 
+        'accepted'
+      );
+    } catch (emailError) {
+      console.error('Fout bij het versturen van acceptatie e-mail:', emailError);
+    }
+
+    res.json({ message: 'Reservering geaccepteerd' });
+
+  } catch (err) {
+    console.error('Error accepting reservation:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Reject a reservation
+app.post('/api/reservaties/:reserveringId/afwijzen', async (req, res) => {
+  try {
+    const { reserveringId } = req.params;
+    const { rejection_reason } = req.body;
+    
+    // Haal de reservering op
+    const [reservations] = await db.promise().query(
+      `SELECT r.*, s.starttijd, s.eindtijd, g.email, g.voornaam, g.naam, b.naam as bedrijfsnaam
+       FROM reserveringen r 
+       JOIN speeddates s ON r.speed_id = s.speed_id 
+       JOIN gebruikers g ON r.student_id = g.gebruiker_id 
+       JOIN bedrijven b ON r.bedrijf_id = b.bedrijf_id 
+       WHERE r.reservering_id = ?`,
+      [reserveringId]
+    );
+
+    if (reservations.length === 0) {
+      return res.status(404).json({ error: 'Reservering niet gevonden' });
+    }
+
+    const reservation = reservations[0];
+    
+    if (reservation.status !== 'pending' && reservation.status !== 'alternative') {
+      return res.status(400).json({ error: 'Reservering kan niet meer afgewezen worden' });
+    }
+
+    // Update de status naar 'rejected'
+    await db.promise().query(
+      'UPDATE reserveringen SET status = "rejected", rejection_reason = ?, updated_at = NOW() WHERE reservering_id = ?',
+      [rejection_reason || null, reserveringId]
+    );
+
+    // Maak het tijdslot weer beschikbaar
+    await db.promise().query(
+      'UPDATE speeddates SET is_bezet = 0 WHERE speed_id = ?',
+      [reservation.speed_id]
+    );
+
+    // Stuur e-mailnotificatie naar de student
+    try {
+      await sendReservationStatusUpdateEmail(
+        reservation.email, 
+        reservation.bedrijfsnaam, 
+        { starttijd: reservation.starttijd, eindtijd: reservation.eindtijd }, 
+        'rejected',
+        rejection_reason
+      );
+    } catch (emailError) {
+      console.error('Fout bij het versturen van afwijzing e-mail:', emailError);
+    }
+
+    res.json({ message: 'Reservering afgewezen' });
+
+  } catch (err) {
+    console.error('Error rejecting reservation:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Propose alternative timeslot
+app.post('/api/reservaties/:reserveringId/alternatief', async (req, res) => {
+  try {
+    const { reserveringId } = req.params;
+    const { alternative_speed_id } = req.body;
+    
+    if (!alternative_speed_id) {
+      return res.status(400).json({ error: 'alternative_speed_id is verplicht' });
+    }
+
+    // Haal de reservering op
+    const [reservations] = await db.promise().query(
+      `SELECT r.*, s.starttijd, s.eindtijd, g.email, g.voornaam, g.naam, b.naam as bedrijfsnaam, b.bedrijf_id
+       FROM reserveringen r 
+       JOIN speeddates s ON r.speed_id = s.speed_id 
+       JOIN gebruikers g ON r.student_id = g.gebruiker_id 
+       JOIN bedrijven b ON r.bedrijf_id = b.bedrijf_id 
+       WHERE r.reservering_id = ?`,
+      [reserveringId]
+    );
+
+    if (reservations.length === 0) {
+      return res.status(404).json({ error: 'Reservering niet gevonden' });
+    }
+
+    const reservation = reservations[0];
+    
+    if (reservation.status !== 'pending') {
+      return res.status(400).json({ error: 'Alleen pending reserveringen kunnen een alternatief krijgen' });
+    }
+
+    // Controleer of het alternatieve tijdslot beschikbaar is
+    const [altSlots] = await db.promise().query(
+      'SELECT * FROM speeddates WHERE speed_id = ? AND bedrijf_id = ? AND is_bezet = 0',
+      [alternative_speed_id, reservation.bedrijf_id]
+    );
+
+    if (altSlots.length === 0) {
+      return res.status(400).json({ error: 'Alternatief tijdslot is niet beschikbaar' });
+    }
+
+    const altSlot = altSlots[0];
+
+    // Update de reservering met het alternatieve tijdslot
+    await db.promise().query(
+      'UPDATE reserveringen SET status = "alternative", alternative_speed_id = ?, updated_at = NOW() WHERE reservering_id = ?',
+      [alternative_speed_id, reserveringId]
+    );
+
+    // Markeer het alternatieve tijdslot als bezet bij acceptatie
+    await db.promise().query(
+      'UPDATE speeddates SET is_bezet = 1 WHERE speed_id = ?',
+      [reservation.alternative_speed_id]
+    );
+
+    // Stuur e-mailnotificatie naar de student
+    try {
+      await sendAlternativeProposalEmail(
+        reservation.email,
+        { naam: reservation.bedrijfsnaam },
+        { starttijd: reservation.starttijd, eindtijd: reservation.eindtijd },
+        { starttijd: altSlot.starttijd, eindtijd: altSlot.eindtijd }
+      );
+    } catch (emailError) {
+      console.error('Fout bij het versturen van alternatief voorstel e-mail:', emailError);
+    }
+
+    res.json({ message: 'Alternatief tijdslot voorgesteld' });
+
+  } catch (err) {
+    console.error('Error proposing alternative:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Student responds to alternative proposal
+app.post('/api/reservaties/:reserveringId/alternatief-antwoord', async (req, res) => {
+  try {
+    const { reserveringId } = req.params;
+    const { accepted } = req.body;
+    
+    if (typeof accepted !== 'boolean') {
+      return res.status(400).json({ error: 'accepted moet true of false zijn' });
+    }
+
+    // Haal de reservering op
+    const [reservations] = await db.promise().query(
+      `SELECT r.*, s.starttijd, s.eindtijd, g.email, g.voornaam, g.naam, b.naam as bedrijfsnaam, b.email as bedrijf_email
+       FROM reserveringen r 
+       JOIN speeddates s ON r.speed_id = s.speed_id 
+       JOIN gebruikers g ON r.student_id = g.gebruiker_id 
+       JOIN bedrijven b ON r.bedrijf_id = b.bedrijf_id 
+       WHERE r.reservering_id = ?`,
+      [reserveringId]
+    );
+
+    if (reservations.length === 0) {
+      return res.status(404).json({ error: 'Reservering niet gevonden' });
+    }
+
+    const reservation = reservations[0];
+    
+    if (reservation.status !== 'alternative') {
+      return res.status(400).json({ error: 'Reservering heeft geen alternatief voorstel' });
+    }
+
+    if (accepted) {
+      // Accepteer het alternatieve tijdslot en update speed_id naar alternative_speed_id
+      await db.promise().query(
+        'UPDATE reserveringen SET status = "accepted", speed_id = alternative_speed_id, alternative_speed_id = NULL, updated_at = NOW() WHERE reservering_id = ?',
+        [reserveringId]
+      );
+
+      // Markeer het alternatieve tijdslot als bezet bij acceptatie
+      await db.promise().query(
+        'UPDATE speeddates SET is_bezet = 1 WHERE speed_id = ?',
+        [reservation.alternative_speed_id]
+      );
+
+      // Haal het alternatieve tijdslot op
+      const [altSlots] = await db.promise().query(
+        'SELECT * FROM speeddates WHERE speed_id = ?',
+        [reservation.alternative_speed_id]
+      );
+
+      if (altSlots.length > 0) {
+        const altSlot = altSlots[0];
+        
+        // Stuur e-mailnotificatie naar het bedrijf
+        try {
+          await sendAlternativeResponseEmail(
+            reservation.bedrijf_email,
+            { voornaam: reservation.voornaam, naam: reservation.naam },
+            { starttijd: altSlot.starttijd, eindtijd: altSlot.eindtijd },
+            true
+          );
+        } catch (emailError) {
+          console.error('Fout bij het versturen van acceptatie e-mail naar bedrijf:', emailError);
+        }
+      }
+
+      res.json({ message: 'Alternatief tijdslot geaccepteerd' });
+
+    } else {
+      // Weiger het alternatieve tijdslot
+      await db.promise().query(
+        'UPDATE reserveringen SET status = "rejected", updated_at = NOW() WHERE reservering_id = ?',
+        [reserveringId]
+      );
+
+      // Maak alleen het oorspronkelijke tijdslot weer beschikbaar
+      // Het alternatieve tijdslot blijft beschikbaar omdat het nooit bezet was
+      await db.promise().query(
+        'UPDATE speeddates SET is_bezet = 0 WHERE speed_id = ?',
+        [reservation.speed_id]
+      );
+
+      // Stuur e-mailnotificatie naar het bedrijf
+      try {
+        await sendAlternativeResponseEmail(
+          reservation.bedrijf_email,
+          { voornaam: reservation.voornaam, naam: reservation.naam },
+          { starttijd: reservation.starttijd, eindtijd: reservation.eindtijd },
+          false
+        );
+      } catch (emailError) {
+        console.error('Fout bij het versturen van weigering e-mail naar bedrijf:', emailError);
+      }
+
+      res.json({ message: 'Alternatief tijdslot geweigerd' });
+    }
+
+  } catch (err) {
+    console.error('Error responding to alternative:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+// Cancel a reservation (student)
+app.delete('/api/reservaties/:reserveringId', async (req, res) => {
+  try {
+    const { reserveringId } = req.params;
+    
+    // Haal de reservering op met alle benodigde informatie voor e-mailnotificatie
+    const [reservations] = await db.promise().query(
+      `SELECT r.*, s.starttijd, s.eindtijd, g.voornaam, g.naam, g.email, b.naam as bedrijfsnaam, b.email as bedrijf_email
+       FROM reserveringen r 
+       JOIN speeddates s ON r.speed_id = s.speed_id 
+       JOIN gebruikers g ON r.student_id = g.gebruiker_id 
+       JOIN bedrijven b ON r.bedrijf_id = b.bedrijf_id 
+       WHERE r.reservering_id = ?`,
+      [reserveringId]
+    );
+
+    if (reservations.length === 0) {
+      return res.status(404).json({ error: 'Reservering niet gevonden' });
+    }
+
+    const reservation = reservations[0];
+    
+    // Sta annulering toe voor alle statussen behalve rejected
+    if (reservation.status === 'rejected') {
+      return res.status(400).json({ error: 'Geweigerde reserveringen kunnen niet geannuleerd worden' });
+    }
+
+    // Maak de tijdsloten weer beschikbaar
+    const slotsToFree = [reservation.speed_id];
+    if (reservation.alternative_speed_id) {
+      slotsToFree.push(reservation.alternative_speed_id);
+    }
+
+    await db.promise().query(
+      'UPDATE speeddates SET is_bezet = 0 WHERE speed_id IN (?)',
+      [slotsToFree]
+    );
+
+    // Stuur e-mailnotificatie naar het bedrijf
+    try {
+      await sendCancellationNotificationEmail(
+        reservation.bedrijf_email,
+        { voornaam: reservation.voornaam, naam: reservation.naam, email: reservation.email },
+        { starttijd: reservation.starttijd, eindtijd: reservation.eindtijd },
+        reservation.bedrijfsnaam
+      );
+    } catch (emailError) {
+      console.error('Fout bij het versturen van annulering e-mail:', emailError);
+    }
+
+    // Verwijder de reservering
+    await db.promise().query(
+      'DELETE FROM reserveringen WHERE reservering_id = ?',
+      [reserveringId]
+    );
+
+    res.json({ message: 'Reservering geannuleerd' });
+
+  } catch (err) {
+    console.error('Error canceling reservation:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
@@ -632,25 +1014,6 @@ app.post('/api/bedrijf/update', async (req, res) => {
   }
 });
 
-// Get reservations for a company
-app.get('/api/bedrijf/reservaties/:bedrijfId', async (req, res) => {
-  try {
-    const [reservaties] = await db.promise().query(
-      `SELECT s.*, g.voornaam, g.naam, g.linkedin, b.lokaal, b.verdieping 
-       FROM speeddates s 
-       JOIN gebruikers g ON s.gebruiker_id = g.gebruiker_id 
-       JOIN bedrijven b ON s.bedrijf_id = b.bedrijf_id 
-       WHERE s.bedrijf_id = ? AND s.is_bezet = 1 
-       ORDER BY s.starttijd ASC`,
-      [req.params.bedrijfId]
-    );
-    res.json(reservaties);
-  } catch (err) {
-    console.error('Error fetching company reservations:', err);
-    res.status(500).json({ error: 'Database error', details: err.message });
-  }
-});
-
 // Create timeslots for a company
 app.post('/api/speeddates/create', async (req, res) => {
   try {
@@ -832,6 +1195,21 @@ app.get('/api/bedrijf/profiel/:id', async (req, res) => {
   } catch (err) {
     console.error('Fout bij ophalen bedrijfsprofiel:', err);
     res.status(500).json({ error: 'Databasefout bij ophalen profiel' });
+  }
+});
+
+// Haal alle tijdsloten op voor een specifiek bedrijf
+app.get('/api/speeddates/:bedrijfId', async (req, res) => {
+  try {
+    const { bedrijfId } = req.params;
+    const [slots] = await db.promise().query(
+      'SELECT * FROM speeddates WHERE bedrijf_id = ? ORDER BY starttijd',
+      [bedrijfId]
+    );
+    res.json(slots);
+  } catch (err) {
+    console.error('Error fetching speeddates:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
 

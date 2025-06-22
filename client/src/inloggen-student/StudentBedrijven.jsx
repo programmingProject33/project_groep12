@@ -143,7 +143,7 @@ function StudentBedrijven() {
       
       // Filter alle bedrijven
       const filtered = bedrijven.filter(bedrijf => {
-        // Search term filter - alleen bedrijven waarvan de naam begint met de zoekterm
+        // Search term filter - alleen eerste letter van bedrijfsnaam
         const matchesSearch = searchTerm.trim() === "" || 
           bedrijf.naam.toLowerCase().startsWith(searchLower);
         
@@ -275,7 +275,7 @@ function StudentBedrijven() {
               <FaSearch className="search-icon" />
               <input
                 type="text"
-                placeholder="Zoek op naam, plaats, sector..."
+                placeholder="Zoek op eerste letter van bedrijfsnaam..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"

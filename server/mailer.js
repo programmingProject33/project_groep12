@@ -167,7 +167,264 @@ const sendReservationNotificationEmail = async (bedrijf, student, slot) => {
     }
 };
 
+const sendReservationStatusUpdateEmail = async (studentEmail, bedrijfNaam, slot, status, reason = '') => {
+    if (!transport) {
+        await initializeMailer();
+        if (!transport) {
+            console.error('❌ FATAL: Email transport could not be initialized for status update.');
+            return;
+        }
+    }
+
+    const eventDate = new Date(slot.starttijd).toLocaleDateString('nl-BE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const startTime = new Date(slot.starttijd).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+    const endTime = new Date(slot.eindtijd).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+
+    let subject, htmlBody;
+
+    switch (status) {
+        case 'accepted':
+            subject = `✅ Je speeddate met ${bedrijfNaam} is bevestigd!`;
+            htmlBody = `
+                <h1 style="color: #1a202c;">Goed nieuws!</h1>
+                <p style="color: #4a5568;">Je reservering voor een speeddate met <strong>${bedrijfNaam}</strong> is geaccepteerd.</p>
+                <p style="color: #4a5568;"><strong>Details:</strong></p>
+                <ul>
+                    <li><strong>Datum:</strong> ${eventDate}</li>
+                    <li><strong>Tijd:</strong> ${startTime} - ${endTime}</li>
+                </ul>
+                <p style="color: #4a5568;">We zien je daar!</p>
+            `;
+            break;
+        case 'rejected':
+            subject = `❌ Update over je speeddate met ${bedrijfNaam}`;
+            htmlBody = `
+                <h1 style="color: #1a202c;">Update over je reservering</h1>
+                <p style="color: #4a5568;">Helaas kan je aangevraagde speeddate met <strong>${bedrijfNaam}</strong> op ${eventDate} van ${startTime} tot ${endTime} niet doorgaan.</p>
+                <p style="color: #4a5568;"><strong>Reden van het bedrijf:</strong></p>
+                <div style="background-color: #f7fafc; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0;">
+                    <p style="margin: 0; color: #4a5568;"><em>${reason}</em></p>
+                </div>
+                <p style="color: #4a5568;">Kijk gerust op de website voor andere beschikbare tijdsloten bij dit of andere bedrijven.</p>
+            `;
+            break;
+        default:
+            console.log("Onbekende status voor e-mailnotificatie:", status);
+            return;
+    }
+
+    try {
+        const info = await transport.sendMail({
+            from: process.env.EMAIL_USER || '"Career Launch" <noreply@careerlaunch.com>',
+            to: studentEmail,
+            subject: subject,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px;">
+                    ${htmlBody}
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 25px 0;">
+                    <p style="color: #94a3b8; font-size: 12px; text-align: center;">
+                        Career Launch - Je carrière begint hier
+                    </p>
+                </div>
+            `
+        });
+        console.log(`✅ Status update ('${status}') email sent to:`, studentEmail);
+         if (nodemailer.getTestMessageUrl(info)) {
+            console.log('📧 Ethereal preview URL:', nodemailer.getTestMessageUrl(info));
+        }
+    } catch (error) {
+        console.error(`❌ Error sending status update email to ${studentEmail}:`, error);
+    }
+};
+
+const sendAlternativeProposalEmail = async (studentEmail, bedrijf, originalSlot, alternativeSlot) => {
+    if (!transport) {
+        await initializeMailer();
+        if (!transport) {
+            console.error('❌ FATAL: Email transport could not be initialized for alternative proposal.');
+            return;
+        }
+    }
+
+    const formatDate = (date) => new Date(date).toLocaleDateString('nl-BE', { weekday: 'long', month: 'long', day: 'numeric' });
+    const formatTime = (date) => new Date(date).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+
+    const originalDateStr = formatDate(originalSlot.starttijd);
+    const originalTimeStr = `${formatTime(originalSlot.starttijd)} - ${formatTime(originalSlot.eindtijd)}`;
+    
+    const alternativeDateStr = formatDate(alternativeSlot.starttijd);
+    const alternativeTimeStr = `${formatTime(alternativeSlot.starttijd)} - ${formatTime(alternativeSlot.eindtijd)}`;
+
+    try {
+        const info = await transport.sendMail({
+            from: process.env.EMAIL_USER || '"Career Launch" <noreply@careerlaunch.com>',
+            to: studentEmail,
+            subject: `Alternatief voorstel voor je speeddate met ${bedrijf.naam}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9fafb;">
+                    <div style="background-color: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
+                        <h1 style="color: #1a202c; text-align: center;">Alternatief voorstel</h1>
+                        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">
+                            Hallo,
+                        </p>
+                        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">
+                            <strong>${bedrijf.naam}</strong> heeft een alternatief tijdslot voorgesteld voor jullie speeddate.
+                        </p>
+                        
+                        <div style="background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                            <h2 style="color: #2d3748; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">Details van het voorstel</h2>
+                            <p style="font-size: 16px; color: #718096;">Oorspronkelijk: <strike>${originalDateStr}, ${originalTimeStr}</strike></p>
+                            <p style="font-size: 18px; color: #2d3748;"><strong>Nieuw voorstel: ${alternativeDateStr}, ${alternativeTimeStr}</strong></p>
+                        </div>
+
+                        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">
+                            Ga naar je <strong>reserveringenpagina</strong> op de Career Launch website om dit voorstel te accepteren of te weigeren.
+                        </p>
+                        
+                        <p style="color: #718096; font-size: 14px; margin-top: 30px;">
+                            Met vriendelijke groet,<br>
+                            Het Career Launch Team
+                        </p>
+                    </div>
+                </div>
+            `
+        });
+        console.log(`✅ Alternative proposal email sent to:`, studentEmail);
+         if (nodemailer.getTestMessageUrl(info)) {
+            console.log('📧 Ethereal preview URL:', nodemailer.getTestMessageUrl(info));
+        }
+    } catch (error) {
+        console.error(`❌ Error sending alternative proposal email to ${studentEmail}:`, error);
+    }
+};
+
+const sendAlternativeResponseEmail = async (bedrijfEmail, student, newSlot, accepted) => {
+    if (!transport) {
+        await initializeMailer();
+        if (!transport) {
+            console.error('❌ FATAL: Email transport could not be initialized for alternative response.');
+            return;
+        }
+    }
+
+    const eventDate = new Date(newSlot.starttijd).toLocaleDateString('nl-BE', { weekday: 'long', month: 'long', day: 'numeric' });
+    const startTime = new Date(newSlot.starttijd).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+    const endTime = new Date(newSlot.eindtijd).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+
+    const subject = accepted 
+        ? `✅ ${student.voornaam} ${student.naam} heeft het alternatieve tijdslot geaccepteerd`
+        : `❌ ${student.voornaam} ${student.naam} heeft het alternatieve tijdslot geweigerd`;
+
+    const htmlBody = accepted
+        ? `
+            <h1 style="color: #1a202c;">Positief nieuws!</h1>
+            <p style="color: #4a5568;">${student.voornaam} ${student.naam} heeft het alternatieve tijdslot geaccepteerd.</p>
+            <p style="color: #4a5568;"><strong>Nieuwe afspraak:</strong></p>
+            <ul>
+                <li><strong>Datum:</strong> ${eventDate}</li>
+                <li><strong>Tijd:</strong> ${startTime} - ${endTime}</li>
+            </ul>
+            <p style="color: #4a5568;">De speeddate gaat door op het nieuwe tijdslot!</p>
+        `
+        : `
+            <h1 style="color: #1a202c;">Update over alternatief voorstel</h1>
+            <p style="color: #4a5568;">${student.voornaam} ${student.naam} heeft het alternatieve tijdslot geweigerd.</p>
+            <p style="color: #4a5568;">De reservering is geannuleerd en beide tijdsloten zijn weer beschikbaar.</p>
+        `;
+
+    try {
+        const info = await transport.sendMail({
+            from: process.env.EMAIL_USER || '"Career Launch" <noreply@careerlaunch.com>',
+            to: bedrijfEmail,
+            subject: subject,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9fafb;">
+                    <div style="background-color: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
+                        ${htmlBody}
+                        <p style="color: #718096; font-size: 14px;">
+                            Met vriendelijke groet,<br>
+                            Het Career Launch Team
+                        </p>
+                    </div>
+                </div>
+            `
+        });
+
+        console.log('✅ Alternative response email sent successfully to:', bedrijfEmail);
+        if (nodemailer.getTestMessageUrl(info)) {
+            console.log('📧 Ethereal preview URL:', nodemailer.getTestMessageUrl(info));
+        }
+
+    } catch (error) {
+        console.error(`❌ Error sending alternative response email to ${bedrijfEmail}:`, error);
+    }
+};
+
+const sendCancellationNotificationEmail = async (bedrijfEmail, student, slot, bedrijfsnaam) => {
+    if (!transport) {
+        await initializeMailer();
+        if (!transport) {
+            console.error('❌ FATAL: Email transport could not be initialized for cancellation notification.');
+            return;
+        }
+    }
+
+    const eventDate = new Date(slot.starttijd).toLocaleDateString('nl-BE', { weekday: 'long', month: 'long', day: 'numeric' });
+    const startTime = new Date(slot.starttijd).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+    const endTime = new Date(slot.eindtijd).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+
+    try {
+        const info = await transport.sendMail({
+            from: process.env.EMAIL_USER || '"Career Launch" <noreply@careerlaunch.com>',
+            to: bedrijfEmail,
+            subject: `❌ Reservering geannuleerd: ${student.voornaam} ${student.naam}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9fafb;">
+                    <div style="background-color: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
+                        <h1 style="color: #1a202c; text-align: center;">Reservering Geannuleerd</h1>
+                        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">
+                            Hallo ${bedrijfsnaam},
+                        </p>
+                        <p style="color: #4a5568; font-size: 16px; line-height: 1.6;">
+                            Een student heeft zojuist zijn/haar speeddate reservering geannuleerd. Hieronder vindt u de details.
+                        </p>
+                        <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                            <h2 style="color: #991b1b; border-bottom: 2px solid #fecaca; padding-bottom: 10px; margin-top: 0;">Geannuleerde Reservering</h2>
+                            <p style="font-size: 16px; color: #991b1b;"><strong>Student:</strong> ${student.voornaam} ${student.naam}</p>
+                            <p style="font-size: 16px; color: #991b1b;"><strong>E-mail Student:</strong> <a href="mailto:${student.email}" style="color: #3884ff;">${student.email}</a></p>
+                            <p style="font-size: 16px; color: #991b1b;"><strong>Datum:</strong> ${eventDate}</p>
+                            <p style="font-size: 16px; color: #991b1b;"><strong>Tijdslot:</strong> ${startTime} - ${endTime}</p>
+                        </div>
+                        <p style="color: #718096; font-size: 14px;">
+                            Het tijdslot is weer beschikbaar voor nieuwe reserveringen.
+                        </p>
+                        <p style="color: #718096; font-size: 14px;">
+                            Met vriendelijke groet,<br>
+                            Het Career Launch Team
+                        </p>
+                    </div>
+                </div>
+            `
+        });
+
+        console.log('✅ Cancellation notification email sent successfully to:', bedrijfEmail);
+        if (nodemailer.getTestMessageUrl(info)) {
+            console.log('📧 Ethereal preview URL:', nodemailer.getTestMessageUrl(info));
+        }
+
+    } catch (error) {
+        console.error(`❌ Error sending cancellation notification to ${bedrijfEmail}:`, error);
+    }
+};
+
 // Start de initialisatie direct wanneer de module geladen wordt.
 initializeMailer();
 
-module.exports = { sendVerificationEmail, sendReservationNotificationEmail }; 
+module.exports = { 
+    sendVerificationEmail, 
+    sendReservationNotificationEmail,
+    sendReservationStatusUpdateEmail,
+    sendAlternativeProposalEmail,
+    sendAlternativeResponseEmail,
+    sendCancellationNotificationEmail
+}; 
