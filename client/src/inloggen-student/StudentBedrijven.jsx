@@ -143,12 +143,9 @@ function StudentBedrijven() {
       
       // Filter alle bedrijven
       const filtered = bedrijven.filter(bedrijf => {
-        // Search term filter
+        // Search term filter - alleen eerste letter van bedrijfsnaam
         const matchesSearch = searchTerm.trim() === "" || 
-          bedrijf.naam.toLowerCase().includes(searchLower) ||
-          bedrijf.gemeente.toLowerCase().includes(searchLower) ||
-          bedrijf.sector?.toLowerCase().includes(searchLower) ||
-          bedrijf.beschrijving?.toLowerCase().includes(searchLower);
+          bedrijf.naam.toLowerCase().startsWith(searchLower);
         
         // Sector filter
         const matchesSector = selectedSector === "" || 
@@ -169,10 +166,7 @@ function StudentBedrijven() {
       // Pas exact dezelfde filter toe op de aanbevolen bedrijven
       const filteredRecommended = recommendedBedrijven.filter(bedrijf => {
         const matchesSearch = searchTerm.trim() === "" || 
-          bedrijf.naam.toLowerCase().includes(searchLower) ||
-          bedrijf.gemeente.toLowerCase().includes(searchLower) ||
-          bedrijf.sector?.toLowerCase().includes(searchLower) ||
-          bedrijf.beschrijving?.toLowerCase().includes(searchLower);
+          bedrijf.naam.toLowerCase().startsWith(searchLower);
         
         const matchesSector = selectedSector === "" || 
           bedrijf.sector?.toLowerCase() === selectedSector.toLowerCase();
@@ -298,7 +292,7 @@ function StudentBedrijven() {
               }} />
               <input
                 type="text"
-                placeholder="Zoek op bedrijfsnaam, plaats, sector of beschrijving..."
+                placeholder="Zoek op eerste letter van bedrijfsnaam..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{

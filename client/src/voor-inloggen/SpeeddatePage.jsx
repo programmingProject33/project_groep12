@@ -67,7 +67,7 @@ export default function SpeeddatePage() {
     async function fetchUserReservations() {
       if (!user) return;
       try {
-        const res = await fetch(`http://localhost:5000/api/reservations/${user.gebruiker_id}`);
+        const res = await fetch(`http://localhost:5000/api/reservaties/${user.gebruiker_id}`);
         if (res.ok) {
           const data = await res.json();
           setUserReservations(data);
@@ -83,8 +83,13 @@ export default function SpeeddatePage() {
   // Verzamel alle reeds gereserveerde tijdstippen van de student
   const reservedTimes = userReservations.map(r => r.starttijd);
 
-  // Verzamel alle bezette tijdsloten bij dit bedrijf
-  const takenSlots = timeslots.filter(slot => slot.is_bezet);
+  // Verzamel alle bezette tijdsloten bij dit bedrijf (alleen geaccepteerde reserveringen)
+  const takenSlots = timeslots.filter(slot => {
+    // Check of er een geaccepteerde reservering is voor dit tijdslot
+    return userReservations.some(reservation => 
+      reservation.speed_id === slot.speed_id && reservation.status === 'accepted'
+    );
+  });
   if (bedrijf && process.env.NODE_ENV !== 'production') {
     console.log(`Bezet bij bedrijf ${bedrijf.naam} (${bedrijfId}):`, takenSlots.map(s => ({ tijd: s.starttijd, gebruiker_id: s.gebruiker_id })));
   }
@@ -98,18 +103,18 @@ export default function SpeeddatePage() {
     setLoading(true);
     setErrorMessage("");
     try {
-      const res = await fetch("http://localhost:5000/api/speeddate", {
+      const res = await fetch("http://localhost:5000/api/reserveren", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          gebruiker_id: user.gebruiker_id,
+          student_id: user.gebruiker_id,
           bedrijf_id: bedrijfId,
           speed_id: selectedSlot.speed_id
         })
       });
       const data = await res.json();
       if (res.ok) {
-        alert("Reservering bevestigd!");
+        alert("Reservering succesvol aangemaakt! Het bedrijf zal je reservering beoordelen.");
         navigate("/student/reservaties");
       } else {
         setErrorMessage(data.error || "Er is een fout opgetreden bij het reserveren.");
@@ -213,15 +218,19 @@ export default function SpeeddatePage() {
                     timeslots.filter(isNotPauseSlot).map((slot) => {
                       // Blokkeer slot als het tijdstip al door deze student is gereserveerd (bedrijf-onafhankelijk)
                       const isOwnReserved = reservedTimes.includes(slot.starttijd);
-                      // Blokkeer slot als het al bezet is door een andere student bij dit bedrijf
-                      const isTakenByOther = slot.is_bezet && (!user || slot.gebruiker_id !== user.gebruiker_id);
+                      // Blokkeer slot als het al bezet is door een andere student bij dit bedrijf (alleen geaccepteerde reserveringen)
+                      const isTakenByOther = userReservations.some(reservation => 
+                        reservation.speed_id === slot.speed_id && 
+                        reservation.status === 'accepted' && 
+                        reservation.student_id !== user.gebruiker_id
+                      );
                       return (
                         <button
                           key={slot.speed_id}
-                          className={`speeddate-slot-btn${slot.is_bezet || isOwnReserved ? " reserved" : ""}${selectedSlot && selectedSlot.speed_id === slot.speed_id ? " selected" : ""}`}
-                          onClick={() => !slot.is_bezet && !isOwnReserved && !isTakenByOther && handleSlotClick(slot)}
+                          className={`speeddate-slot-btn${isTakenByOther || isOwnReserved ? " reserved" : ""}${selectedSlot && selectedSlot.speed_id === slot.speed_id ? " selected" : ""}`}
+                          onClick={() => !isTakenByOther && !isOwnReserved && handleSlotClick(slot)}
                           type="button"
-                          disabled={slot.is_bezet || isOwnReserved || isTakenByOther}
+                          disabled={isTakenByOther || isOwnReserved}
                         >
                           {formatTime(slot.starttijd)} - {formatTime(slot.eindtijd)}
                         </button>

@@ -63,10 +63,7 @@ function Bedrijven() {
 
     if (searchTerm.trim() !== "") {
       filtered = filtered.filter(bedrijf =>
-        bedrijf.naam.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bedrijf.gemeente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bedrijf.sector?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bedrijf.beschrijving?.toLowerCase().includes(searchTerm.toLowerCase())
+        bedrijf.naam.toLowerCase().startsWith(searchTerm.toLowerCase())
       );
     }
     
@@ -120,7 +117,7 @@ function Bedrijven() {
               <FaSearch className="search-icon" />
               <input
                 type="text"
-                placeholder="Zoek op naam, plaats, sector..."
+                placeholder="Zoek op eerste letter van bedrijfsnaam..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
