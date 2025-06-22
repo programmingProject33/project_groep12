@@ -95,7 +95,7 @@ function App() {
         </Route>
 
         {/* Route voor e-mail verificatie */}
-        <Route path="/verify" element={<VerificationPage />} />
+        <Route path="/confirm/:token" element={<VerificationPage />} />
 
         {/* Student routes met UserLayout als parent */}
         <Route path="/student" element={

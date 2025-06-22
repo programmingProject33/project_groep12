@@ -56,7 +56,7 @@ const sendVerificationEmail = async (userEmail, token) => {
         }
     }
 
-    const url = `http://localhost:5173/verify?token=${token}`;
+    const url = `http://localhost:5173/confirm/${token}`;
 
     try {
         const info = await transport.sendMail({
@@ -70,7 +70,7 @@ const sendVerificationEmail = async (userEmail, token) => {
                         
                         <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
                             Bedankt voor je registratie! Om je account te activeren en te kunnen inloggen, 
-                            moet je eerst je e-mailadres verifiëren.
+                            moet je eerst je e-mailadres verifiëren door op de onderstaande knop te klikken.
                         </p>
                         
                         <div style="text-align: center; margin: 30px 0;">
@@ -82,9 +82,23 @@ const sendVerificationEmail = async (userEmail, token) => {
                             </a>
                         </div>
                         
+                        <div style="background-color: #f1f5f9; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                            <h3 style="color: #1e293b; margin-top: 0; margin-bottom: 15px;">Wat gebeurt er na verificatie?</h3>
+                            <ul style="color: #475569; line-height: 1.6; margin: 0; padding-left: 20px;">
+                                <li>Je account wordt geactiveerd</li>
+                                <li>Je kunt inloggen met je gebruikersnaam en wachtwoord</li>
+                                <li>Je krijgt toegang tot alle functies van Career Launch</li>
+                            </ul>
+                        </div>
+                        
                         <p style="color: #64748b; font-size: 14px; margin-top: 25px;">
                             <strong>Let op:</strong> Deze link is 24 uur geldig. Als je deze registratie niet hebt uitgevoerd, 
                             kun je deze e-mail veilig negeren.
+                        </p>
+                        
+                        <p style="color: #64748b; font-size: 14px; margin-top: 15px;">
+                            <strong>Problemen?</strong> Als de knop niet werkt, kopieer dan deze link naar je browser: 
+                            <a href="${url}" style="color: #3884ff; word-break: break-all;">${url}</a>
                         </p>
                         
                         <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 25px 0;">

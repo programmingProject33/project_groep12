@@ -226,7 +226,67 @@ async function createTimeslotsForBedrijf(bedrijfId, dateStr) {
   }
 }
 
-// User registration endpoint
+// Route to handle email confirmation
+app.get('/api/confirm/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      return res.status(400).json({ error: 'Verificatietoken is vereist.' });
+    }
+
+    // First, try to find the token in the 'gebruikers' table (students)
+    let [users] = await db.promise().query(
+      'SELECT * FROM gebruikers WHERE verification_token = ?',
+      [token]
+    );
+
+    if (users.length > 0) {
+      // Student found, update the verification status
+      await db.promise().query(
+        'UPDATE gebruikers SET is_verified = TRUE, verification_token = NULL WHERE gebruiker_id = ?',
+        [users[0].gebruiker_id]
+      );
+
+      return res.status(200).json({ 
+        message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.',
+        type: 'student'
+      });
+    }
+
+    // If not found in users, try the 'bedrijven' table (companies)
+    let [bedrijven] = await db.promise().query(
+      'SELECT * FROM bedrijven WHERE verification_token = ?',
+      [token]
+    );
+
+    if (bedrijven.length > 0) {
+      // Company found, update the verification status
+      await db.promise().query(
+        'UPDATE bedrijven SET is_verified = TRUE, verification_token = NULL WHERE bedrijf_id = ?',
+        [bedrijven[0].bedrijf_id]
+      );
+
+      return res.status(200).json({ 
+        message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.',
+        type: 'bedrijf'
+      });
+    }
+
+    // Token not found in either table
+    return res.status(404).json({ 
+      error: 'Ongeldige of verlopen verificatietoken. De link is mogelijk verlopen of al gebruikt.' 
+    });
+
+  } catch (err) {
+    console.error('Error during email verification:', err);
+    res.status(500).json({ 
+      error: 'Er is een technische fout opgetreden. Probeer het later opnieuw of neem contact op met de beheerder.' 
+    });
+  }
+});
+
+// Student and Company Registration
 app.post('/api/register', async (req, res) => {
   const { type, ...userData } = req.body;
   const verificationToken = crypto.randomBytes(32).toString('hex');
@@ -1116,50 +1176,6 @@ app.post('/api/speeddates/create-for-all-companies', async (req, res) => {
     console.error('Error creating timeslots for all companies:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
-});
-
-// Email verification endpoint
-app.get('/api/verify', async (req, res) => {
-    const { token } = req.query;
-
-    if (!token) {
-        return res.status(400).json({ error: 'Verificatie token is vereist' });
-    }
-
-    try {
-        // Probeer de token te vinden in de 'gebruikers' tabel
-        let [userResult] = await db.promise().query(
-            'SELECT * FROM gebruikers WHERE verification_token = ?', [token]
-        );
-
-        if (userResult.length > 0) {
-            // Gebruiker gevonden, update de status
-            await db.promise().query(
-                'UPDATE gebruikers SET is_verified = TRUE, verification_token = NULL WHERE verification_token = ?', [token]
-            );
-            return res.status(200).json({ message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.' });
-        }
-
-        // Als niet in gebruikers, probeer de 'bedrijven' tabel
-        let [bedrijfResult] = await db.promise().query(
-            'SELECT * FROM bedrijven WHERE verification_token = ?', [token]
-        );
-
-        if (bedrijfResult.length > 0) {
-            // Bedrijf gevonden, update de status
-            await db.promise().query(
-                'UPDATE bedrijven SET is_verified = TRUE, verification_token = NULL WHERE verification_token = ?', [token]
-            );
-            return res.status(200).json({ message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.' });
-        }
-
-        // Als in geen van beide tabellen gevonden
-        return res.status(404).json({ error: 'Ongeldige of verlopen verificatietoken.' });
-
-    } catch (err) {
-        console.error('Error during verification:', err);
-        res.status(500).json({ error: 'Databasefout tijdens verificatieproces.' });
-    }
 });
 
 // GET bedrijfsprofiel data (inclusief dienstverbanden)
