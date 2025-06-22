@@ -47,7 +47,7 @@ function StudentenLijst() {
     }
 
     if (jaar !== 'alle') {
-      data = data.filter(s => s.opleiding_jaar === jaar);
+      data = data.filter(s => String(s.opleiding_jaar) === jaar);
     }
 
     data.sort((a, b) => {

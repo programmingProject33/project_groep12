@@ -1,12 +1,10 @@
-// server/routes/stats.js
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const authAdmin = require('../middleware/adminAuth');
 
-// GET /api/admin/stats/companies
-// Geeft totaal aantal bedrijven terug
-router.get('/admin/stats/companies', authAdmin, (req, res) => {
+// Bedrijven tellen
+router.get('/stats/companies', authAdmin, (req, res) => {
   db.query('SELECT COUNT(*) AS count FROM bedrijven', (err, results) => {
     if (err) {
       console.error('Fout bij ophalen bedrijven-count:', err);
@@ -16,9 +14,8 @@ router.get('/admin/stats/companies', authAdmin, (req, res) => {
   });
 });
 
-// GET /api/admin/stats/students
-// Geeft totaal aantal studenten en alumni terug
-router.get('/admin/stats/students', authAdmin, (req, res) => {
+// Studenten tellen
+router.get('/stats/students', authAdmin, (req, res) => {
   db.query('SELECT COUNT(*) AS count FROM gebruikers', (err, results) => {
     if (err) {
       console.error('Fout bij ophalen studenten-count:', err);
@@ -28,27 +25,48 @@ router.get('/admin/stats/students', authAdmin, (req, res) => {
   });
 });
 
-// GET /api/admin/stats/reservations
-// Geeft totaal aantal speeddate-reserveringen terug
-router.get('/admin/stats/reservations', authAdmin, (req, res) => {
-  db.query('SELECT COUNT(*) AS count FROM speeddate_reservations', (err, results) => {
+// Totaal aantal speeddates (alle slots)
+router.get('/stats/reservations', authAdmin, (req, res) => {
+  db.query('SELECT COUNT(*) AS count FROM speeddates', (err, results) => {
     if (err) {
-      console.error('Fout bij ophalen reserveringen-count:', err);
+      console.error('Fout bij ophalen speeddate-totaal:', err);
       return res.status(500).json({ message: 'Serverfout' });
     }
     res.json({ count: results[0].count });
   });
 });
 
-// GET /api/admin/stats/questions
-// Geeft totaal aantal binnengekomen vragen terug
-router.get('/admin/stats/questions', authAdmin, (req, res) => {
-  db.query('SELECT COUNT(*) AS count FROM user_questions', (err, results) => {
+// Aantal studenten met minstens 1 reservatie
+router.get('/stats/reserved-students', authAdmin, (req, res) => {
+  const sql = `
+    SELECT COUNT(DISTINCT gebruiker_id) AS count
+    FROM speeddates
+    WHERE gebruiker_id IS NOT NULL
+  `;
+  db.query(sql, (err, results) => {
     if (err) {
-      console.error('Fout bij ophalen vragen-count:', err);
+      console.error('Fout bij ophalen gereserveerde studenten:', err);
       return res.status(500).json({ message: 'Serverfout' });
     }
     res.json({ count: results[0].count });
+  });
+});
+
+// Totaal slots + gereserveerd + beschikbaar
+router.get('/stats/speeddateslots', authAdmin, (req, res) => {
+  const sql = `
+    SELECT 
+      COUNT(*) AS totaal,
+      SUM(is_bezet = 1) AS gereserveerd,
+      SUM(is_bezet = 0) AS beschikbaar
+    FROM speeddates
+  `;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Fout bij ophalen speeddateslots:', err);
+      return res.status(500).json({ message: 'Serverfout' });
+    }
+    res.json(results[0]);
   });
 });
 

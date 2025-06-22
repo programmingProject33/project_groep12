@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import AdminNav from '../components/AdminNav';
 
 
 export default function AdminDetail() {
@@ -12,26 +11,22 @@ export default function AdminDetail() {
     fetch(`http://localhost:5000/api/admin/admins/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => {
-        if (!res.ok) throw new Error('Niet gevonden');
-        return res.json();
-      })
+      .then(res => res.json())
       .then(setAdmin)
       .catch(() => setAdmin(null));
   }, [id]);
 
-  if (admin === null) return <p>Bezig met laden of niet gevonden</p>;
+  if (!admin) return <p>Bezig met laden of niet gevonden</p>;
 
   return (
-    <div>
-      <AdminNav />
-      <main>
-      <h1>Admin: {admin.username}</h1>
-      <p>Voornaam: {admin.first_name || '-'}</p>
-      <p>Achternaam: {admin.last_name || '-'}</p>
-      <p>E-mail: {admin.email}</p>
-      <p>Aangemaakt op: {new Date(admin.created_at).toLocaleString()}</p>
-      </main>
+    <div className="admin-detail-container">
+      <h1>Admin Details</h1>
+      <p><strong>Gebruikersnaam:</strong> {admin.username}</p>
+      <p><strong>Voornaam:</strong> {admin.first_name || '-'}</p>
+      <p><strong>Achternaam:</strong> {admin.last_name || '-'}</p>
+      <p><strong>E-mail:</strong> {admin.email}</p>
+      <p><strong>Rol:</strong> {admin.role}</p>
+      <p><strong>Aangemaakt op:</strong> {new Date(admin.created_at).toLocaleString()}</p>
     </div>
   );
 }

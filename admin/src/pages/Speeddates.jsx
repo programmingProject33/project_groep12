@@ -10,6 +10,7 @@ function Speeddates() {
   const [bedrijven, setBedrijven] = useState([]);
   const [studenten, setStudenten] = useState([]);
 
+  // Ophalen van data bij het laden
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
 
@@ -33,6 +34,7 @@ function Speeddates() {
       .catch(err => console.error('Fout bij ophalen speeddates:', err));
   }, []);
 
+  // Filteren en sorteren
   useEffect(() => {
     let result = [...data];
 
@@ -52,73 +54,95 @@ function Speeddates() {
     }
 
     result.sort((a, b) => {
-      const tijdA = new Date(a.time_slot);
-      const tijdB = new Date(b.time_slot);
+      const tijdA = new Date(a.starttijd);
+      const tijdB = new Date(b.starttijd);
       return sortOrder === 'asc' ? tijdA - tijdB : tijdB - tijdA;
     });
 
     setFiltered(result);
   }, [zoekterm, bedrijfFilter, studentFilter, sortOrder, data]);
 
+  // Gegroepeerde weergave per student
+  const gegroepeerd = {};
+  filtered.forEach(r => {
+    const sleutel = `${r.student_voornaam} ${r.student_naam}`;
+    if (!gegroepeerd[sleutel]) {
+      gegroepeerd[sleutel] = [];
+    }
+    gegroepeerd[sleutel].push({
+      bedrijf: r.bedrijf_naam,
+      tijd: `${new Date(r.starttijd).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(r.eindtijd).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+    });
+  });
+
   return (
     <div>
-    
       <main>
-      <h1>Speeddate-reserveringen</h1>
-    
-      <div className="filterbar">
-        <input
-          type="text"
-          placeholder="Zoek student of bedrijf..."
-          value={zoekterm}
-          onChange={(e) => setZoekterm(e.target.value)}
-          style={{ marginRight: '10px' }}
-        />
+        <h1>Speeddate-reserveringen</h1>
 
-        <select value={bedrijfFilter} onChange={(e) => setBedrijfFilter(e.target.value)}>
-          <option value="alle">Alle bedrijven</option>
-          {bedrijven.map((b, i) => (
-            <option key={i} value={b}>{b}</option>
-          ))}
-        </select>
+        {/* Filterbalk */}
+        <div className="filterbar">
+          <input
+            type="text"
+            placeholder="Zoek student of bedrijf..."
+            value={zoekterm}
+            onChange={(e) => setZoekterm(e.target.value)}
+            style={{ marginRight: '10px' }}
+          />
 
-        <select value={studentFilter} onChange={(e) => setStudentFilter(e.target.value)} style={{ marginLeft: '10px' }}>
-          <option value="alle">Alle studenten</option>
-          {studenten.map((s, i) => (
-            <option key={i} value={s}>{s}</option>
-          ))}
-        </select>
-
-        <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} style={{ marginLeft: '10px' }}>
-          <option value="asc">Tijdstip: vroeg → laat</option>
-          <option value="desc">Tijdstip: laat → vroeg</option>
-        </select>
-      </div>
-
-      <div className="table-container">
-      {filtered.length === 0 ? (
-        <p>Geen speeddate-reserveringen gevonden.</p>
-      ) : (
-        <table  className="custom-table">
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Bedrijf</th>
-              <th>Tijdstip</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((r, i) => (
-              <tr key={i}>
-                <td>{r.student_voornaam} {r.student_naam}</td>
-                <td>{r.bedrijf_naam}</td>
-                <td>{new Date(r.time_slot).toLocaleString()}</td>
-              </tr>
+          <select value={bedrijfFilter} onChange={(e) => setBedrijfFilter(e.target.value)}>
+            <option value="alle">Alle bedrijven</option>
+            {bedrijven.map((b, i) => (
+              <option key={i} value={b}>{b}</option>
             ))}
-          </tbody>
-        </table>
-      )}
-      </div>
+          </select>
+
+          <select value={studentFilter} onChange={(e) => setStudentFilter(e.target.value)} style={{ marginLeft: '10px' }}>
+            <option value="alle">Alle studenten</option>
+            {studenten.map((s, i) => (
+              <option key={i} value={s}>{s}</option>
+            ))}
+          </select>
+
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} style={{ marginLeft: '10px' }}>
+            <option value="asc">Tijdstip: vroeg → laat</option>
+            <option value="desc">Tijdstip: laat → vroeg</option>
+          </select>
+        </div>
+
+        {/* Tabelweergave */}
+        <div className="table-container">
+          {filtered.length === 0 ? (
+            <p>Geen speeddate-reserveringen gevonden.</p>
+          ) : (
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Bedrijven</th>
+                  <th>Tijdstippen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(gegroepeerd).map(([student, afspraken], i) => (
+                  <tr key={i}>
+                    <td>{student}</td>
+                    <td>
+                      {afspraken.map((a, j) => (
+                        <div key={j}>{a.bedrijf}</div>
+                      ))}
+                    </td>
+                    <td>
+                      {afspraken.map((a, j) => (
+                        <div key={j}>{a.tijd}</div>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </main>
     </div>
   );
