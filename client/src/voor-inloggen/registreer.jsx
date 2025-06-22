@@ -15,6 +15,17 @@ const OPLEIDINGEN = [
   "Postgraduaat Toegepaste Artificial Intelligence"
 ];
 
+const opleidingOpties = [
+  "Toegepaste Informatica (Bachelor)",
+  "Postgraduaat Coding (online)",
+  "Multimedia & Creatieve Technologie (Bachelor)",
+  "Digitale Vormgeving (Bachelor)",
+  "Elektronica-ICT (Bachelor)",
+  "Bedrijfsmanagement (Bachelor)",
+  "Communicatie (Bachelor)",
+  "Toerisme- en Recreatiemanagement (Bachelor)",
+];
+
 export default function Registreer()   // Dit is een functionele component in React. Het maakt de registratiepagina.
  {
    const [activeTab, setActiveTab] = useState("student");  // Hier gebruiken we een hook (useState) om bij te houden welke tab actief is (student of bedrijf).
@@ -65,7 +76,9 @@ export default function Registreer()   // Dit is een functionele component in Re
     wachtwoord2_bedrijf: '',
     sector: '',
     beschrijving: '',
-    zoeken_we: ''
+    gezocht_profiel_omschrijving: '',
+    gezochte_opleidingen: [],
+    dienstverbanden: [],
   });
 
   // Error state
@@ -80,10 +93,32 @@ export default function Registreer()   // Dit is een functionele component in Re
   };
 
   const handleCompanyChange = (e) => {
-    setCompanyForm({
-      ...companyForm,
-      [e.target.name]: e.target.value
-    });
+    const { name, value, type, checked } = e.target;
+    if (name === "gezochte_opleidingen") {
+      const updatedOpleidingen = checked
+        ? [...companyForm.gezochte_opleidingen, value]
+        : companyForm.gezochte_opleidingen.filter((item) => item !== value);
+      setCompanyForm({ ...companyForm, gezochte_opleidingen: updatedOpleidingen });
+    } else {
+      setCompanyForm({ ...companyForm, [name]: value });
+    }
+  };
+
+  const handleDienstverbandChange = (e) => {
+    const { value, checked } = e.target;
+    const { dienstverbanden } = companyForm;
+
+    if (checked) {
+      setCompanyForm({
+        ...companyForm,
+        dienstverbanden: [...dienstverbanden, value],
+      });
+    } else {
+      setCompanyForm({
+        ...companyForm,
+        dienstverbanden: dienstverbanden.filter((item) => item !== value),
+      });
+    }
   };
 
   // LinkedIn URL validation function
@@ -217,7 +252,9 @@ export default function Registreer()   // Dit is een functionele component in Re
         wachtwoord2_bedrijf: '',
         sector: '',
         beschrijving: '',
-        zoeken_we: ''
+        gezocht_profiel_omschrijving: '',
+        gezochte_opleidingen: [],
+        dienstverbanden: [],
       });
     } catch (err) {
       setError(err.message);
@@ -390,218 +427,157 @@ export default function Registreer()   // Dit is een functionele component in Re
  
           {activeTab === "bedrijf" && (
             <form className="registerbedrijf-form" onSubmit={handleCompanySubmit}>
-              {/* Formulier voor bedrijf registratie */}
-              <h1 className="registerbedrijf-title">Account maken als Bedrijf</h1>
+              <h2 className="registerbedrijf-title">Registreer je Bedrijf</h2>
 
-              <h2 className="registerbedrijf-section-title">Bedrijfsgegevens:</h2>
-              <label>
-                Bedrijfsnaam:
-                <input 
-                  type="text" 
-                  name="bedrijfsnaam" 
-                  value={companyForm.bedrijfsnaam}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Sector:
-                <input
-                  type="text"
-                  name="sector"
-                  value={companyForm.sector}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Wie zijn we:
-                <textarea
-                  name="beschrijving"
-                  value={companyForm.beschrijving}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Dit zoeken we:
-                <textarea
-                  name="zoeken_we"
-                  value={companyForm.zoeken_we}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                KVK-nummer:
-                <input 
-                  type="text" 
-                  name="kvk" 
-                  value={companyForm.kvk}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                BTW-nummer:
-                <input 
-                  type="text" 
-                  name="btw" 
-                  value={companyForm.btw}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <div className="registerbedrijf-address-row">
+              {/* --- Bedrijfsinformatie --- */}
+              <h3 className="registerbedrijf-section-title">Bedrijfsinformatie</h3>
+              <div className="registreer-form-grid">
                 <label>
-                  Straatnaam en huisnummer:
-                  <input 
-                    type="text" 
-                    name="straat" 
-                    value={companyForm.straat}
-                    onChange={handleCompanyChange}
-                    required
-                  />
+                  Officiële bedrijfsnaam
+                  <input type="text" name="bedrijfsnaam" value={companyForm.bedrijfsnaam} onChange={handleCompanyChange} required />
                 </label>
                 <label>
-                  Gemeente en postcode:
-                  <input 
-                    type="text" 
-                    name="gemeente" 
-                    value={companyForm.gemeente}
-                    onChange={handleCompanyChange}
-                    required
-                  />
+                  BTW-nummer
+                  <input type="text" name="btw" value={companyForm.btw} onChange={handleCompanyChange} required />
+                </label>
+                <div className="registerbedrijf-address-row">
+                  <label>
+                    Straatnaam
+                    <input type="text" name="straat" value={companyForm.straat} onChange={handleCompanyChange} required />
+                  </label>
+                  <label>
+                    Gemeente
+                    <input type="text" name="gemeente" value={companyForm.gemeente} onChange={handleCompanyChange} required />
+                  </label>
+                </div>
+                <label>
+                  Telefoonnummer
+                  <input type="tel" name="telbedrijf" value={companyForm.telbedrijf} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  E-mailadres
+                  <input type="email" name="emailbedrijf" value={companyForm.emailbedrijf} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  Sector
+                  <input type="text" name="sector" value={companyForm.sector} onChange={handleCompanyChange} />
                 </label>
               </div>
-              <label>
-                Telefoonnummer:
-                <input 
-                  type="text" 
-                  name="telbedrijf" 
-                  value={companyForm.telbedrijf}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Bedrijf e-mailadres:
-                <input 
-                  type="email" 
-                  name="emailbedrijf" 
-                  value={companyForm.emailbedrijf}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
 
-              <h2 className="registerbedrijf-section-title">Contactpersoon:</h2>
-              <label>
-                Voornaam:
-                <input 
-                  type="text" 
-                  name="voornaam_contact" 
-                  value={companyForm.voornaam_contact}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Naam:
-                <input 
-                  type="text" 
-                  name="naam_contact" 
-                  value={companyForm.naam_contact}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Specialisatie:
-                <input 
-                  type="text" 
-                  name="specialisatie" 
-                  value={companyForm.specialisatie}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                E-mailadres:
-                <input 
-                  type="email" 
-                  name="email_contact" 
-                  value={companyForm.email_contact}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Telefoonnummer:
-                <input 
-                  type="text" 
-                  name="tel_contact" 
-                  value={companyForm.tel_contact}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-
-              <h2 className="registerbedrijf-section-title">Accountgegevens</h2>
-              <label>
-                Gebruikersnaam:
-                <input 
-                  type="text" 
-                  name="gebruikersnaam_bedrijf" 
-                  value={companyForm.gebruikersnaam_bedrijf}
-                  onChange={handleCompanyChange}
-                  required
-                />
-              </label>
-              <label>
-                Wachtwoord:
-                <div className="password-input-container">
-                  <input 
-                    type={showCompanyPassword ? "text" : "password"}
-                    name="wachtwoord_bedrijf" 
-                    value={companyForm.wachtwoord_bedrijf}
-                    onChange={handleCompanyChange}
-                    required
-                    minLength="6"
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle-btn"
-                    onClick={() => setShowCompanyPassword(!showCompanyPassword)}
-                  >
-                    {showCompanyPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
+              {/* --- Profielinformatie --- */}
+              <h3 className="registerbedrijf-section-title">Profielinformatie voor studenten</h3>
+              <div className="registreer-form-grid">
+                <label>
+                  Bedrijfsbeschrijving
+                  <textarea name="beschrijving" value={companyForm.beschrijving} onChange={handleCompanyChange} placeholder="Een korte beschrijving van jullie bedrijf..." />
+                  <p className="form-helper">Deze tekst is zichtbaar voor studenten op je bedrijfspagina.</p>
+                </label>
+                <label>
+                  Omschrijving gezocht profiel
+                  <textarea name="gezocht_profiel_omschrijving" value={companyForm.gezocht_profiel_omschrijving} onChange={handleCompanyChange} placeholder="Beschrijf de ideale kandidaat, bv. kennis van Java, teamplayer..." />
+                  <p className="form-helper">Deze tekst is ook zichtbaar voor studenten.</p>
+                </label>
+                <label>
+                  Gezochte opleidingen
+                  <div className="checkbox-group">
+                    {opleidingOpties.map((opleiding) => (
+                      <div key={opleiding} className="checkbox-item">
+                        <input
+                          type="checkbox"
+                          id={`opleiding-${opleiding}`}
+                          name="gezochte_opleidingen"
+                          value={opleiding}
+                          checked={companyForm.gezochte_opleidingen.includes(opleiding)}
+                          onChange={handleCompanyChange}
+                        />
+                        <label htmlFor={`opleiding-${opleiding}`}>{opleiding}</label>
+                      </div>
+                    ))}
+                  </div>
+                </label>
+                <div className="registreer-form-group full-width">
+                  <label>Welk soort dienstverband bieden jullie aan?</label>
+                  <div className="checkbox-group">
+                    {['Voltijds', 'Deeltijds', 'Freelance', 'Stage'].map((dienstverband) => (
+                      <label key={dienstverband} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          name="dienstverbanden"
+                          value={dienstverband}
+                          checked={companyForm.dienstverbanden.includes(dienstverband)}
+                          onChange={handleDienstverbandChange}
+                        />
+                        {dienstverband}
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </label>
-              <label>
-                Wachtwoord bevestiging:
-                <div className="password-input-container">
-                  <input 
-                    type={showCompanyPassword2 ? "text" : "password"}
-                    name="wachtwoord2_bedrijf" 
-                    value={companyForm.wachtwoord2_bedrijf}
-                    onChange={handleCompanyChange}
-                    required
-                    minLength="6"
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle-btn"
-                    onClick={() => setShowCompanyPassword2(!showCompanyPassword2)}
-                  >
-                    {showCompanyPassword2 ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-              </label>
+              </div>
 
-              <button type="submit" className="registerbedrijf-btn bedrijf-btn">
-                Account maken
-              </button>
+              {/* --- Contactpersoon --- */}
+              <h3 className="registerbedrijf-section-title">Contactpersoon</h3>
+              <div className="registreer-form-grid">
+                <label>
+                  Voornaam contactpersoon
+                  <input type="text" name="voornaam_contact" value={companyForm.voornaam_contact} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  Naam contactpersoon
+                  <input type="text" name="naam_contact" value={companyForm.naam_contact} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  Specialisatie contactpersoon
+                  <input type="text" name="specialisatie" value={companyForm.specialisatie} onChange={handleCompanyChange} />
+                </label>
+                <label>
+                  E-mailadres contactpersoon
+                  <input type="email" name="email_contact" value={companyForm.email_contact} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  Telefoonnummer contactpersoon
+                  <input type="tel" name="tel_contact" value={companyForm.tel_contact} onChange={handleCompanyChange} />
+                </label>
+              </div>
+
+              {/* --- Accountgegevens --- */}
+              <h3 className="registerbedrijf-section-title">Accountgegevens</h3>
+              <div className="registreer-form-grid">
+                <label>
+                  Gebruikersnaam
+                  <input type="text" name="gebruikersnaam_bedrijf" value={companyForm.gebruikersnaam_bedrijf} onChange={handleCompanyChange} required />
+                </label>
+                <label>
+                  Wachtwoord
+                  <div className="password-input-container">
+                    <input
+                      type={showCompanyPassword ? 'text' : 'password'}
+                      name="wachtwoord_bedrijf"
+                      value={companyForm.wachtwoord_bedrijf}
+                      onChange={handleCompanyChange}
+                      required
+                    />
+                    <button type="button" className="password-toggle-btn" onClick={() => setShowCompanyPassword(!showCompanyPassword)}>
+                      {showCompanyPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </label>
+                <label>
+                  Herhaal wachtwoord
+                  <div className="password-input-container">
+                    <input
+                      type={showCompanyPassword2 ? 'text' : 'password'}
+                      name="wachtwoord2_bedrijf"
+                      value={companyForm.wachtwoord2_bedrijf}
+                      onChange={handleCompanyChange}
+                      required
+                    />
+                    <button type="button" className="password-toggle-btn" onClick={() => setShowCompanyPassword2(!showCompanyPassword2)}>
+                      {showCompanyPassword2 ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </label>
+              </div>
+              <button type="submit" className="registerbedrijf-btn">Account Aanmaken</button>
             </form>
           )}
         </div>

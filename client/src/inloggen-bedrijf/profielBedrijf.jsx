@@ -44,48 +44,55 @@ export default function Profiel() {
     contact_email: user?.contact_email || "",
     contact_telefoon: user?.contact_telefoon || "",
     gebruikersnaam: user?.gebruikersnaam || "",
-    wachtwoord: user?.wachtwoord || "",
+    wachtwoord: "", // Start met een leeg wachtwoordveld
     sector: user?.sector || "",
     beschrijving: user?.beschrijving || "",
-    zoeken_we: user?.zoeken_we || "",
+    gezocht_profiel_omschrijving: user?.gezocht_profiel_omschrijving || "",
+    gezochte_opleidingen: user?.gezochte_opleidingen || "",
+    dienstverbanden: user?.dienstverbanden || [],
     created_at: user?.created_at || "",
     lokaal: user?.lokaal || "",
     verdieping: user?.verdieping || ""
   });
 
   useEffect(() => {
-    if (user) {
-      setProfile({
-        bedrijf_id: user.bedrijf_id || "",
-        bedrijf_URL: user.bedrijf_URL || "",
-        naam: user.naam || "",
-        BTW_nr: user.BTW_nr || "",
-        straatnaam: user.straatnaam || "",
-        huis_nr: user.huis_nr || "",
-        bus_nr: user.bus_nr || "",
-        postcode: user.postcode || "",
-        gemeente: user.gemeente || "",
-        telefoon_nr: user.telefoon_nr || "",
-        email: user.email || "",
-        contact_voornaam: user.contact_voornaam || "",
-        contact_naam: user.contact_naam || "",
-        contact_specialisatie: user.contact_specialisatie || "",
-        contact_email: user.contact_email || "",
-        contact_telefoon: user.contact_telefoon || "",
-        gebruikersnaam: user.gebruikersnaam || "",
-        wachtwoord: user.wachtwoord || "",
-        sector: user.sector || "",
-        beschrijving: user.beschrijving || "",
-        zoeken_we: user.zoeken_we || "",
-        created_at: user.created_at || "",
-        lokaal: user.lokaal || "",
-        verdieping: user.verdieping || ""
-      });
-    }
-  }, [user]);
+    const fetchProfile = async () => {
+      if (user?.bedrijf_id) {
+        try {
+          const res = await fetch(`/api/bedrijf/profiel/${user.bedrijf_id}`);
+          if (res.ok) {
+            const data = await res.json();
+            setProfile({
+              ...data,
+              wachtwoord: "", // Wachtwoord niet meesturen, dus leeg houden
+            });
+          } else {
+            setError("Profielgegevens konden niet worden geladen.");
+          }
+        } catch (err) {
+          setError("Netwerkfout bij het laden van profielgegevens.");
+        }
+      }
+    };
+    fetchProfile();
+  }, [user?.bedrijf_id]);
 
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
+  };
+
+  const handleDienstverbandChange = (e) => {
+    const { value, checked } = e.target;
+    const { dienstverbanden } = profile;
+
+    if (checked) {
+      setProfile({ ...profile, dienstverbanden: [...dienstverbanden, value] });
+    } else {
+      setProfile({
+        ...profile,
+        dienstverbanden: dienstverbanden.filter((item) => item !== value),
+      });
+    }
   };
 
   const handleSave = async (e) => {
@@ -99,8 +106,15 @@ export default function Profiel() {
       return;
     }
 
-    const postData = { ...profile, gebruikerId: parseInt(profile.bedrijf_id, 10) };
-    console.log('POST profiel:', postData);
+    // Clone het profiel object om het veilig aan te passen voor de POST request
+    const postData = { ...profile };
+
+    // Als het wachtwoordveld leeg is, verwijder het dan uit de data
+    // zodat het niet wordt geüpdatet naar een lege string.
+    if (!postData.wachtwoord) {
+      delete postData.wachtwoord;
+    }
+
     try {
       const res = await fetch("/api/bedrijf/update", {
         method: "POST",
@@ -110,12 +124,21 @@ export default function Profiel() {
       if (res.ok) {
         setSuccess("Profiel succesvol bijgewerkt.");
         setEditMode(false);
-        setUser({ ...user, ...profile });
+        // Update de user context met de nieuwe data (zonder wachtwoord)
+        const updatedUser = { ...user, ...profile };
+        if (postData.wachtwoord) {
+          updatedUser.wachtwoord = postData.wachtwoord; // Update wachtwoord in context als het is gewijzigd
+        } else {
+          delete updatedUser.wachtwoord;
+        }
+        setUser(updatedUser);
+
       } else {
-        setError("Er is iets misgegaan bij het opslaan.");
+        const errData = await res.json();
+        setError(errData.error || "Er is iets misgegaan bij het opslaan.");
       }
     } catch (err) {
-      setError("Er is iets misgegaan bij het opslaan.");
+      setError("Netwerkfout bij het opslaan.");
     }
   };
 
@@ -178,8 +201,26 @@ export default function Profiel() {
                 </div>
               </div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Sector</span><input name="sector" value={profile.sector} onChange={handleChange} /></div>
-              <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Beschrijving</span><textarea name="beschrijving" value={profile.beschrijving} onChange={handleChange} /></div>
-              <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Wat zoeken we?</span><textarea name="zoeken_we" value={profile.zoeken_we} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Bedrijfsbeschrijving</span><textarea name="beschrijving" value={profile.beschrijving} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Omschrijving gezocht profiel</span><textarea name="gezocht_profiel_omschrijving" value={profile.gezocht_profiel_omschrijving} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Gezochte opleidingen (voor matching)</span><textarea name="gezochte_opleidingen" value={profile.gezochte_opleidingen} onChange={handleChange} /></div>
+              <div className="bedrijfprofiel-info-item profiel-grid-full">
+                <span className="bedrijfprofiel-label">Aangeboden dienstverbanden</span>
+                <div className="checkbox-group">
+                  {['Voltijds', 'Deeltijds', 'Freelance', 'Stage'].map(dienstverband => (
+                    <label key={dienstverband} className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="dienstverbanden"
+                        value={dienstverband}
+                        checked={profile.dienstverbanden.includes(dienstverband)}
+                        onChange={handleDienstverbandChange}
+                      />
+                      {dienstverband}
+                    </label>
+                  ))}
+                </div>
+              </div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Lokaal</span><span className="bedrijfprofiel-value">{mapKlasToAula(profile.lokaal) || 'Niet toegewezen'}</span></div>
               <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Verdieping</span><span className="bedrijfprofiel-value">{mapKlasToAula(profile.verdieping) || 'Onbekend'}</span></div>
             </div>
@@ -204,8 +245,10 @@ export default function Profiel() {
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Contact telefoon</span><span className="bedrijfprofiel-value">{profile.contact_telefoon}</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Gebruikersnaam</span><span className="bedrijfprofiel-value">{profile.gebruikersnaam}</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Sector</span><span className="bedrijfprofiel-value">{profile.sector}</span></div>
-            <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Beschrijving</span><span className="bedrijfprofiel-value">{profile.beschrijving}</span></div>
-            <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Wat zoeken we?</span><span className="bedrijfprofiel-value">{profile.zoeken_we}</span></div>
+            <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Bedrijfsbeschrijving</span><span className="bedrijfprofiel-value">{profile.beschrijving}</span></div>
+            <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Omschrijving gezocht profiel</span><span className="bedrijfprofiel-value">{profile.gezocht_profiel_omschrijving}</span></div>
+            <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Gezochte opleidingen</span><span className="bedrijfprofiel-value">{profile.gezochte_opleidingen}</span></div>
+            <div className="bedrijfprofiel-info-item profiel-grid-full"><span className="bedrijfprofiel-label">Aangeboden dienstverbanden</span><span className="bedrijfprofiel-value">{(profile.dienstverbanden || []).join(', ')}</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Lokaal</span><span className="bedrijfprofiel-value">{mapKlasToAula(profile.lokaal) || 'Niet toegewezen'}</span></div>
             <div className="bedrijfprofiel-info-item"><span className="bedrijfprofiel-label">Verdieping</span><span className="bedrijfprofiel-value">{mapKlasToAula(profile.verdieping) || 'Onbekend'}</span></div>
           </div>

@@ -149,28 +149,29 @@ export default function SpeeddatePage() {
         <>
           <div className="speeddate-header">{bedrijf.naam}</div>
           <div className="speeddate-labels">
-            <span className="speeddate-label">Sector: {bedrijf.sector || "IT"}</span>
-            <span className="speeddate-label">Dienstverband: stage</span>
+            <span className="speeddate-label">Sector: {bedrijf.sector || "N.v.t."}</span>
+            <span className="speeddate-label">Dienstverband: {(bedrijf.dienstverbanden && bedrijf.dienstverbanden.length > 0) ? bedrijf.dienstverbanden.join(', ') : 'N.v.t.'}</span>
           </div>
 
           <div className="speeddate-box">
             <div className="speeddate-title">Wie zijn we:</div>
-            <div style={{ marginBottom: 12 }}>{bedrijf.beschrijving || "Welkom bij ICT-Talents, waar we de toekomst van technologie vormgeven door middel van innovatie en talent! Bij ons geen on-the-job, maar een duurzame relatie die langdurig meegaat en een eindeloze loop in je code. Wij zijn op zoek naar een enthousiaste .NET Developer om ons dynamisch team te versterken."}</div>
-            <div className="speeddate-title">Dit zoeken we:</div>
-            {bedrijf.zoeken_we ? (
-              <ul className="speeddate-list">
-                {bedrijf.zoeken_we.split(/\r?\n|\r|•|\*/)
-                  .map(line => line.trim())
-                  .filter(line => line.length > 0)
-                  .map((line, idx) => (
-                    <li key={idx}>{line}</li>
-                  ))}
-              </ul>
-            ) : (
-              <ul className="speeddate-list">
-                <li>Je beheerst Nederlands, hebt kennis Engels.</li>
-                <li>Affiniteit met .NET, C#, SQL, Azure is een mooie extra!</li>
-              </ul>
+            <div style={{ marginBottom: 12 }}>{bedrijf.beschrijving || "Geen beschrijving beschikbaar."}</div>
+            
+            <div className="speeddate-title">Dit zoeken we in een kandidaat:</div>
+            <div style={{ marginBottom: 12 }}>{bedrijf.gezocht_profiel_omschrijving || "Geen specifieke omschrijving beschikbaar."}</div>
+
+            {bedrijf.gezochte_opleidingen && (
+              <>
+                <div className="speeddate-title">Specifiek op zoek naar opleidingen:</div>
+                <ul className="speeddate-list">
+                  {bedrijf.gezochte_opleidingen.split(',')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0)
+                    .map((line, idx) => (
+                      <li key={idx}>{line}</li>
+                    ))}
+                </ul>
+              </>
             )}
           </div>
 

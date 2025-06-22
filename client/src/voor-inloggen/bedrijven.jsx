@@ -75,7 +75,9 @@ function Bedrijven() {
     }
     
     if (selectedDienstverband) {
-      filtered = filtered.filter(bedrijf => bedrijf.zoeken_we && bedrijf.zoeken_we.toLowerCase().includes(selectedDienstverband.toLowerCase()));
+      filtered = filtered.filter(bedrijf => 
+        bedrijf.dienstverbanden && bedrijf.dienstverbanden.includes(selectedDienstverband)
+      );
     }
 
     setFilteredBedrijven(filtered);

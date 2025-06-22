@@ -31,6 +31,16 @@ const BESCHIKBARE_LOCATIES = [
 // De vaste datum voor het speeddate-evenement.
 const EVENEMENT_DATUM = '2024-11-28';
 
+// Middleware to get user ID from request, assuming you have a way to authenticate
+// and add user info to the request object (e.g., using JWT).
+// For now, we'll assume a user ID is passed in the request body or params.
+const getBedrijfId = (req) => {
+  // This is a placeholder. In a real app, you would get this from a decoded JWT token.
+  // For example: req.user.id
+  // We'll use a hardcoded ID or one from the body for now.
+  return req.body.bedrijf_id || req.params.id || req.user?.bedrijf_id;
+};
+
 // --- EINDE CONFIGURATIE ---
 
 const app = express();
@@ -45,7 +55,9 @@ app.use('/api/admin', adminProfile);
 app.use('/api/admin', adminProtected);
 app.use('/api/admin', adminRoutes);        // bevat adminbeheer
 
-app.use('/api/admin', bedrijvenRoutes);
+// Koppel de bedrijvenRouter voor alle /api/bedrijven calls
+app.use('/api/bedrijven', bedrijvenRoutes);
+
 app.use('/api/admin', studentenRoutes);
 app.use('/api/admin', speeddatesRoutes);
 app.use('/api/admin', statistiekenRoutes);
@@ -136,16 +148,6 @@ app.get('/api/test', async (req, res) => {
     });
   }
 });
-
-app.get('/api/bedrijven', (req, res) => {
-  db.query('SELECT * FROM bedrijven', (err, results) =>{
-    if(err) {
-      console.error('Database error:', err);
-      return res.status(500).json({error: 'Database error', details: err.message});
-    }
-    res.json(results);
-  });
-}); 
 
 // Get database structure
 app.get('/api/structure', (req, res) => {
@@ -249,53 +251,51 @@ app.post('/api/register', async (req, res) => {
       res.status(500).json({ error: 'Database error', details: err.message });
     }
   } else if (type === 'bedrijf') {
+    const connection = await db.promise().getConnection();
     try {
-        const {
-            bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email,
-            contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
-            gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, number_of_representatives
-        } = userData;
+      await connection.beginTransaction();
 
-        // 1. Controleer of email of gebruikersnaam al bestaat
-        const [existingBedrijven] = await db.promise().query(
-            'SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?',
-            [email, gebruikersnaam]
-        );
-        if (existingBedrijven.length > 0) {
-            return res.status(400).json({ error: 'Email of gebruikersnaam voor bedrijf bestaat al' });
-        }
+      const {
+        bedrijfsnaam, btw, straat, gemeente, telbedrijf, emailbedrijf, sector,
+        beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen, dienstverbanden,
+        voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
+        gebruikersnaam_bedrijf, wachtwoord_bedrijf
+      } = userData;
+      
+      const [existingCompanies] = await connection.query(
+        'SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?',
+        [emailbedrijf, gebruikersnaam_bedrijf]
+      );
+      if (existingCompanies.length > 0) {
+        throw new Error('Email of gebruikersnaam bestaat al');
+      }
 
-        // 2. Zoek een vrije locatie
-        const [gebruikteLokalen] = await db.promise().query('SELECT lokaal FROM bedrijven WHERE lokaal IS NOT NULL');
-        const gebruikteLokaalNamen = gebruikteLokalen.map(b => b.lokaal);
-        const vrijeLocatie = BESCHIKBARE_LOCATIES.find(loc => !gebruikteLokaalNamen.includes(loc.lokaal));
+      const [result] = await connection.query(
+        'INSERT INTO bedrijven (naam, BTW_nr, straatnaam, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen, is_verified, verification_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [bedrijfsnaam, btw, straat, gemeente, telbedrijf, emailbedrijf, voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact, gebruikersnaam_bedrijf, wachtwoord_bedrijf, sector, beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen, false, verificationToken]
+      );
+      
+      const bedrijfId = result.insertId;
 
-        if (!vrijeLocatie) {
-            return res.status(500).json({ error: 'Geen vrije locaties meer beschikbaar voor het evenement.' });
-        }
+      if (dienstverbanden && dienstverbanden.length > 0) {
+        const dienstverbandQuery = 'INSERT INTO bedrijf_dienstverbanden (bedrijf_id, dienstverband_id) SELECT ?, id FROM dienstverbanden WHERE naam IN (?)';
+        await connection.query(dienstverbandQuery, [bedrijfId, dienstverbanden]);
+      }
 
-        // 3. Voeg bedrijf toe aan de database met de toegewezen locatie
-        const [result] = await db.promise().query(
-            `INSERT INTO bedrijven (bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, lokaal, verdieping, number_of_representatives, is_verified, verification_token) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, zoeken_we, vrijeLocatie.lokaal, vrijeLocatie.verdieping, number_of_representatives, false, verificationToken]
-        );
-        
-        const nieuwBedrijfId = result.insertId;
+      await sendVerificationEmail(emailbedrijf, verificationToken);
+      
+      await connection.commit();
+      res.status(201).json({ message: 'Account succesvol aangemaakt. Controleer je e-mail voor de verificatielink.' });
 
-        // 4. Maak tijdsloten aan voor het nieuwe bedrijf
-        await createTimeslotsForBedrijf(nieuwBedrijfId, EVENEMENT_DATUM);
-        
-        // 5. Stuur verificatie-email
-        await sendVerificationEmail(email, verificationToken);
-
-        res.status(201).json({ message: 'Bedrijfsaccount succesvol aangemaakt. Een locatie en tijdsloten zijn toegewezen. Controleer je e-mail voor de verificatielink.' });
     } catch (err) {
-        console.error('Error in bedrijf registration:', err);
-        res.status(500).json({ error: 'Database error', details: err.message });
+      await connection.rollback();
+      console.error('Error in company registration:', err);
+      res.status(500).json({ error: err.message || 'Database error' });
+    } finally {
+      connection.release();
     }
   } else {
-    res.status(400).json({ error: 'Ongeldig type gebruiker' });
+    res.status(400).json({ error: 'Ongeldig registratietype' });
   }
 });
 
@@ -574,101 +574,61 @@ console.log(`ingevoegd: ${name}`);
 });
 */
 
-// Profiel van bedrijf updaten
+// POST om bedrijfsprofiel bij te werken
 app.post('/api/bedrijf/update', async (req, res) => {
-  console.log('Ontvangen body voor update:', req.body); // Debug log
-  const {
-    gebruikerId,
-    naam,
-    BTW_nr,
-    bedrijf_URL,
-    straatnaam,
-    huis_nr,
-    bus_nr,
-    postcode,
-    gemeente,
-    telefoon_nr,
-    email,
-    contact_voornaam,
-    contact_naam,
-    contact_specialisatie,
-    contact_email,
-    contact_telefoon,
-    gebruikersnaam,
-    wachtwoord,
-    sector,
-    beschrijving,
-    zoeken_we
+  const { 
+    bedrijf_id, 
+    dienstverbanden,
+    bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente,
+    telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie,
+    contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, 
+    beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen 
   } = req.body;
-  if (!gebruikerId) {
-    return res.status(400).json({ error: 'Bedrijf ID ontbreekt' });
+
+  if (!bedrijf_id) {
+    return res.status(400).json({ error: 'bedrijf_id is verplicht' });
   }
+
+  const updatableBedrijfsData = {
+    bedrijf_URL, naam, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente,
+    telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie,
+    contact_email, contact_telefoon, gebruikersnaam, sector, 
+    beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen
+  };
+
+  if (wachtwoord) {
+    updatableBedrijfsData.wachtwoord = wachtwoord;
+  }
+
+  Object.keys(updatableBedrijfsData).forEach(key => updatableBedrijfsData[key] === undefined && delete updatableBedrijfsData[key]);
+
+  const connection = await db.promise().getConnection();
+
   try {
-    // Alle velden updaten behalve bedrijf_id en created_at
-    await db.promise().query(
-      `UPDATE bedrijven SET 
-        naam = ?, 
-        BTW_nr = ?,
-        bedrijf_URL = ?,
-        straatnaam = ?,
-        huis_nr = ?,
-        bus_nr = ?,
-        postcode = ?,
-        gemeente = ?,
-        telefoon_nr = ?,
-        email = ?,
-        contact_voornaam = ?,
-        contact_naam = ?,
-        contact_specialisatie = ?,
-        contact_email = ?,
-        contact_telefoon = ?,
-        gebruikersnaam = ?,
-        wachtwoord = ?,
-        sector = ?,
-        beschrijving = ?,
-        zoeken_we = ?
-      WHERE bedrijf_id = ?`,
-      [
-        naam,
-        BTW_nr,
-        bedrijf_URL,
-        straatnaam,
-        huis_nr,
-        bus_nr,
-        postcode,
-        gemeente,
-        telefoon_nr,
-        email,
-        contact_voornaam,
-        contact_naam,
-        contact_specialisatie,
-        contact_email,
-        contact_telefoon,
-        gebruikersnaam,
-        wachtwoord,
-        sector,
-        beschrijving,
-        zoeken_we,
-        gebruikerId
-      ]
-    );
-    // Dan de volledige geüpdatete data ophalen
-    const [updatedBedrijf] = await db.promise().query(
-      'SELECT * FROM bedrijven WHERE bedrijf_id = ?',
-      [gebruikerId]
-    );
-    if (updatedBedrijf.length === 0) {
-      return res.status(404).json({ error: 'Bedrijf niet gevonden na update' });
+    await connection.beginTransaction();
+
+    const updateQuery = 'UPDATE bedrijven SET ? WHERE bedrijf_id = ?';
+    if (Object.keys(updatableBedrijfsData).length > 0) {
+      await connection.query(updateQuery, [updatableBedrijfsData, bedrijf_id]);
     }
-    const user = updatedBedrijf[0];
-    delete user.wachtwoord; // Verwijder wachtwoord uit response
-    res.json({
-      message: 'Profiel succesvol bijgewerkt',
-      user: user
-    });
+
+    await connection.query('DELETE FROM bedrijf_dienstverbanden WHERE bedrijf_id = ?', [bedrijf_id]);
+
+    if (dienstverbanden && dienstverbanden.length > 0) {
+      const dienstverbandQuery = 'INSERT INTO bedrijf_dienstverbanden (bedrijf_id, dienstverband_id) SELECT ?, id FROM dienstverbanden WHERE naam IN (?)';
+      await connection.query(dienstverbandQuery, [bedrijf_id, dienstverbanden]);
+    }
+    
+    await connection.commit();
+
+    res.status(200).json({ message: 'Profiel succesvol bijgewerkt.' });
+
   } catch (err) {
-    console.error('Fout bij updaten profiel:', err);
-    res.status(500).json({ error: 'Database error', details: err.message });
+    await connection.rollback();
+    console.error(`Fout bij bijwerken bedrijfsprofiel voor ID ${bedrijf_id}:`, err);
+    res.status(500).json({ error: 'Databasefout bij bijwerken profiel', details: err.message });
+  } finally {
+    connection.release();
   }
 });
 
@@ -837,6 +797,42 @@ app.get('/api/verify', async (req, res) => {
         console.error('Error during verification:', err);
         res.status(500).json({ error: 'Databasefout tijdens verificatieproces.' });
     }
+});
+
+// GET bedrijfsprofiel data (inclusief dienstverbanden)
+app.get('/api/bedrijf/profiel/:id', async (req, res) => {
+  const bedrijfId = req.params.id;
+
+  if (!bedrijfId) {
+    return res.status(400).json({ error: 'Bedrijf ID is verplicht' });
+  }
+
+  try {
+    // 1. Haal basis bedrijfsinformatie op
+    const [bedrijven] = await db.promise().query('SELECT * FROM bedrijven WHERE bedrijf_id = ?', [bedrijfId]);
+    if (bedrijven.length === 0) {
+      return res.status(404).json({ error: 'Bedrijf niet gevonden' });
+    }
+    const bedrijf = bedrijven[0];
+    delete bedrijf.wachtwoord; // Stuur nooit het wachtwoord terug
+
+    // 2. Haal de gekoppelde dienstverbanden op
+    const [dienstverbanden] = await db.promise().query(`
+      SELECT d.naam 
+      FROM bedrijf_dienstverbanden bd
+      JOIN dienstverbanden d ON bd.dienstverband_id = d.id
+      WHERE bd.bedrijf_id = ?
+    `, [bedrijfId]);
+
+    // 3. Voeg de lijst van dienstverband-namen toe aan het bedrijfs-object
+    bedrijf.dienstverbanden = dienstverbanden.map(d => d.naam);
+
+    res.json(bedrijf);
+
+  } catch (err) {
+    console.error('Fout bij ophalen bedrijfsprofiel:', err);
+    res.status(500).json({ error: 'Databasefout bij ophalen profiel' });
+  }
 });
 
 app.listen(PORT, () => {

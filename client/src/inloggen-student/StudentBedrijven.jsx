@@ -34,52 +34,28 @@ function calculateMatchScore(student, bedrijf) {
   let reasons = [];
 
   // 1. Opleiding matching
-  if (student.opleiding && bedrijf.zoeken_we) {
-    try {
-      const zoekenWe = typeof bedrijf.zoeken_we === 'string' ? JSON.parse(bedrijf.zoeken_we) : bedrijf.zoeken_we;
-      if (Array.isArray(zoekenWe)) {
-        const hasOpleidingMatch = zoekenWe.some(item => 
-          item.toLowerCase().includes(student.opleiding.toLowerCase()) ||
-          student.opleiding.toLowerCase().includes(item.toLowerCase())
-        );
-        if (hasOpleidingMatch) {
-          score += 3;
-          reasons.push('opleiding match');
-        }
-      }
-    } catch (e) {
-      // Fallback: check direct in zoeken_we string
-      if (bedrijf.zoeken_we.toLowerCase().includes(student.opleiding.toLowerCase())) {
-        score += 3;
-        reasons.push('opleiding match');
-      }
+  if (student.opleiding && bedrijf.gezochte_opleidingen) {
+    if (bedrijf.gezochte_opleidingen.toLowerCase().includes(student.opleiding.toLowerCase())) {
+      score += 3;
+      reasons.push('opleiding match');
     }
   }
 
   // 2. Dienstverbanden matching
   if (student.dienstverbanden && bedrijf.dienstverbanden) {
-    try {
-      const studentDienstverbanden = typeof student.dienstverbanden === 'string' ? 
-        JSON.parse(student.dienstverbanden) : student.dienstverbanden;
-      const bedrijfDienstverbanden = typeof bedrijf.dienstverbanden === 'string' ? 
-        JSON.parse(bedrijf.dienstverbanden) : bedrijf.dienstverbanden;
-      
-      if (Array.isArray(studentDienstverbanden) && Array.isArray(bedrijfDienstverbanden)) {
-        const hasDienstverbandMatch = studentDienstverbanden.some(studentDienst =>
-          bedrijfDienstverbanden.some(bedrijfDienst =>
-            studentDienst.toLowerCase().includes(bedrijfDienst.toLowerCase()) ||
-            bedrijfDienst.toLowerCase().includes(studentDienst.toLowerCase())
-          )
-        );
-        if (hasDienstverbandMatch) {
-          score += 2;
-          reasons.push('dienstverband match');
-        }
-      }
-    } catch (e) {
-      // Fallback: direct string comparison
-      if (student.dienstverbanden.toLowerCase().includes(bedrijf.dienstverbanden.toLowerCase()) ||
-          bedrijf.dienstverbanden.toLowerCase().includes(student.dienstverbanden.toLowerCase())) {
+    const studentDienstverbanden = typeof student.dienstverbanden === 'string' ? 
+      JSON.parse(student.dienstverbanden) : student.dienstverbanden;
+    const bedrijfDienstverbanden = typeof bedrijf.dienstverbanden === 'string' ? 
+      JSON.parse(bedrijf.dienstverbanden) : bedrijf.dienstverbanden;
+    
+    if (Array.isArray(studentDienstverbanden) && Array.isArray(bedrijfDienstverbanden)) {
+      const hasDienstverbandMatch = studentDienstverbanden.some(studentDienst =>
+        bedrijfDienstverbanden.some(bedrijfDienst =>
+          studentDienst.toLowerCase().includes(bedrijfDienst.toLowerCase()) ||
+          bedrijfDienst.toLowerCase().includes(studentDienst.toLowerCase())
+        )
+      );
+      if (hasDienstverbandMatch) {
         score += 2;
         reasons.push('dienstverband match');
       }
@@ -183,74 +159,14 @@ function StudentBedrijven() {
           bedrijf.gemeente?.toLowerCase() === selectedLocation.toLowerCase();
         
         // Dienstverband filter
-        let matchesDienstverband = true;
-        if (selectedDienstverband !== "") {
-          try {
-            const zoekenWe = typeof bedrijf.zoeken_we === 'string' ? JSON.parse(bedrijf.zoeken_we) : bedrijf.zoeken_we;
-            if (Array.isArray(zoekenWe)) {
-              matchesDienstverband = zoekenWe.some(item => {
-                const itemLower = item.toLowerCase();
-                const selectedLower = selectedDienstverband.toLowerCase();
-                
-                // Direct match
-                if (itemLower.includes(selectedLower) || selectedLower.includes(itemLower)) {
-                  return true;
-                }
-                
-                // Common variations
-                const variations = {
-                  'voltijds': ['voltijds', 'voltijd', 'fulltime', 'full-time', 'full time', 'voltijds werk'],
-                  'deeltijds': ['deeltijds', 'deeltijd', 'parttime', 'part-time', 'part time', 'deeltijds werk'],
-                  'freelance': ['freelance', 'freelancer', 'zelfstandige', 'zelfstandig', 'freelance werk'],
-                  'stage': ['stage', 'stages', 'internship', 'intern', 'stageplaats', 'stage plaats']
-                };
-                
-                if (variations[selectedLower]) {
-                  return variations[selectedLower].some(variation => 
-                    itemLower.includes(variation)
-                  );
-                }
-                
-                return false;
-              });
-            } else {
-              const zoekenWeLower = bedrijf.zoeken_we?.toLowerCase() || '';
-              const selectedLower = selectedDienstverband.toLowerCase();
-              
-              // Direct match
-              if (zoekenWeLower.includes(selectedLower)) {
-                matchesDienstverband = true;
-              } else {
-                // Common variations
-                const variations = {
-                  'voltijds': ['voltijds', 'voltijd', 'fulltime', 'full-time', 'full time', 'voltijds werk'],
-                  'deeltijds': ['deeltijds', 'deeltijd', 'parttime', 'part-time', 'part time', 'deeltijds werk'],
-                  'freelance': ['freelance', 'freelancer', 'zelfstandige', 'zelfstandig', 'freelance werk'],
-                  'stage': ['stage', 'stages', 'internship', 'intern', 'stageplaats', 'stage plaats']
-                };
-                
-                if (variations[selectedLower]) {
-                  matchesDienstverband = variations[selectedLower].some(variation => 
-                    zoekenWeLower.includes(variation)
-                  );
-                } else {
-                  matchesDienstverband = false;
-                }
-              }
-            }
-          } catch (e) {
-            // Fallback: simple string matching
-            const zoekenWeLower = bedrijf.zoeken_we?.toLowerCase() || '';
-            const selectedLower = selectedDienstverband.toLowerCase();
-            matchesDienstverband = zoekenWeLower.includes(selectedLower);
-          }
-        }
+        const matchesDienstverband = selectedDienstverband === "" ||
+          (bedrijf.dienstverbanden && bedrijf.dienstverbanden.includes(selectedDienstverband));
         
         return matchesSearch && matchesSector && matchesLocation && matchesDienstverband;
       });
       setFilteredBedrijven(filtered);
       
-      // Filter aanbevolen bedrijven
+      // Pas exact dezelfde filter toe op de aanbevolen bedrijven
       const filteredRecommended = recommendedBedrijven.filter(bedrijf => {
         const matchesSearch = searchTerm.trim() === "" || 
           bedrijf.naam.toLowerCase().includes(searchLower) ||
@@ -264,68 +180,8 @@ function StudentBedrijven() {
         const matchesLocation = selectedLocation === "" || 
           bedrijf.gemeente?.toLowerCase() === selectedLocation.toLowerCase();
         
-        let matchesDienstverband = true;
-        if (selectedDienstverband !== "") {
-          try {
-            const zoekenWe = typeof bedrijf.zoeken_we === 'string' ? JSON.parse(bedrijf.zoeken_we) : bedrijf.zoeken_we;
-            if (Array.isArray(zoekenWe)) {
-              matchesDienstverband = zoekenWe.some(item => {
-                const itemLower = item.toLowerCase();
-                const selectedLower = selectedDienstverband.toLowerCase();
-                
-                // Direct match
-                if (itemLower.includes(selectedLower) || selectedLower.includes(itemLower)) {
-                  return true;
-                }
-                
-                // Common variations
-                const variations = {
-                  'voltijds': ['voltijds', 'voltijd', 'fulltime', 'full-time', 'full time', 'voltijds werk'],
-                  'deeltijds': ['deeltijds', 'deeltijd', 'parttime', 'part-time', 'part time', 'deeltijds werk'],
-                  'freelance': ['freelance', 'freelancer', 'zelfstandige', 'zelfstandig', 'freelance werk'],
-                  'stage': ['stage', 'stages', 'internship', 'intern', 'stageplaats', 'stage plaats']
-                };
-                
-                if (variations[selectedLower]) {
-                  return variations[selectedLower].some(variation => 
-                    itemLower.includes(variation)
-                  );
-                }
-                
-                return false;
-              });
-            } else {
-              const zoekenWeLower = bedrijf.zoeken_we?.toLowerCase() || '';
-              const selectedLower = selectedDienstverband.toLowerCase();
-              
-              // Direct match
-              if (zoekenWeLower.includes(selectedLower)) {
-                matchesDienstverband = true;
-              } else {
-                // Common variations
-                const variations = {
-                  'voltijds': ['voltijds', 'voltijd', 'fulltime', 'full-time', 'full time', 'voltijds werk'],
-                  'deeltijds': ['deeltijds', 'deeltijd', 'parttime', 'part-time', 'part time', 'deeltijds werk'],
-                  'freelance': ['freelance', 'freelancer', 'zelfstandige', 'zelfstandig', 'freelance werk'],
-                  'stage': ['stage', 'stages', 'internship', 'intern', 'stageplaats', 'stage plaats']
-                };
-                
-                if (variations[selectedLower]) {
-                  matchesDienstverband = variations[selectedLower].some(variation => 
-                    zoekenWeLower.includes(variation)
-                  );
-                } else {
-                  matchesDienstverband = false;
-                }
-              }
-            }
-          } catch (e) {
-            // Fallback: simple string matching
-            const zoekenWeLower = bedrijf.zoeken_we?.toLowerCase() || '';
-            const selectedLower = selectedDienstverband.toLowerCase();
-            matchesDienstverband = zoekenWeLower.includes(selectedLower);
-          }
-        }
+        const matchesDienstverband = selectedDienstverband === "" ||
+          (bedrijf.dienstverbanden && bedrijf.dienstverbanden.includes(selectedDienstverband));
         
         return matchesSearch && matchesSector && matchesLocation && matchesDienstverband;
       });
