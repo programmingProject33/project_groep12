@@ -330,7 +330,7 @@ function StudentBedrijven() {
           {/* Aanbevolen bedrijven */}
           {user && user.type === 'student' && filteredRecommendedBedrijven.length > 0 && (
             <div className="recommended-section">
-              <h2 className="recommended-title">
+              <h2 className="section-title">
                 <span role="img" aria-label="star">✨</span> Aanbevolen voor jouw opleiding
               </h2>
               <div className="bedrijven-grid recommended-grid">
@@ -344,7 +344,7 @@ function StudentBedrijven() {
           
           {/* Overzicht van overige bedrijven */}
           <div className="all-bedrijven-section" ref={bedrijvenOverzichtRef}>
-            <h2 className="all-bedrijven-title">
+            <h2 className="section-title">
               {searchTerm ? 'Zoekresultaten' : 'Alle partnerbedrijven'}
             </h2>
             <div className="bedrijven-grid">

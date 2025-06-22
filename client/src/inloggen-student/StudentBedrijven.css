@@ -1,1 +1,32 @@
 /* This file can be empty or contain only essential styles for the companies page */ 
+
+.recommended-section,
+.all-bedrijven-section {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.section-title span {
+  margin-right: 0.5rem;
+}
+
+.section-divider {
+  border: 0;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 3rem auto;
+  width: 80%;
+}
+
+.recommended-grid {
+  /* Specifieke stijlen voor aanbevolen grid indien nodig */
+} 
