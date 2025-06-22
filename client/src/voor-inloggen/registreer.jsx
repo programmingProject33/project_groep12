@@ -165,7 +165,8 @@ export default function Registreer()   // Dit is een functionele component in Re
         },
         body: JSON.stringify({
           type: 'student',
-          ...studentForm
+          ...studentForm,
+          dienstverbanden: []
         }),
       });
 
@@ -176,7 +177,7 @@ export default function Registreer()   // Dit is een functionele component in Re
       }
 
       // Registration successful
-      setSuccessMessage('Bijna klaar! We hebben een verificatie-e-mail gestuurd. Controleer je inbox om je registratie te voltooien.');
+      setSuccessMessage('🎉 Registratie succesvol! We hebben een verificatie-e-mail gestuurd naar je inbox. Klik op de link in de e-mail om je account te activeren. Controleer ook je spam-folder als je de e-mail niet ziet.');
       setStudentForm({
         voornaam: '',
         naam: '',
@@ -233,7 +234,7 @@ export default function Registreer()   // Dit is een functionele component in Re
       }
 
       // Registration successful
-      setSuccessMessage('Bijna klaar! We hebben een verificatie-e-mail gestuurd. Controleer je inbox om je registratie te voltooien.');
+      setSuccessMessage('🎉 Registratie succesvol! We hebben een verificatie-e-mail gestuurd naar je inbox. Klik op de link in de e-mail om je account te activeren. Controleer ook je spam-folder als je de e-mail niet ziet.');
       setCompanyForm({
         bedrijfsnaam: '',
         kvk: '',

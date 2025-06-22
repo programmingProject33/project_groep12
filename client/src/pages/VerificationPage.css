@@ -16,7 +16,7 @@
     text-align: center;
     max-width: 500px;
     width: 100%;
-    border-top: 5px solid;
+    border-top: 5px solid #3884ff; /* Default blue */
 }
 
 .verification-box.success {
@@ -34,11 +34,86 @@
     margin-bottom: 0.75rem;
 }
 
-.verification-box .message {
+.status-message {
     font-size: 1.1rem;
     color: #475569;
     line-height: 1.6;
-    min-height: 50px; /* Zorgt voor consistente hoogte */
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.success-content {
+    margin-top: 1.5rem;
+}
+
+.success-content p {
+    color: #374151;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+}
+
+.success-content p:first-child {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #059669;
+}
+
+.redirect-message {
+    font-style: italic;
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+.error-content {
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
+.help-text {
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.help-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.help-list li {
+    color: #6b7280;
+    padding: 0.25rem 0;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.help-list li:before {
+    content: "•";
+    color: #3884ff;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.action-buttons {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .link-button {
@@ -55,4 +130,59 @@
 
 .link-button:hover {
     background-color: #2367d2;
+}
+
+.login-button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: #3884ff;
+    color: white;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.login-button:hover {
+    background-color: #2367d2;
+}
+
+.register-button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: #f3f4f6;
+    color: #374151;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: 1px solid #d1d5db;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.register-button:hover {
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+    .verification-box {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-buttons button {
+        width: 100%;
+        max-width: 250px;
+    }
 } 
