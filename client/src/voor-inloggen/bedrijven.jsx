@@ -223,11 +223,18 @@ function Bedrijven() {
                 );
               })}
           </div>
-          {visibleCount < filteredBedrijven.length && (
-            <button className="toon-meer-btn" style={{margin: '2.5rem auto 0 auto', padding: '0.7rem 2.2rem', background: '#e0e7ef', color: '#1e293b', border: 'none', borderRadius: '2rem', fontSize: '1.1rem', fontWeight: 600, boxShadow: '0 2px 8px rgba(59,130,246,0.08)', cursor: 'pointer', display: 'block', transition: 'background 0.2s, color 0.2s, transform 0.2s'}} onClick={() => setVisibleCount(v => v + 9)}>
-              Toon meer
-            </button>
-          )}
+          <div className="pagination-controls">
+            {visibleCount < filteredBedrijven.length && (
+              <button className="toon-meer-btn" onClick={() => setVisibleCount(v => v + 9)}>
+                Toon meer
+              </button>
+            )}
+            {visibleCount > 9 && (
+              <button className="toon-meer-btn" onClick={() => setVisibleCount(9)}>
+                Toon minder
+              </button>
+            )}
+          </div>
         </div>
       </main>
       {showLoginModal && (

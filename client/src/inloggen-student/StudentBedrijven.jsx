@@ -354,16 +354,18 @@ function StudentBedrijven() {
                 </div>
               ))}
             </div>
-            {visibleCount < overigeBedrijven.length && (
-              <button className="toon-meer-btn" onClick={() => setVisibleCount(v => v + 9)}>
-                Toon meer
-              </button>
-            )}
-            {visibleCount > 9 && (
-              <button className="toon-meer-btn" style={{background: '#f1f5f9', color: '#2563eb', marginTop: '1rem'}} onClick={() => setVisibleCount(9)}>
-                Toon minder
-              </button>
-            )}
+            <div className="pagination-controls">
+              {visibleCount < overigeBedrijven.length && (
+                <button className="toon-meer-btn" onClick={() => setVisibleCount(v => v + 9)}>
+                  Toon meer
+                </button>
+              )}
+              {visibleCount > 9 && (
+                <button className="toon-meer-btn" onClick={() => setVisibleCount(9)}>
+                  Toon minder
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </main>

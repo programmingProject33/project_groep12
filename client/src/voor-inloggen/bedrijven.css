@@ -372,9 +372,14 @@
 
 
 /* --- Toon Meer Button --- */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
 .toon-meer-btn {
-  display: block;
-  margin: 2.5rem auto 0 auto;
   padding: 0.7rem 2.2rem;
   background: #e0e7ef;
   color: #1e293b;
@@ -382,14 +387,14 @@
   border-radius: 2rem;
   font-size: 1.1rem;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(59,130,246,0.08);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
   cursor: pointer;
   transition: background 0.2s, color 0.2s, transform 0.2s;
 }
+
 .toon-meer-btn:hover {
-  background: #3b82f6;
-  color: #fff;
-  transform: translateY(-2px) scale(1.04);
+  background: #d1d5db;
+  transform: translateY(-2px);
 }
 
 
