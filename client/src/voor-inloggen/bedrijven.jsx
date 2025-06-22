@@ -38,6 +38,7 @@ function Bedrijven() {
   const [filteredBedrijven, setFilteredBedrijven] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSector, setSelectedSector] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedDienstverband, setSelectedDienstverband] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -63,15 +64,16 @@ function Bedrijven() {
 
     if (searchTerm.trim() !== "") {
       filtered = filtered.filter(bedrijf =>
-        bedrijf.naam.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bedrijf.gemeente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bedrijf.sector?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        bedrijf.beschrijving?.toLowerCase().includes(searchTerm.toLowerCase())
+        bedrijf.naam.toLowerCase().startsWith(searchTerm.toLowerCase())
       );
     }
     
     if (selectedSector) {
       filtered = filtered.filter(bedrijf => bedrijf.sector === selectedSector);
+    }
+    
+    if (selectedLocation) {
+      filtered = filtered.filter(bedrijf => bedrijf.gemeente === selectedLocation);
     }
     
     if (selectedDienstverband) {
@@ -83,7 +85,7 @@ function Bedrijven() {
     setFilteredBedrijven(filtered);
     setVisibleCount(9); // Reset zichtbare items bij elke filterwijziging
 
-  }, [searchTerm, selectedSector, selectedDienstverband, bedrijven]);
+  }, [searchTerm, selectedSector, selectedLocation, selectedDienstverband, bedrijven]);
 
   const handleReserveerClick = (bedrijfId) => {
     if (user) {
@@ -125,6 +127,9 @@ function Bedrijven() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
               />
+              <button className="search-button">
+                Zoeken
+              </button>
             </div>
 
             <div className="filters-container">
@@ -136,6 +141,17 @@ function Bedrijven() {
                 <option value="">Alle Sectoren</option>
                 {uniekeSectoren.map(sector => (
                   <option key={sector} value={sector}>{sector}</option>
+                ))}
+              </select>
+
+              <select
+                className="filter-select"
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+              >
+                <option value="">Alle Locaties</option>
+                {[...new Set(bedrijven.map(b => b.gemeente).filter(Boolean))].sort().map(gemeente => (
+                  <option key={gemeente} value={gemeente}>{gemeente}</option>
                 ))}
               </select>
 

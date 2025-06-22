@@ -143,12 +143,9 @@ function StudentBedrijven() {
       
       // Filter alle bedrijven
       const filtered = bedrijven.filter(bedrijf => {
-        // Search term filter
+        // Search term filter - alleen bedrijven waarvan de naam begint met de zoekterm
         const matchesSearch = searchTerm.trim() === "" || 
-          bedrijf.naam.toLowerCase().includes(searchLower) ||
-          bedrijf.gemeente.toLowerCase().includes(searchLower) ||
-          bedrijf.sector?.toLowerCase().includes(searchLower) ||
-          bedrijf.beschrijving?.toLowerCase().includes(searchLower);
+          bedrijf.naam.toLowerCase().startsWith(searchLower);
         
         // Sector filter
         const matchesSector = selectedSector === "" || 
@@ -169,10 +166,7 @@ function StudentBedrijven() {
       // Pas exact dezelfde filter toe op de aanbevolen bedrijven
       const filteredRecommended = recommendedBedrijven.filter(bedrijf => {
         const matchesSearch = searchTerm.trim() === "" || 
-          bedrijf.naam.toLowerCase().includes(searchLower) ||
-          bedrijf.gemeente.toLowerCase().includes(searchLower) ||
-          bedrijf.sector?.toLowerCase().includes(searchLower) ||
-          bedrijf.beschrijving?.toLowerCase().includes(searchLower);
+          bedrijf.naam.toLowerCase().startsWith(searchLower);
         
         const matchesSector = selectedSector === "" || 
           bedrijf.sector?.toLowerCase() === selectedSector.toLowerCase();
@@ -275,216 +269,63 @@ function StudentBedrijven() {
           <h1 className="bedrijven-title"><span role="img" aria-label="zoek" dangerouslySetInnerHTML={{__html: "&#128269;"}} /> Ontdek onze partnerbedrijven</h1>
           <p className="bedrijven-subtitle">Kies je favoriet en plan je speeddates</p>
           
-          {/* Zoekbalk */}
-          <div className="search-container" style={{
-            marginBottom: '2rem',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '1rem'
-          }}>
-            <div className="search-box" style={{
-              position: 'relative',
-              width: '100%',
-              maxWidth: '500px'
-            }}>
-              <FaSearch style={{
-                position: 'absolute',
-                left: '1rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#64748b',
-                fontSize: '1.1rem'
-              }} />
+          {/* Zoekbalk en filters */}
+          <div className="search-filter-section">
+            <div className="search-box">
+              <FaSearch className="search-icon" />
               <input
                 type="text"
-                placeholder="Zoek op bedrijfsnaam, plaats, sector of beschrijving..."
+                placeholder="Zoek op naam, plaats, sector..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '1rem 1rem 1rem 3rem',
-                  border: '2px solid #e2e8f0',
-                  borderRadius: '1rem',
-                  fontSize: '1rem',
-                  outline: 'none',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  background: '#fff'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#3b82f6';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
+                className="search-input"
               />
+              <button className="search-button">
+                Zoeken
+              </button>
             </div>
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm("")}
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: '#f1f5f9',
-                  border: '1px solid #cbd5e1',
-                  borderRadius: '0.5rem',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  color: '#64748b'
-                }}
+
+            <div className="filters-container">
+              <select 
+                className="filter-select"
+                value={selectedSector}
+                onChange={(e) => setSelectedSector(e.target.value)}
               >
-                Wissen
-              </button>
-            )}
-          </div>
+                <option value="">Alle Sectoren</option>
+                {[...new Set(bedrijven.map(b => b.sector).filter(Boolean))].sort().map(sector => (
+                  <option key={sector} value={sector}>{sector}</option>
+                ))}
+              </select>
 
-          {/* Filters */}
-          <div className="filters-container" style={{
-            marginBottom: '2rem',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '1rem',
-            flexWrap: 'wrap'
-          }}>
-            {/* Sector Filter */}
-            <select
-              value={selectedSector}
-              onChange={(e) => setSelectedSector(e.target.value)}
-              style={{
-                padding: '0.75rem 1rem',
-                border: '2px solid #e2e8f0',
-                borderRadius: '0.8rem',
-                fontSize: '1rem',
-                outline: 'none',
-                transition: 'border-color 0.2s, box-shadow 0.2s',
-                background: '#fff',
-                minWidth: '150px',
-                cursor: 'pointer'
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = '#3b82f6';
-                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = '#e2e8f0';
-                e.target.style.boxShadow = 'none';
-              }}
-            >
-              <option value="">Alle sectoren</option>
-              {[...new Set(bedrijven.map(b => b.sector).filter(Boolean))].sort().map(sector => (
-                <option key={sector} value={sector}>{sector}</option>
-              ))}
-            </select>
-
-            {/* Locatie Filter */}
-            <select
-              value={selectedLocation}
-              onChange={(e) => setSelectedLocation(e.target.value)}
-              style={{
-                padding: '0.75rem 1rem',
-                border: '2px solid #e2e8f0',
-                borderRadius: '0.8rem',
-                fontSize: '1rem',
-                outline: 'none',
-                transition: 'border-color 0.2s, box-shadow 0.2s',
-                background: '#fff',
-                minWidth: '150px',
-                cursor: 'pointer'
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = '#3b82f6';
-                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = '#e2e8f0';
-                e.target.style.boxShadow = 'none';
-              }}
-            >
-              <option value="">Alle locaties</option>
-              {[...new Set(bedrijven.map(b => b.gemeente).filter(Boolean))].sort().map(gemeente => (
-                <option key={gemeente} value={gemeente}>{gemeente}</option>
-              ))}
-            </select>
-
-            {/* Dienstverband Filter */}
-            <select
-              value={selectedDienstverband}
-              onChange={(e) => setSelectedDienstverband(e.target.value)}
-              style={{
-                padding: '0.75rem 1rem',
-                border: '2px solid #e2e8f0',
-                borderRadius: '0.8rem',
-                fontSize: '1rem',
-                outline: 'none',
-                transition: 'border-color 0.2s, box-shadow 0.2s',
-                background: '#fff',
-                minWidth: '150px',
-                cursor: 'pointer'
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = '#3b82f6';
-                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = '#e2e8f0';
-                e.target.style.boxShadow = 'none';
-              }}
-            >
-              <option value="">Alle dienstverbanden</option>
-              <option value="voltijds">Voltijds</option>
-              <option value="deeltijds">Deeltijds</option>
-              <option value="freelance">Freelance</option>
-              <option value="stage">Stage</option>
-            </select>
-
-            {/* Clear Filters Button */}
-            {(selectedSector || selectedLocation || selectedDienstverband) && (
-              <button
-                onClick={() => {
-                  setSelectedSector("");
-                  setSelectedLocation("");
-                  setSelectedDienstverband("");
-                }}
-                style={{
-                  padding: '0.75rem 1rem',
-                  background: '#f1f5f9',
-                  border: '1px solid #cbd5e1',
-                  borderRadius: '0.8rem',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  color: '#64748b'
-                }}
+              <select
+                className="filter-select"
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
               >
-                Filters wissen
-              </button>
-            )}
+                <option value="">Alle Locaties</option>
+                {[...new Set(bedrijven.map(b => b.gemeente).filter(Boolean))].sort().map(gemeente => (
+                  <option key={gemeente} value={gemeente}>{gemeente}</option>
+                ))}
+              </select>
+
+              <select
+                className="filter-select"
+                value={selectedDienstverband}
+                onChange={(e) => setSelectedDienstverband(e.target.value)}
+              >
+                <option value="">Alle Dienstverbanden</option>
+                <option value="Voltijds">Voltijds</option>
+                <option value="Deeltijds">Deeltijds</option>
+                <option value="Freelance">Freelance</option>
+                <option value="Stage">Stage</option>
+              </select>
+            </div>
           </div>
 
           {/* Resultaten teller */}
-          {(searchTerm || selectedSector || selectedLocation || selectedDienstverband) && (
-            <div style={{
-              textAlign: 'center',
-              marginBottom: '1.5rem',
-              color: '#64748b',
-              fontSize: '1rem'
-            }}>
-              {filteredBedrijven.length} bedrijf{filteredBedrijven.length !== 1 ? 'en' : ''} gevonden
-              {filteredRecommendedBedrijven.length > 0 && (
-                <span style={{ marginLeft: '0.5rem', color: '#3b82f6' }}>
-                  ({filteredRecommendedBedrijven.length} aanbevolen)
-                </span>
-              )}
-              {(selectedSector || selectedLocation || selectedDienstverband) && (
-                <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#94a3b8' }}>
-                  {selectedSector && <span style={{ marginRight: '1rem' }}>Sector: {selectedSector}</span>}
-                  {selectedLocation && <span style={{ marginRight: '1rem' }}>Locatie: {selectedLocation}</span>}
-                  {selectedDienstverband && <span>Dienstverband: {selectedDienstverband}</span>}
-                </div>
-              )}
-            </div>
-          )}
+          <div className="result-count">
+            {filteredBedrijven.length} bedrijf{filteredBedrijven.length !== 1 ? 'en' : ''} gevonden
+          </div>
           
           {/* Aanbevolen bedrijven */}
           {user && user.type === 'student' && filteredRecommendedBedrijven.length > 0 && (
@@ -497,11 +338,6 @@ function StudentBedrijven() {
                   <BedrijfCard key={bedrijf.bedrijf_id} bedrijf={bedrijf} index={index} isRecommended={true} />
                 ))}
               </div>
-              {overigeBedrijven.length > 0 && (
-                <button className="scroll-btn" onClick={scrollToOverzicht}>
-                  Toon alle bedrijven <span style={{fontSize: '1.3em', marginLeft: '0.5em'}} aria-label="pijl" role="img">↓</span>
-                </button>
-              )}
               {overigeBedrijven.length > 0 && <div className="section-divider"></div>}
             </div>
           )}

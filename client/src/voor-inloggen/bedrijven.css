@@ -64,7 +64,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   width: 100%;
   max-width: 800px;
   margin: 0 auto 2rem auto;
@@ -74,19 +74,19 @@
 
 .filters-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 1rem;
-  padding: 2rem;
-  background-color: #ffffff;
-  border-radius: 1.5rem;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
-  border: 1px solid #eef2f7;
   width: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .search-box {
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .search-icon {
@@ -97,13 +97,14 @@
   color: #64748b;
   font-size: 1.1rem;
   pointer-events: none;
+  z-index: 2;
 }
 
 .search-input {
-  width: 100%;
+  flex: 1;
   padding: 1.2rem 1.5rem 1.2rem 4rem;
   border: 1px solid #dde4ee;
-  border-radius: 1.5rem;
+  border-radius: 1.5rem 0 0 1.5rem;
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -111,15 +112,35 @@
   color: #334155;
 }
 
+.search-button {
+  padding: 1.2rem 2rem;
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 0 1.5rem 1.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.search-button:hover {
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
 .filter-select {
-  width: 100%;
-  padding: 1.2rem 1.5rem;
+  width: auto;
+  min-width: 150px;
+  padding: 1rem 1.5rem;
   border: 1px solid #dde4ee;
   border-radius: 0.75rem;
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
-  background: #f8fafc;
+  background: #ffffff;
   color: #334155;
   -webkit-appearance: none;
   appearance: none;
@@ -127,12 +148,17 @@
   background-position: right 1.5rem center;
   background-repeat: no-repeat;
   background-size: 1em 1em;
+  cursor: pointer;
 }
 
 .search-input:focus,
 .filter-select:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.search-input:focus {
+  border-right-color: #3b82f6;
 }
 
 .result-count {
