@@ -1,92 +1,69 @@
 import { useEffect, useState } from 'react';
 import '../App.css';
 
-export default function Dashboard() {
-  const [admin, setAdmin] = useState(null);
+function Dashboard() {
   const [stats, setStats] = useState({
     companies: 0,
     students: 0,
     reservations: 0,
-    questions: 0
+    avgPerCompany: 0,
+    reservedStudents: 0,
+    unreservedStudents: 0,
+    totalSlots: 0,
+    availableSlots: 0,
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+
+  const token = localStorage.getItem('adminToken');
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      setError('Geen toegang');
-      setLoading(false);
-      return;
-    }
+    const headers = { Authorization: `Bearer ${token}` };
 
-    // Haal profiel op
-    fetch('http://localhost:5000/api/admin/me', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => setAdmin(data))
-      .catch(() => setError('Fout bij ophalen profiel'));
-
-    // Haal statistieken op
     Promise.all([
-      fetch('http://localhost:5000/api/admin/stats/companies', {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-      fetch('http://localhost:5000/api/admin/stats/students', {
-        headers: { Authorization: `Bearer ${token}` }
-      }),
-      fetch('http://localhost:5000/api/admin/stats/reservations', {
-        headers: { Authorization: `Bearer ${token}` }
-      }),
-      
+      fetch('http://localhost:5000/api/admin/stats/companies', { headers }).then(r => r.json()),
+      fetch('http://localhost:5000/api/admin/stats/students', { headers }).then(r => r.json()),
+      fetch('http://localhost:5000/api/admin/stats/reservations', { headers }).then(r => r.json()),
+      fetch('http://localhost:5000/api/admin/stats/reserved-students', { headers }).then(r => r.json()),
+      fetch('http://localhost:5000/api/admin/stats/speeddateslots', { headers }).then(r => r.json()),
     ])
-      .then(responses => Promise.all(responses.map(r => r.json())))
-      .then(([companies, students, reservations]) => {
+      .then(([companies, students, reservations, reserved, slots]) => {
         setStats({
           companies: companies.count,
           students: students.count,
-          reservations: reservations.count
+          reservations: slots.gereserveerd,
+          avgPerCompany: companies.count > 0 ? Math.round(slots.gereserveerd / companies.count) : 0,
+          reservedStudents: reserved.count,
+          unreservedStudents: students.count - reserved.count,
+          totalSlots: slots.totaal,
+          availableSlots: slots.beschikbaar,
         });
-        setLoading(false);
       })
-      .catch(() => {
-        setError('Fout bij ophalen statistieken');
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <p>Bezig met laden...</p>;
-  if (error) return <p style={{ color: 'red' }}>{error}</p>;
+      .catch(console.error);
+  }, [token]);
 
   return (
     <div className="dashboard-container">
-      <h1>Welkom terug, {admin.first_name || admin.username} 👋</h1>
-
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h3>Bedrijven</h3>
-          <p>{stats.companies}</p>
+      <h1>Dashboard</h1>
+      <div className="cards-wrapper">
+        <div className="card">
+          <h2>Bedrijven</h2>
+          <p><strong>Totaal:</strong> <span className="stat-value">{stats.companies}</span></p>
+          <p><strong>Gemiddelde speeddate per bedrijf:</strong> <span className="stat-value">{stats.avgPerCompany}</span></p>
         </div>
-        <div className="stat-card">
-          <h3>Studenten</h3>
-          <p>{stats.students}</p>
+        <div className="card">
+          <h2>Studenten</h2>
+          <p><strong>Totaal:</strong> <span className="stat-value">{stats.students}</span></p>
+          <p><strong>Met speeddate:</strong> <span className="stat-value">{stats.reservedStudents}</span></p>
+          <p><strong>Zonder speeddate:</strong> <span className="stat-value">{stats.unreservedStudents}</span></p>
         </div>
-        <div className="stat-card">
-          <h3>Speeddates</h3>
-          <p>{stats.reservations}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Vragen</h3>
-          <p>{stats.questions}</p>
+        <div className="card">
+          <h2>Speeddates</h2>
+          <p><strong>Gereserveerd:</strong> <span className="stat-value">{stats.reservations}</span></p>
+          <p><strong>Beschikbaar:</strong> <span className="stat-value">{stats.availableSlots}</span></p>
+          <p><strong>Totaal slots:</strong> <span className="stat-value">{stats.totalSlots}</span></p>
         </div>
       </div>
     </div>
   );
 }
 
-
- 
-
-
-
+export default Dashboard;

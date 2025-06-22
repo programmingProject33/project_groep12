@@ -19,35 +19,7 @@ function BedrijfDetail() {
       .catch(err => console.error('Fout bij ophalen bedrijf:', err));
   }, [id]);
 
-    // Verwijderfunctie met wachtwoordbevestiging
-    const handleVerwijderen = async () => {
-        const bevestiging = window.confirm('Weet je zeker dat je dit bedrijf wilt verwijderen?');
-        if (!bevestiging) return;
-    
-        const wachtwoord = prompt('Voer je admin-wachtwoord in om te bevestigen:');
-        if (!wachtwoord) return;
-    
-        const token = localStorage.getItem('adminToken');
-    
-        const response = await fetch(`http://localhost:5000/api/admin/bedrijven/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ password: wachtwoord }),
-        });
-    
-        const result = await response.json();
-    
-        if (response.ok) {
-          alert(result.message);
-          navigate('/admin/bedrijven');
-        } else {
-          alert(result.message || 'Verwijderen is mislukt');
-        }
-      };
-    
+   
   
 
   if (!bedrijf) return <p>Bezig met laden...</p>;
@@ -55,7 +27,7 @@ function BedrijfDetail() {
   return (
     <div >
       <h1>{bedrijf.naam}</h1>
-      <button onClick={handleVerwijderen} className="verwijder-knop">Verwijder bedrijf</button>
+      
 
       <div className="bedrijf-deteail-columns">
         {/* Linkerkolom - Bedrijfsinfo */}

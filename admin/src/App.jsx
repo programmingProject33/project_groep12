@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import BedrijvenLijst from './pages/BedrijvenLijst';
+import BedrijfDetail from './pages/BedrijvenDetail';
 import StudentenLijst from './pages/StudentenLijst';
 import Speeddastes from './pages/Speeddates';
 import Profile from './pages/Profile';
@@ -24,6 +25,7 @@ function App() {
         <Route path="/admins" element={<ProtectedRoute><Layout><AdminsLijst /></Layout></ProtectedRoute>} />
         <Route path="/admins/nieuw" element={<ProtectedRoute><Layout><AdminCreate /></Layout></ProtectedRoute>} />
         <Route path="/admins/:id" element={<ProtectedRoute><Layout><AdminDetail /></Layout></ProtectedRoute>} />
+        <Route path="/admins/bedrijven/:id" element={<ProtectedRoute><Layout><BedrijfDetail /></Layout></ProtectedRoute>} />
       </Routes>
     </Router>
   );
