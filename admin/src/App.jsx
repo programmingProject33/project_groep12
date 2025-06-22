@@ -16,41 +16,17 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-
-        <Route
-          path="/dashboard"
-          element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>}
-        />
-        <Route
-          path="/bedrijven"
-          element={<ProtectedRoute><Layout><BedrijvenLijst /></Layout></ProtectedRoute>}
-        />
-        <Route
-          path="/studenten"
-          element={<ProtectedRoute><Layout><StudentenLijst /></Layout></ProtectedRoute>}
-        />
-        <Route
-          path="/speeddates"
-          element={<ProtectedRoute><Layout><Speeddastes /></Layout></ProtectedRoute>}
-        />
-        <Route
-          path="/profile"
-          element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>}
-        />
-        <Route
-          path="/admins"
-          element={<ProtectedRoute><Layout><AdminsLijst /></Layout></ProtectedRoute>}
-        />
-        <Route
-          path="/admins/new"
-          element={<ProtectedRoute><Layout><AdminCreate /></Layout></ProtectedRoute>}
-        />
-        <Route
-          path="/admins/:id"
-          element={<ProtectedRoute><Layout><AdminDetail /></Layout></ProtectedRoute>}
-        />
+        <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+        <Route path="/bedrijven" element={<ProtectedRoute><Layout><BedrijvenLijst /></Layout></ProtectedRoute>} />
+        <Route path="/studenten" element={<ProtectedRoute><Layout><StudentenLijst /></Layout></ProtectedRoute>} />
+        <Route path="/speeddates" element={<ProtectedRoute><Layout><Speeddastes /></Layout></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
+        <Route path="/admins" element={<ProtectedRoute><Layout><AdminsLijst /></Layout></ProtectedRoute>} />
+        <Route path="/admins/nieuw" element={<ProtectedRoute><Layout><AdminCreate /></Layout></ProtectedRoute>} />
+        <Route path="/admins/:id" element={<ProtectedRoute><Layout><AdminDetail /></Layout></ProtectedRoute>} />
       </Routes>
     </Router>
   );
 }
+
 export default App;

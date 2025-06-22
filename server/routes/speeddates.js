@@ -1,30 +1,28 @@
-// server/routes/speeddates.js
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const authAdmin = require('../middleware/adminAuth');
 
 // GET /api/admin/speeddates
-// Haalt speeddate-reserveringen op, met optionele filtering en sortering
-// Query-parameters: company (naam), student (naam), sort (time_asc of time_desc)
+// Haalt alle speeddate-reserveringen op, met optionele filtering en sortering
 router.get('/speeddates', authAdmin, (req, res) => {
   const { bedrijven, studenten, soort } = req.query;
   let conditions = [];
   let values = [];
 
-  // Voeg filter op bedrijfsnaam toe indien meegegeven
+  // Filter op bedrijfsnaam
   if (bedrijven) {
     conditions.push('b.naam LIKE ?');
     values.push(`%${bedrijven}%`);
   }
 
-  // Voeg filter op studentnaam toe indien meegegeven
+  // Filter op studentnaam
   if (studenten) {
     conditions.push('CONCAT(s.voornaam, " ", s.naam) LIKE ?');
     values.push(`%${studenten}%`);
   }
 
-  // Basis SQL met joins naar studenten en bedrijven
+  // Basis SQL-query met joins
   let sql = `
     SELECT 
       r.speed_id,
@@ -38,18 +36,19 @@ router.get('/speeddates', authAdmin, (req, res) => {
     JOIN bedrijven b ON r.bedrijf_id = b.bedrijf_id
   `;
 
-  // Voeg WHERE-clausule toe als er filters zijn
-  if (conditions.length) {  
+  // WHERE-clausules toevoegen indien nodig
+  if (conditions.length) {
     sql += ' WHERE ' + conditions.join(' AND ');
   }
 
-  // Voeg ORDER BY toe
+  // Sorteer op tijd
   if (soort === 'time_desc') {
-    sql += ' ORDER BY r.starttijd, r.eindtijd DESC';
+    sql += ' ORDER BY r.starttijd DESC, r.eindtijd DESC';
   } else {
-    sql += ' ORDER BY r.starttijd, r.eindtijd ASC';
+    sql += ' ORDER BY r.starttijd ASC, r.eindtijd ASC';
   }
 
+  // Query uitvoeren
   db.query(sql, values, (err, results) => {
     if (err) {
       console.error('Fout bij ophalen speeddates:', err);
