@@ -10,7 +10,7 @@ export default function Studenten() {
   const [studenten, setStudenten] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [zoekterm, setZoekterm] = useState("");
   const [filterOpleiding, setFilterOpleiding] = useState("alle");
   const [selectedDienstverbanden, setSelectedDienstverbanden] = useState([]);
   const [sortField, setSortField] = useState("naam");
@@ -99,21 +99,21 @@ export default function Studenten() {
   };
 
   const filteredStudenten = studenten.filter(student => {
+    // Filter op voornaam
+    const matchVoornaam = student.voornaam && student.voornaam.toLowerCase().startsWith(zoekterm.toLowerCase());
+    // Filter op opleiding
+    const matchOpleiding =
+      filterOpleiding === '' || filterOpleiding === 'alle' || (student.opleiding && student.opleiding.toLowerCase() === filterOpleiding.toLowerCase());
+    // Filter op dienstverband
     const dienstverbandRaw = student.dienstverbanden || student.dienstverband || '';
     const dienstverbandArr = normalizeDienstverband(dienstverbandRaw);
-    const fullName = `${student.voornaam || ''} ${student.naam || ''}`.toLowerCase();
-    const matchesSearch = 
-      fullName.includes(searchTerm.toLowerCase()) ||
-      student.opleiding.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesOpleiding =
-      filterOpleiding === '' || filterOpleiding === 'alle' || student.opleiding.toLowerCase() === filterOpleiding.toLowerCase();
-    const matchesDienstverband =
+    const matchDienstverband =
       selectedDienstverbanden.length === 0 ||
       dienstverbandArr.some(d => selectedDienstverbanden.map(f => f.toLowerCase()).includes(d));
-    return matchesSearch && matchesOpleiding && matchesDienstverband;
+    // Combineer alle filters
+    return matchVoornaam && matchOpleiding && matchDienstverband;
   });
 
-  // Sorteerfunctie
   const sortedStudenten = [...filteredStudenten].sort((a, b) => {
     if (sortField === "naam") {
       if (sortOrder === "asc") return a.naam.localeCompare(b.naam);
@@ -122,7 +122,6 @@ export default function Studenten() {
       if (sortOrder === "asc") return (a.opleiding || "").localeCompare(b.opleiding || "");
       else return (b.opleiding || "").localeCompare(a.opleiding || "");
     } else if (sortField === "dienstverbanden") {
-      // Sorteer op eerste dienstverband alfabetisch
       const aDienst = (Array.isArray(a.dienstverbanden) ? a.dienstverbanden[0] : (a.dienstverbanden || "")).toLowerCase();
       const bDienst = (Array.isArray(b.dienstverbanden) ? b.dienstverbanden[0] : (b.dienstverbanden || "")).toLowerCase();
       if (sortOrder === "asc") return aDienst.localeCompare(bDienst);
@@ -188,12 +187,25 @@ export default function Studenten() {
         {/* Filterbox */}
         <div className="filterbox">
           <div className="filterbox-row">
-            <input
-              type="text"
-              placeholder="Zoek op voornaam of achternaam"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
+            <div className="search-input-container">
+              <FaSearch className="search-icon" />
+              <input
+                type="text"
+                placeholder="Zoek op voornaam"
+                value={zoekterm}
+                onChange={e => setZoekterm(e.target.value)}
+              />
+              {zoekterm && (
+                <button
+                  className="clear-search-btn"
+                  onClick={() => setZoekterm("")}
+                  type="button"
+                  aria-label="Zoekopdracht wissen"
+                >
+                  ×
+                </button>
+              )}
+            </div>
             <select
               value={filterOpleiding}
               onChange={e => setFilterOpleiding(e.target.value)}
@@ -219,6 +231,9 @@ export default function Studenten() {
         </div>
         {/* Studentenlijst */}
         <div className="studenten-kaarten-container">
+          <div className="search-results-info">
+            <p>{filteredStudenten.length} student{filteredStudenten.length !== 1 ? 'en' : ''} gevonden</p>
+          </div>
           {sortedStudenten.length === 0 && (
             <div style={{ textAlign: 'center', color: '#94a3b8', padding: '3rem 0', width: '100%' }}>Geen studenten gevonden.</div>
           )}

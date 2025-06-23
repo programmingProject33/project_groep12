@@ -22,6 +22,7 @@ const bedrijvenRoutes = require('./routes/bedrijven');       // GET /api/admin/b
 const studentenRoutes = require('./routes/studenten');       // GET /api/admin/studenten
 const speeddatesRoutes = require('./routes/speeddates');     // GET/POST/PUT /api/admin/speeddates
 const statistiekenRoutes = require('./routes/stats');        // GET /api/admin/stats
+const dienstverbandenRoutes = require('./routes/dienstverbanden'); // GET/PUT /api/admin/dienstverbanden
 
 // Publieke routes
 const publicBedrijvenRoutes = require('./routes/publicBedrijven');
@@ -72,6 +73,7 @@ app.use('/api/admin', bedrijvenRoutes);
 app.use('/api/admin', studentenRoutes);
 app.use('/api/admin', speeddatesRoutes);
 app.use('/api/admin', statistiekenRoutes);
+app.use('/api/admin', dienstverbandenRoutes); // Dienstverbanden beheer
 // admin routes eind
 
 // Publieke routes

@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminsLijst from './pages/AdminsLijst';
 import AdminCreate from './pages/AdminCreate';
 import AdminDetail from './pages/AdminDetail';
+import Dienstverbanden from './pages/Dienstverbanden';
 import Layout from './components/Layout';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/admins/nieuw" element={<ProtectedRoute><Layout><AdminCreate /></Layout></ProtectedRoute>} />
         <Route path="/admins/:id" element={<ProtectedRoute><Layout><AdminDetail /></Layout></ProtectedRoute>} />
         <Route path="/pages/bedrijven/:id" element={<ProtectedRoute><Layout><BedrijfDetail /></Layout></ProtectedRoute>} />
+        <Route path="/dienstverbanden" element={<ProtectedRoute><Layout><Dienstverbanden /></Layout></ProtectedRoute>} />
       </Routes>
     </Router>
   );

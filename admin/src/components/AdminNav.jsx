@@ -34,6 +34,12 @@ function AdminNav() {
             </li>
 
             <li>
+              <NavLink to="/dienstverbanden" className={({ isActive }) => isActive ? 'active' : ''}>
+                Dienstverbanden
+              </NavLink>
+            </li>
+
+            <li>
               <NavLink to="/admins" className={({ isActive }) => isActive ? 'active' : ''}>
                 Admins
               </NavLink>
