@@ -45,7 +45,6 @@ export default function AdminsList() {
   };
 
 
-
   return (
     <div className="admin-list-container">
       <h1>Overzicht Admins</h1>
@@ -76,7 +75,7 @@ export default function AdminsList() {
                 
                 {me?.role === 'superadmin' && a.id !== me.id && (
                   <>
-                    <button onClick={() => deleteAdmin(a.id)}> Verwijderen</button>
+                    <button className='verwijder-bedrijf-student-admin' onClick={() => deleteAdmin(a.id)}> Verwijderen</button>
                 
                   </>
                 )}
