@@ -62,8 +62,7 @@ app.use('/api/admin', adminProfile);
 app.use('/api/admin', adminProtected);
 app.use('/api/admin', adminRoutes);        // bevat adminbeheer
 
-// Koppel de bedrijvenRouter voor alle /api/bedrijven calls
-app.use('/api/bedrijven', bedrijvenRoutes);
+app.use('/api/admin', bedrijvenRoutes);
 
 app.use('/api/admin', studentenRoutes);
 app.use('/api/admin', speeddatesRoutes);

@@ -3,14 +3,14 @@ import '../App.css';
 
 function Dashboard() {
   const [stats, setStats] = useState({
-    companies: 0,
-    students: 0,
-    reservations: 0,
-    avgPerCompany: 0,
-    reservedStudents: 0,
-    unreservedStudents: 0,
-    totalSlots: 0,
+    bedrijfCount: 0,
+    avgSlotsPerBedrijf: 0,
+    studentCount: 0,
+    studentsWithReservation: 0,
+    studentsWithoutReservation: 0,
+    reservedSlots: 0,
     availableSlots: 0,
+    totalSlots: 0,
   });
 
   const token = localStorage.getItem('adminToken');
@@ -19,46 +19,46 @@ function Dashboard() {
     const headers = { Authorization: `Bearer ${token}` };
 
     Promise.all([
-      fetch('http://localhost:5000/api/admin/stats/companies', { headers }).then(r => r.json()),
-      fetch('http://localhost:5000/api/admin/stats/students', { headers }).then(r => r.json()),
-      fetch('http://localhost:5000/api/admin/stats/reservations', { headers }).then(r => r.json()),
-      fetch('http://localhost:5000/api/admin/stats/reserved-students', { headers }).then(r => r.json()),
+      fetch('http://localhost:5000/api/admin/stats/bedrijven-en-slots', { headers }).then(r => r.json()),
+      fetch('http://localhost:5000/api/admin/stats/studenten', { headers }).then(r => r.json()),
       fetch('http://localhost:5000/api/admin/stats/speeddateslots', { headers }).then(r => r.json()),
     ])
-      .then(([companies, students, reservations, reserved, slots]) => {
+      .then(([bedrijven, studenten, slots]) => {
         setStats({
-          companies: companies.count,
-          students: students.count,
-          reservations: slots.gereserveerd,
-          avgPerCompany: companies.count > 0 ? Math.round(slots.gereserveerd / companies.count) : 0,
-          reservedStudents: reserved.count,
-          unreservedStudents: students.count - reserved.count,
-          totalSlots: slots.totaal,
+          bedrijfCount: bedrijven.bedrijf_count,
+          avgSlotsPerBedrijf: bedrijven.gemiddeld_per_bedrijf,
+          studentCount: studenten.student_count,
+          studentsWithReservation: studenten.students_with_reservation,
+          studentsWithoutReservation: studenten.student_count - studenten.students_with_reservation,
+          reservedSlots: slots.gereserveerd,
           availableSlots: slots.beschikbaar,
+          totalSlots: slots.totaal,
         });
       })
       .catch(console.error);
-  }, [token]);
+  }, []);
 
   return (
-    <div className="dashboard-container">
+    <div>
       <h1>Dashboard</h1>
       <div className="cards-wrapper">
         <div className="card">
           <h2>Bedrijven</h2>
-          <p><strong>Totaal:</strong> <span className="stat-value">{stats.companies}</span></p>
-          <p><strong>Gemiddelde speeddate per bedrijf:</strong> <span className="stat-value">{stats.avgPerCompany}</span></p>
+          <p><strong>Totaal:</strong> <span className="stat-value">{stats.bedrijfCount}</span></p>
+          <p><strong>Gemiddeld speeddates per bedrijf:</strong> <span className="stat-value">{Math.round(stats.avgSlotsPerBedrijf)}</span></p>
         </div>
+
         <div className="card">
           <h2>Studenten</h2>
-          <p><strong>Totaal:</strong> <span className="stat-value">{stats.students}</span></p>
-          <p><strong>Met speeddate:</strong> <span className="stat-value">{stats.reservedStudents}</span></p>
-          <p><strong>Zonder speeddate:</strong> <span className="stat-value">{stats.unreservedStudents}</span></p>
+          <p><strong>Totaal:</strong> <span className="stat-value">{stats.studentCount}</span></p>
+          <p><strong>Met reservatie:</strong> <span className="stat-value">{stats.studentsWithReservation}</span></p>
+          <p><strong>Zonder reservatie:</strong> <span className="stat-value">{stats.studentsWithoutReservation}</span></p>
         </div>
+
         <div className="card">
           <h2>Speeddates</h2>
-          <p><strong>Gereserveerd:</strong> <span className="stat-value">{stats.reservations}</span></p>
-          <p><strong>Beschikbaar:</strong> <span className="stat-value">{stats.availableSlots}</span></p>
+          <p><strong>Gereserveerde slots:</strong> <span className="stat-value">{stats.reservedSlots}</span></p>
+          <p><strong>Beschikbare slots:</strong> <span className="stat-value">{stats.availableSlots}</span></p>
           <p><strong>Totaal slots:</strong> <span className="stat-value">{stats.totalSlots}</span></p>
         </div>
       </div>
