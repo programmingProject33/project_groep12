@@ -436,21 +436,57 @@ app.post('/api/register', async (req, res) => {
       // Hash het wachtwoord
       const hashedPassword = await bcrypt.hash(wachtwoord_bedrijf, 10);
 
-      const [result] = await connection.query(
-        'INSERT INTO bedrijven (naam, BTW_nr, straatnaam, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen, is_verified, verification_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)',
-        [bedrijfsnaam, btw, straat, gemeente, telbedrijf, emailbedrijf, voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact, gebruikersnaam_bedrijf, hashedPassword, sector, beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen, false, verificationToken]
-      );
-      console.log("Bedrijf succesvol toegevoegd in database:", emailbedrijf, "Token:", verificationToken);
-      
-      const bedrijfId = result.insertId;
+      // === Stap 2: Data voorbereiden voor INSERT ===
+      const insertBedrijfQuery = `
+        INSERT INTO bedrijven (
+          bedrijf_URL, naam, KVK_nr, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email,
+          contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
+          gebruikersnaam, wachtwoord, sector, beschrijving, gezochte_opleidingen, lokaal, verdieping, profile_photo,
+          number_of_representatives, is_verified, verification_token, gezocht_profiel_omschrijving
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      const bedrijfParams = [
+        bedrijf_URL || null,
+        naam || null,
+        KVK_nr || null,
+        BTW_nr || null,
+        straatnaam || null,
+        huis_nr || null,
+        bus_nr || null,
+        postcode || null,
+        gemeente || null,
+        telefoon_nr || null,
+        email || null,
+        contact_voornaam || null,
+        contact_naam || null,
+        contact_specialisatie || null,
+        contact_email || null,
+        contact_telefoon || null,
+        gebruikersnaam || null,
+        wachtwoord || null,
+        sector || null,
+        beschrijving || null,
+        gezochte_opleidingen || null,
+        lokaal || null,
+        verdieping || null,
+        profile_photo || null,
+        1,
+        is_verified || 0,
+        verification_token || null,
+        gezocht_profiel_omschrijving || null
+      ];
+      const [result] = await connection.execute(insertBedrijfQuery, bedrijfParams);
+      const nieuwBedrijfId = result[0]?.insertId || result.insertId;
+      await connection.commit();
+      res.status(201).json({ message: "Bedrijf succesvol geregistreerd." });
 
       if (dienstverbanden && dienstverbanden.length > 0) {
         const dienstverbandQuery = 'INSERT INTO bedrijf_dienstverbanden (bedrijf_id, dienstverband_id) SELECT ?, id FROM dienstverbanden WHERE naam IN (?)';
-        await connection.query(dienstverbandQuery, [bedrijfId, dienstverbanden]);
+        await connection.query(dienstverbandQuery, [nieuwBedrijfId, dienstverbanden]);
       }
 
       // === Automatisch tijdsloten aanmaken voor nieuw bedrijf ===
-      await createTimeslotsForBedrijf(bedrijfId, EVENEMENT_DATUM);
+      await createTimeslotsForBedrijf(nieuwBedrijfId, EVENEMENT_DATUM);
 
       await sendVerificationEmail(emailbedrijf, verificationToken);
       console.log("Verificatiemail succesvol verzonden naar:", emailbedrijf);
@@ -1364,30 +1400,53 @@ app.post('/api/register-bedrijf', async (req, res) => {
     if (usernameExists.length > 0) throw new Error('Deze gebruikersnaam is al in gebruik.');
 
     // === Stap 2: Data voorbereiden voor INSERT ===
-    const bcrypt = require('bcrypt');
-    const hashedPassword = await bcrypt.hash(wachtwoord, 10);
-    const [contact_voornaam, ...contact_naam_parts] = contactpersoon_naam.split(' ');
-    const contact_naam = contact_naam_parts.join(' ');
-    
-    // === Stap 3: Hoofd-INSERT in 'bedrijven' tabel ===
     const insertBedrijfQuery = `
       INSERT INTO bedrijven (
-        naam, BTW_nr, straatnaam, postcode, gemeente, telefoon_nr, email,
+        bedrijf_URL, naam, KVK_nr, BTW_nr, straatnaam, huis_nr, bus_nr, postcode, gemeente, telefoon_nr, email,
         contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
-        gebruikersnaam, wachtwoord, sector, beschrijving, gezochte_opleidingen, 
-        gezocht_profiel_omschrijving, bedrijf_URL, is_verified
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        gebruikersnaam, wachtwoord, sector, beschrijving, gezochte_opleidingen, lokaal, verdieping, profile_photo,
+        number_of_representatives, is_verified, verification_token, gezocht_profiel_omschrijving
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const bedrijfParams = [
-      bedrijfsnaam, kvk_nummer, adres, postcode, stad, telbedrijf, email,
-      contact_voornaam, contact_naam, specialisatie, contactpersoon_email, contactpersoon_telefoon,
-      gebruikersnaam, hashedPassword, sector, beschrijving, 
-      Array.isArray(gezochte_opleidingen) ? gezochte_opleidingen.join(', ') : '',
-      gezocht_profiel_omschrijving, website_url
+      bedrijf_URL || null,
+      naam || null,
+      KVK_nr || null,
+      BTW_nr || null,
+      straatnaam || null,
+      huis_nr || null,
+      bus_nr || null,
+      postcode || null,
+      gemeente || null,
+      telefoon_nr || null,
+      email || null,
+      contact_voornaam || null,
+      contact_naam || null,
+      contact_specialisatie || null,
+      contact_email || null,
+      contact_telefoon || null,
+      gebruikersnaam || null,
+      wachtwoord || null,
+      sector || null,
+      beschrijving || null,
+      gezochte_opleidingen || null,
+      lokaal || null,
+      verdieping || null,
+      profile_photo || null,
+      1,
+      is_verified || 0,
+      verification_token || null,
+      gezocht_profiel_omschrijving || null
     ];
-
     const [result] = await connection.execute(insertBedrijfQuery, bedrijfParams);
-    const nieuwBedrijfId = result.insertId;
+    const nieuwBedrijfId = result[0]?.insertId || result.insertId;
+    await connection.commit();
+    res.status(201).json({ message: "Bedrijf succesvol geregistreerd." });
+
+    if (dienstverbanden && dienstverbanden.length > 0) {
+      const dienstverbandQuery = 'INSERT INTO bedrijf_dienstverbanden (bedrijf_id, dienstverband_id) SELECT ?, id FROM dienstverbanden WHERE naam IN (?)';
+      await connection.query(dienstverbandQuery, [nieuwBedrijfId, dienstverbanden]);
+    }
 
     // === Stap 4: Data invoegen in koppeltabel 'bedrijf_dienstverbanden' ===
     if (dienstverbanden && Array.isArray(dienstverbanden) && dienstverbanden.length > 0) {

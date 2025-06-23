@@ -80,8 +80,8 @@ export default function Registreer()   // Dit is een functionele component in Re
     sector: '',
     beschrijving: '',
     gezocht_profiel_omschrijving: '',
-    gezochte_opleidingen: [],
-    dienstverbanden: [],
+    gezochte_opleiding: '',
+    dienstverband: '',
   });
 
   // Error state
@@ -96,15 +96,8 @@ export default function Registreer()   // Dit is een functionele component in Re
   };
 
   const handleCompanyChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (name === "gezochte_opleidingen") {
-      const updatedOpleidingen = checked
-        ? [...companyForm.gezochte_opleidingen, value]
-        : companyForm.gezochte_opleidingen.filter((item) => item !== value);
-      setCompanyForm({ ...companyForm, gezochte_opleidingen: updatedOpleidingen });
-    } else {
-      setCompanyForm({ ...companyForm, [name]: value });
-    }
+    const { name, value } = e.target;
+    setCompanyForm({ ...companyForm, [name]: value });
   };
 
   const handleDienstverbandChange = (e) => {
@@ -250,7 +243,7 @@ export default function Registreer()   // Dit is een functionele component in Re
         emailbedrijf: '', contact_voornaam: '', contact_naam: '', contact_specialisatie: '',
         contact_email: '', contact_telefoon: '', gebruikersnaam_bedrijf: '', wachtwoord_bedrijf: '',
         wachtwoord2_bedrijf: '', sector: '', beschrijving: '', gezocht_profiel_omschrijving: '',
-        gezochte_opleidingen: [], dienstverbanden: [], website_url: '', postcode: '',
+        gezochte_opleiding: '', dienstverband: '', website_url: '', postcode: '',
         huis_nr: '', bus_nr: '',
       });
 
@@ -503,7 +496,13 @@ export default function Registreer()   // Dit is een functionele component in Re
                       <div className="checkbox-group">
                         {opleidingOpties.map((opleiding) => (
                           <label key={opleiding} className="checkbox-label">
-                            <input type="checkbox" name="gezochte_opleidingen" value={opleiding} checked={companyForm.gezochte_opleidingen.includes(opleiding)} onChange={handleCompanyChange} />
+                            <input
+                              type="radio"
+                              name="gezochte_opleiding"
+                              value={opleiding}
+                              checked={companyForm.gezochte_opleiding === opleiding}
+                              onChange={handleCompanyChange}
+                            />
                             {opleiding}
                           </label>
                         ))}
@@ -514,7 +513,13 @@ export default function Registreer()   // Dit is een functionele component in Re
                       <div className="checkbox-group">
                         {['Voltijds', 'Deeltijds', 'Freelance', 'Stage'].map((dienstverband) => (
                           <label key={dienstverband} className="checkbox-label">
-                            <input type="checkbox" name="dienstverbanden" value={dienstverband} checked={companyForm.dienstverbanden.includes(dienstverband)} onChange={handleDienstverbandChange} />
+                            <input
+                              type="radio"
+                              name="dienstverband"
+                              value={dienstverband}
+                              checked={companyForm.dienstverband === dienstverband}
+                              onChange={handleCompanyChange}
+                            />
                             {dienstverband}
                           </label>
                         ))}

@@ -1,158 +1,142 @@
-# 💼 Career Launch Speeddate Website
-Welkom bij ons project! Wij bouwen een interactieve website voor de Career Launch Beurs, waarbij studenten speeddates kunnen reserveren met bedrijven. De bedoeling is om gerichte connecties te maken tussen jong talent en werkgevers in een moderne, efficiënte omgeving.
+# CareerLaunch Reserveringsplatform
 
-## 🎯 Doel van het project
-Een gebruiksvriendelijke reserveringswebsite waarmee:
+## 🧾 Inhoud
+- [Introductie](#introductie)
+- [✨ Features](#-features)
+- [🧑‍💻 Installatie & Opstart](#-installatie--opstart)
+- [📂 Structuur van het project](#-structuur-van-het-project)
+- [👥 Testaccounts](#-testaccounts)
+- [🛠 Developer info](#-developer-info)
+- [❓ Veelgestelde vragen](#-veelgestelde-vragen)
 
-- Bedrijven hun aanwezigheid en beschikbaarheid beheren
-- Studenten zich kunnen inschrijven en gesprekken boeken
-## 👥 Wie zijn we?
-Dit project wordt ontwikkeld door:
+---
 
-- MEZIANI Bilal
-- IBRAHIM SHEXO Mohammad
-- LODHl Mutahir
-- ASSARAR Nisrine
-## 🔧 Gebruikte technologieën
-Voor dit project gaan we voorlopig de volgende webtechnologieën gebruiken:
+## 🧠 Introductie
+CareerLaunch is een reserveringsplatform voor speeddates tussen studenten en bedrijven. Studenten kunnen zich aanmelden voor tijdsloten bij bedrijven, bedrijven beheren hun eigen tijdsloten en reserveringen, en beheerders (admins) houden overzicht via een admin-dashboard. Het platform is bedoeld voor gebruik door studenten, bedrijven en beheerders van een hogeschool of universiteit.
 
-- HTML
-- CSS
-- JavaScript
-- figma
-- trello
-- github
-- node.js
-- EXPRESS
-- mySQL
-- REACT
-> ✨ We hebben ChatGPT gebruikt voor het verfijnen en mooier maken van deze README.
+---
 
-## 🧑‍🎓 Voor studenten (2de,3de jaar)
-### 1. Startpagina
- - Welkomsttekst
- - Inschrijvingsformulier
- - Navigatie:
-`Home | Bedrijven | Contact | Registreer | Login`
- - Footer met contactgegevens en social media
-### 2. Inschrijvingspagina
-- Formulier met voornaam, naam, e-mailadres,gebruikersnaam, wachtwoord + bevestiging
-- Keuzeoptie: "student"
-### 3. Bedrijfspagina info
-- Alle bedrijven staan op die pagina
-- je kunt specifieke bedrijven zoeken op de zoekveld
-- je kunt filtreren op sector en of op dienstverband(stage,studentenjob,voltijds,...)
-- Klik op 'meer info' het opent de volgende pagina
-### 4. Reserveren
-- Bedrijfsinformatie
-- Beschikbare tijdstippen
-- Selectie + reservatie van gewenst moment
-### 5. Bevestigingspagina
-- Bevestiging van reservatie
-- E-mail met datum, tijd, locatie en annuleeroptie
-### 6. Reservaties
-- Al je reservaties staan daar
-- Je kan ze daar gerust annuleren als het nodig is
-### 7. Bericht Annulatie
-- een bevestiging dat je speeddate werd geannuleerd
-### 8. Profielpagina Student
-- Profiel foto + gebruikersnaam
-- Uploadknoppen(Upload motivatiebrief, LinkedIn knop, Upload CV knop
-- Overzicht van studentgegevens:Naam, Studierichting, E-mailadres,Dienstverbanden, Competenties, Wachtwoord wijzigen
-- Uitloggen knop
+## ✨ Features
+- **Registratie & login** (met e-mailverificatie)
+- **Studentenlijst** met krachtige filters en zoekfunctie (voornaam, opleiding, dienstverband)
+- **Reserveringsmodule** per tijdslot (studenten reserveren, bedrijven beheren)
+- **Bedrijven-dashboard** met overzicht van reserveringen
+- **Admin-paneel** voor beheer van gebruikers, bedrijven, dienstverbanden en statistieken
+- **Automatisch aanmaken van tijdsloten** voor bedrijven
+- **E-mailnotificaties** bij registratie, verificatie en reserveringen
+- **Feedback en foutmeldingen** bij alle belangrijke acties
+- **404-pagina** voor niet-bestaande routes
 
-> Wanneer een student zich registreerd word de header en footer gemodifieerd registreer wordt reservaties en login wordt pictogram profiel
+---
 
-## 🏢 Voor bedrijven
-### 1. Startpagina
-- Zelfde als bij studenten
-- Inschrijving met keuzeoptie: "Bedrijf"
-### 2. Inschrijvingspagina
-- Bedrijfsgegevens: Bedrijfsnaam,adres,telefoonnummer,bedrijfse-mailadres,
-- Contactpersoon:voornaam, naam, specialisatie,  e-mailadres, telefoonnummer
-- Accountgegevens: gebruikersnaam, wachtwoord + bevestiging
-### 3. Profiel studenten
-- Alle reservaties van studenten voor elk bedrijf staan op die pagina met hun profiel, de sector en dienstverband  waarvoor ze interesse hebben
-- Ze kunnen sector en dienstverband filteren
-- Als ze specifieke studenten willen kunnen ze hen zoeken op het zoekveld
-### 4. Reservatie
-- alle reserveringen van studenten die interesse hebben in hun bedrijf
-- er staat hun profiel waarop je kan clicken om meer info erover hebben, naam,tijdslot, emailadres
-### 5. Profielpagina Bedrijf
-- Bedrijfslogo + gebruikersnaam
-- Overzicht van bedrijfsgegevens:Naam, Contact (e-mailadres), Adres, Website
-- Bedrijfspresentatie ("Wie zijn we?" tekst
-- Gezochte profielen (“Dit zoeken we!”)
-- Sector
-- Dienstverband
-- Uitloggen knop
-- Wijzigen knop
+## 🧑‍💻 Installatie & Opstart
 
-## 🛠️ Voor organisatoren / administrators
+### 🔗 1. Vereisten
+- Node.js (v18 of hoger)
+- MySQL (of phpMyAdmin)
+- (optioneel) Nodemailer / SMTP-server voor e-mailverificatie
 
-De organisatoren hebben toegang tot een aparte beheerpagina waarop ze:
-### 1. Admin login
-- Inlogformulier voor admin met velden voor gebruikersnaam en wachtwoord
-- Inloggen-knop
-- Button wachtwoord vergeten
-### 2. Wachtwoord vergeten
-- Formulier voor het invoeren van e-mailadres om een wachtwoord-reset link te ontvangen
-- Button wachtwoord opnieuw instellen
-### 3. Nieuwe wachtwoord
-- Formulier om een nieuw wachtwoord in te stellen
-- Velden voor nieuw wachtwoord en bevestiging
-- Button wachtwoord opslaan en terug naar login
-### 4. Begin Pagina (Dashboard)
-- Overzicht van aantal bedrijfsaanvragen, studenten, reserveringen, en nieuwe bedrijven
-- Sectie met recente activiteiten
-- Navigatieknoppen naar andere modules
-### 5. Bedrijfs aanvragen
-- Lijst met bedrijven die een aanvraag hebben gedaan
-- Informatie per bedrijf (naam, e-mail, status)
-- Knoppen om aanvragen te accepteren of af te wijzen
-### 6. Lijst Bedrijven
-- Overzicht van alle bedrijven
-- Informatie per bedrijf (bedrijfsnaam, contactpersoon, e-mail)
-- Knoppen om bedrijfsgegevens te bekijken of bewerken
-### 7. Lijst studenten
-- Lijst met alle studenten
-- Informatie per student (naam, e-mail)
-- Knoppen om studentgegevens te bewerken
-### 8. Speeddates Reservatie
-- Lijst met alle speeddate-reserveringen
-- Informatie per reservering (student, bedrijf, datum, tijd)
-  
-## 📩 Contact
-Voor vragen, feedback of samenwerking:
-📧 support-careerlaunch@ehb.be
-📍 Nijverheidskaai 170, 1070 Anderlecht. 
-📱 Volg ons op Instagram & LinkedIn @careerlaunch
+### 📂 2. Projectstructuur
+```
+project-root/
+├── client/       → Frontend (Vite + React)
+├── server/       → Backend (Node.js + Express)
+├── server/database.sql  → Database structuur/dump
+├── .env.example  → Voorbeeld van de vereiste .env-config
+```
 
+### ⚙️ 3. Configuratie
+1. Maak een `.env` bestand aan in de map `server/` (gebruik `.env.example` als sjabloon).
+2. Vul de volgende velden in:
+   - `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+   - `EMAIL_USER`, `EMAIL_PASS` (voor e-mailverificatie)
+   - `JWT_SECRET` (voor authenticatie)
 
-## 🚀 Installatie en starten
-- Clone de repo https://github.com/programmingProject33/project_groep12.git
-- cd client
-- Installeer de dependencies:
-    * npm install
-- Start de dev-server:
-    * npm run dev
-    *    http://localhost:5173/
-- Express.js dependencies instaleren
-  - cd server
-  - npm init -y
-  - npm install express 
-  - npm install --save-dev nodemon om server doorlopend starten 
-  - server 1 keer starten: cd server dan node server.js
-  - server doorlopend starten: cd server dan npm run server
-  - server draait op: http://localhost:5000/
- 
-## Database tabellen aanmaken en aansluiten met server
-  - cd server
-  - npm install mysql2 dotenv
-  - .env file in .gitignore zetten om database gegevens locaal ta houden 
-  - Bron: https://claude.ai/share/8460215f-3971-40be-8093-66eb1bc768df
-### Database tabellen aanmaken en json data erin opslaan
-  - Bron: https://chatgpt.com/share/684b5156-105c-800a-b4c9-b220a4afa83a
-  - Data van json file in database opslaan via een script in server.js
+### ▶️ 4. Website starten
+**Backend starten:**
+```bash
+cd server
+npm install
+npm run dev
+```
+**Frontend starten:**
+```bash
+cd client
+npm install
+npm run dev
+```
+De site draait op:
+- Frontend: [http://localhost:5173](http://localhost:5173)
+- Backend: [http://localhost:5000](http://localhost:5000)
+
+Gebruik [http://localhost:5173](http://localhost:5173) om de app te testen.
+
+---
+
+## 📂 Structuur van het project
+```
+project-root/
+├── client/                # Frontend (React + Vite)
+│   ├── src/
+│   │   ├── voor-inloggen/     # Publieke pagina's (login, registratie, home, bedrijven)
+│   │   ├── inloggen-student/  # Student specifieke pagina's
+│   │   ├── inloggen-bedrijf/  # Bedrijf specifieke pagina's
+│   │   ├── pages/             # Algemene pagina's (verificatie, etc.)
+│   │   ├── AuthContext.jsx    # Auth context
+│   │   └── App.jsx           # Routing
+│   └── ...
+├── server/                # Backend (Node.js + Express)
+│   ├── routes/                # API-routes (gebruikers, bedrijven, reservaties, admin, ...)
+│   ├── db.js                  # Database connectie
+│   ├── mailer.js              # E-mail functionaliteit
+│   ├── server.js              # Hoofdserver
+│   └── database.sql           # Database structuur
+├── .env.example           # Voorbeeld .env-config
+└── README.md              # Deze handleiding
+```
+
+---
+
+## 👥 Testaccounts
+| Rol      | Gebruikersnaam | Wachtwoord  |
+|----------|----------------|-------------|
+| Student  | student1       | student123  |
+| Bedrijf  | bedrijf1       | bedrijf123  |
+| Admin    | admin          | admin123    |
+
+Je kunt ook zelf registreren via de registratiepagina.
+
+---
+
+## 🛠 Developer info
+- **API-routes** vind je in `server/routes/` (gebruikers, bedrijven, reservaties, admin, ...)
+- **Database**: structuur staat in `server/database.sql`. Gebruik deze om de MySQL database aan te maken.
+- **Tijdsloten** worden automatisch aangemaakt voor bedrijven na registratie.
+- **E-mail**: wordt verstuurd via Nodemailer (SMTP-configuratie vereist in `.env`).
+- **Login**: JWT-authenticatie, tokens worden opgeslagen in localStorage.
+- **Foutmeldingen**: worden getoond in de UI, en zijn zichtbaar in de browserconsole (F12 > Console).
+- **Debugging**: Gebruik `console.log` in de frontend/backend, en de Network-tab in de browser voor API-verkeer.
+- **404-pagina**: Niet-bestaande routes tonen een nette foutpagina.
+
+---
+
+## ❓ Veelgestelde vragen
+**1. Ik krijg geen e-mail bij registratie/verificatie?**
+- Controleer je SMTP-instellingen in `.env`.
+- Kijk in je spamfolder.
+
+**2. Databasefout bij opstart?**
+- Controleer of MySQL draait en de database correct is aangemaakt met `server/database.sql`.
+
+**3. Hoe reset ik een wachtwoord?**
+- Neem contact op met de admin of implementeer een wachtwoord-resetfunctie.
+
+**4. Hoe debug ik fouten?**
+- Bekijk de browserconsole (F12) en de Network-tab voor API-verkeer.
+- Check de backend logs in de terminal.
+
+---
+
+Veel succes met CareerLaunch! 🚀
 
 
