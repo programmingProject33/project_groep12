@@ -183,6 +183,7 @@ export default function Registreer()   // Dit is een functionele component in Re
 
       // Registration successful
       setSuccessMessage('🎉 Registratie succesvol! We hebben een verificatie-e-mail gestuurd naar je inbox. Klik op de link in de e-mail om je account te activeren. Controleer ook je spam-folder als je de e-mail niet ziet.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       setStudentForm({
         voornaam: '',
         naam: '',

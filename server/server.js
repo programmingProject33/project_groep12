@@ -109,7 +109,7 @@ app.post('/api/login', async (req, res) => {
             let [companyRows] = await db.promise().query(
                 "SELECT * FROM bedrijven WHERE gebruikersnaam = ? OR email = ?", 
                 [gebruikersnaam, gebruikersnaam]
-            );
+    );
             console.log(`Zoeken naar gebruiker '${gebruikersnaam}' in bedrijven tabel, gevonden:`, companyRows.length);
             if (companyRows.length > 0) {
                 user = companyRows[0];
@@ -137,7 +137,7 @@ app.post('/api/login', async (req, res) => {
     if (!user.is_verified) {
             console.log("Login mislukt: gebruiker is niet geverifieerd.");
             return res.status(401).json({ message: 'Account is niet geverifieerd. Controleer uw e-mail.' });
-        }
+    }
 
         // Log het wachtwoord dat wordt vergeleken (alleen voor debugging)
         console.log("Vergelijk wachtwoord met hash:", user.wachtwoord.substring(0, 10) + "...");
@@ -146,9 +146,9 @@ app.post('/api/login', async (req, res) => {
         console.log("Wachtwoord match:", isMatch);
 
         if (isMatch) {
-            // Bouw expliciet het user object voor de frontend met gebruiker_id
+            // Bouw expliciet het user object voor de frontend met het juiste ID veld
             const userForFrontend = {
-                gebruiker_id: userId, // Gebruik consistent gebruiker_id
+                [idColumn]: userId, // Gebruik het juiste ID veld (gebruiker_id of bedrijf_id)
                 gebruikersnaam: user.gebruikersnaam,
                 email: user.email,
                 voornaam: user.voornaam,
@@ -325,7 +325,7 @@ app.get('/api/confirm/:token', async (req, res) => {
                     message: "Je account is al geverifieerd. Je kunt nu inloggen.",
                     verified: true 
                 });
-            }
+    }
 
             // Check of token al is gebruikt (NULL)
             if (user.verification_token === null) {
@@ -446,6 +446,9 @@ app.post('/api/register', async (req, res) => {
         const dienstverbandQuery = 'INSERT INTO bedrijf_dienstverbanden (bedrijf_id, dienstverband_id) SELECT ?, id FROM dienstverbanden WHERE naam IN (?)';
         await connection.query(dienstverbandQuery, [bedrijfId, dienstverbanden]);
       }
+
+      // === Automatisch tijdsloten aanmaken voor nieuw bedrijf ===
+      await createTimeslotsForBedrijf(bedrijfId, EVENEMENT_DATUM);
 
       await sendVerificationEmail(emailbedrijf, verificationToken);
       console.log("Verificatiemail succesvol verzonden naar:", emailbedrijf);
@@ -1483,7 +1486,85 @@ app.post('/api/register-student', async (req, res) => {
     }
 });
 
+// === SCRIPT: Vul tijdsloten aan voor bedrijven zonder tijdsloten ===
+async function addTimeslotsForCompaniesWithoutSlots() {
+  const db = require('./db');
+  // Haal alle bedrijven op
+  const [bedrijven] = await db.promise().query('SELECT bedrijf_id FROM bedrijven');
+  let added = 0, skipped = 0;
+  for (const bedrijf of bedrijven) {
+    // Check of er al tijdsloten zijn
+    const [slots] = await db.promise().query('SELECT COUNT(*) as aantal FROM speeddates WHERE bedrijf_id = ?', [bedrijf.bedrijf_id]);
+    if (slots[0].aantal > 0) {
+      skipped++;
+      continue;
+    }
+    // Voeg tijdsloten toe: 10:00-18:00, elke 10 minuten, met pauzes
+    const dateStr = new Date().toISOString().split('T')[0];
+    for (let hour = 10; hour < 18; hour++) {
+      for (let min = 0; min < 60; min += 10) {
+        // Pauzes overslaan:
+        const isPauze1 = (hour === 11 && min >= 20 && min < 40);
+        const isLunch = (hour === 13);
+        const isPauze2 = (hour === 16 && min >= 20 && min < 40);
+        if (isPauze1 || isLunch || isPauze2) continue;
+        const starttijd = `${dateStr} ${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}:00`;
+        let eindMin = min + 10;
+        let eindHour = hour;
+        if (eindMin === 60) {
+          eindHour = hour + 1;
+          eindMin = 0;
+        }
+        const eindtijd = `${dateStr} ${String(eindHour).padStart(2, '0')}:${String(eindMin).padStart(2, '0')}:00`;
+        await db.promise().query(
+          'INSERT INTO speeddates (bedrijf_id, starttijd, eindtijd, is_bezet) VALUES (?, ?, ?, 0)',
+          [bedrijf.bedrijf_id, starttijd, eindtijd]
+        );
+      }
+    }
+    added++;
+    console.log(`Tijdsloten toegevoegd voor bedrijf_id: ${bedrijf.bedrijf_id}`);
+  }
+  console.log(`Klaar! Toegevoegd: ${added}, overgeslagen: ${skipped}`);
+}
+addTimeslotsForCompaniesWithoutSlots();
+
 // Fallback voor ongedefinieerde routes
 app.use((req, res) => {
   res.status(404).json({ error: 'Route niet gevonden' });
 });
+
+async function fixSpecificCompaniesTimeslots() {
+  const db = require('./db');
+  const bedrijfIds = [97,95,96,98,99,111,88,94];
+  // Verwijder bestaande tijdsloten
+  await db.promise().query('DELETE FROM speeddates WHERE bedrijf_id IN (?)', [bedrijfIds]);
+  // Voeg correcte tijdsloten toe voor elk bedrijf
+  const dateStr = new Date().toISOString().split('T')[0];
+  for (const bedrijf_id of bedrijfIds) {
+    for (let hour = 10; hour < 18; hour++) {
+      for (let min = 0; min < 60; min += 10) {
+        // Pauzes overslaan:
+        const isPauze1 = (hour === 11 && min >= 20 && min < 40);
+        const isLunch = (hour === 13);
+        const isPauze2 = (hour === 16 && min >= 20 && min < 40);
+        if (isPauze1 || isLunch || isPauze2) continue;
+        const starttijd = `${dateStr} ${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}:00`;
+        let eindMin = min + 10;
+        let eindHour = hour;
+        if (eindMin === 60) {
+          eindHour = hour + 1;
+          eindMin = 0;
+        }
+        const eindtijd = `${dateStr} ${String(eindHour).padStart(2, '0')}:${String(eindMin).padStart(2, '0')}:00`;
+        await db.promise().query(
+          'INSERT INTO speeddates (bedrijf_id, starttijd, eindtijd, is_bezet) VALUES (?, ?, ?, 0)',
+          [bedrijf_id, starttijd, eindtijd]
+        );
+      }
+    }
+    console.log(`Tijdsloten opnieuw gezet voor bedrijf_id: ${bedrijf_id}`);
+  }
+  console.log('Klaar met fixen van tijdsloten voor de 8 bedrijven.');
+}
+fixSpecificCompaniesTimeslots();

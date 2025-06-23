@@ -32,9 +32,12 @@ export default function Reservaties() {
   if (isAuthLoading) return null;
 
   useEffect(() => {
+    console.log('User object in Reservaties component:', user);
+    console.log('User bedrijf_id:', user?.bedrijf_id);
+    
     const fetchReservaties = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/bedrijf/reservaties/${user.bedrijf_id}`);
+        const response = await fetch(`/api/bedrijf/reservaties/${user.bedrijf_id}`);
         if (!response.ok) {
           throw new Error('Fout bij het ophalen van de reservaties');
         }
@@ -50,12 +53,12 @@ export default function Reservaties() {
 
     const fetchAvailableSlots = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/speeddates/${user.bedrijf_id}`);
+        const response = await fetch(`/api/speeddates/${user.bedrijf_id}`);
         if (response.ok) {
           const data = await response.json();
           
           // Haal alle reserveringen op voor dit bedrijf om te bepalen welke tijdsloten echt bezet zijn
-          const reservationsResponse = await fetch(`http://localhost:5000/api/bedrijf/reservaties/${user.bedrijf_id}`);
+          const reservationsResponse = await fetch(`/api/bedrijf/reservaties/${user.bedrijf_id}`);
           const reservations = await reservationsResponse.ok ? await reservationsResponse.json() : [];
           
           // Filter alleen beschikbare tijdsloten (niet bezet door geaccepteerde reserveringen)
@@ -133,7 +136,7 @@ export default function Reservaties() {
   const handleAccept = async (reserveringId) => {
     setActionLoading(reserveringId);
     try {
-      const response = await fetch(`http://localhost:5000/api/reservaties/${reserveringId}/accepteren`, {
+      const response = await fetch(`/api/reservaties/${reserveringId}/accepteren`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -144,7 +147,7 @@ export default function Reservaties() {
       }
       
       // Refresh de reserveringen
-      const refreshResponse = await fetch(`http://localhost:5000/api/bedrijf/reservaties/${user.bedrijf_id}`);
+      const refreshResponse = await fetch(`/api/bedrijf/reservaties/${user.bedrijf_id}`);
       const data = await refreshResponse.json();
       setReservaties(data);
       
@@ -165,7 +168,7 @@ export default function Reservaties() {
     
     setActionLoading(reserveringId);
     try {
-      const response = await fetch(`http://localhost:5000/api/reservaties/${reserveringId}/afwijzen`, {
+      const response = await fetch(`/api/reservaties/${reserveringId}/afwijzen`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rejection_reason: rejectionReason })
@@ -176,7 +179,7 @@ export default function Reservaties() {
       }
       
       // Refresh de reserveringen
-      const refreshResponse = await fetch(`http://localhost:5000/api/bedrijf/reservaties/${user.bedrijf_id}`);
+      const refreshResponse = await fetch(`/api/bedrijf/reservaties/${user.bedrijf_id}`);
       const data = await refreshResponse.json();
       setReservaties(data);
       
@@ -193,7 +196,7 @@ export default function Reservaties() {
   const handleProposeAlternative = async (reserveringId, alternativeSpeedId) => {
     setActionLoading(reserveringId);
     try {
-      const response = await fetch(`http://localhost:5000/api/reservaties/${reserveringId}/alternatief`, {
+      const response = await fetch(`/api/reservaties/${reserveringId}/alternatief`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ alternative_speed_id: alternativeSpeedId })
@@ -204,7 +207,7 @@ export default function Reservaties() {
       }
       
       // Refresh de reserveringen
-      const refreshResponse = await fetch(`http://localhost:5000/api/bedrijf/reservaties/${user.bedrijf_id}`);
+      const refreshResponse = await fetch(`/api/bedrijf/reservaties/${user.bedrijf_id}`);
       const data = await refreshResponse.json();
       setReservaties(data);
       
