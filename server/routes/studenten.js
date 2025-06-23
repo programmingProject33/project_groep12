@@ -12,4 +12,25 @@ router.get('/studenten', adminAuth, (req, res) => {
   });
 });
 
+// DELETE /api/admin/studenten/:id
+router.delete('/studenten/:id', adminAuth, (req, res) => {
+  const { id } = req.params;
+  console.log("Verzoek tot verwijderen student met ID:", id);
+
+  db.query('DELETE FROM gebruikers WHERE gebruiker_id = ?', [id], (err, result) => {
+    if (err) {
+      console.error("Databasefout bij verwijderen:", err);
+      return res.status(500).json({ error: 'Serverfout bij verwijderen student' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Student niet gevonden' });
+    }
+
+    res.status(200).json({ message: 'Student verwijderd' });
+  });
+});
+
+
+
 module.exports = router;

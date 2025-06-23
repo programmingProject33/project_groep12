@@ -53,6 +53,32 @@ function BedrijvenLijst() {
     setFiltered(data);
   }, [zoekterm, sortOrder, sector, bedrijven]);
 
+  const handleVerwijderBedrijf = (id) => {
+    const bevestig = window.confirm("Weet je zeker dat je dit bedrijf wilt verwijderen?");
+    if (!bevestig) return;
+
+    const token = localStorage.getItem('adminToken');
+
+    fetch(`http://localhost:5000/api/admin/bedrijven/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Verwijderen mislukt');
+        setBedrijven(prev => prev.filter(b => b.bedrijf_id !== id));
+        alert(" Bedrijf is succesvol verwijderd.");
+      })
+      .catch(err => {
+        console.error('Fout bij verwijderen bedrijf:', err);
+        alert(" Verwijderen is mislukt. Probeer opnieuw.");
+      });
+  };
+
+
+
   return (
     <div>
       <main>
@@ -94,18 +120,29 @@ function BedrijvenLijst() {
                   <th>Naam</th>
                   <th>Sector</th>
                   <th>Email</th>
+                  <th>Acties</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(b => (
                   <tr
                     key={b.bedrijf_id}
-                    onClick={() => navigate(`/admins/bedrijven/${b.bedrijf_id}`)} 
+                    onClick={() => navigate(`/pages/bedrijven/${b.bedrijf_id}`)}
                     style={{ cursor: 'pointer' }}
                   >
                     <td>{b.naam}</td>
                     <td>{b.sector || '-'}</td>
                     <td>{b.email}</td>
+                    <td>
+                      <button className='verwijder-bedrijf-student-admin'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleVerwijderBedrijf(b.bedrijf_id);
+                        }}
+                      >
+                        Verwijderen
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

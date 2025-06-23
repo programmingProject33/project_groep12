@@ -16,7 +16,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
         <Route path="/bedrijven" element={<ProtectedRoute><Layout><BedrijvenLijst /></Layout></ProtectedRoute>} />
         <Route path="/studenten" element={<ProtectedRoute><Layout><StudentenLijst /></Layout></ProtectedRoute>} />
@@ -25,7 +25,7 @@ function App() {
         <Route path="/admins" element={<ProtectedRoute><Layout><AdminsLijst /></Layout></ProtectedRoute>} />
         <Route path="/admins/nieuw" element={<ProtectedRoute><Layout><AdminCreate /></Layout></ProtectedRoute>} />
         <Route path="/admins/:id" element={<ProtectedRoute><Layout><AdminDetail /></Layout></ProtectedRoute>} />
-        <Route path="/admins/bedrijven/:id" element={<ProtectedRoute><Layout><BedrijfDetail /></Layout></ProtectedRoute>} />
+        <Route path="/pages/bedrijven/:id" element={<ProtectedRoute><Layout><BedrijfDetail /></Layout></ProtectedRoute>} />
       </Routes>
     </Router>
   );

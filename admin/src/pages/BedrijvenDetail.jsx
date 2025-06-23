@@ -26,11 +26,13 @@ function BedrijfDetail() {
 
   return (
     <div >
+     
       <h1>{bedrijf.naam}</h1>
       
 
       <div className="bedrijf-deteail-columns">
         {/* Linkerkolom - Bedrijfsinfo */}
+        <div className="top-columns">
         <div className="col">
             <h2>bedrijfsgegevens</h2>
           <p><span className="label">Bedrijfsnaam:</span> {bedrijf.naam}</p>
@@ -52,9 +54,9 @@ function BedrijfDetail() {
           <p><span className="label">Telefoon:</span> {bedrijf.contact_telefoon}</p>
         
      </div>
-
+     </div>
         {/* Careerlaunch gegevens */}
-         <div className="col">
+         <div className="bottom-column">
          <h2>Careerlaunch gegevens</h2>
          <p><span className="label">Aantal vertegenwoordigers:</span> {bedrijf.number_of_representatives}</p>
          <p><span className="label">Verdieping / lokaal:</span> {bedrijf.verdieping} / {bedrijf.lokaal}</p>

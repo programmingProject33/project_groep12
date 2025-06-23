@@ -23,7 +23,7 @@ function Profile() {
   // Token check & logout
   function logout() {
     localStorage.removeItem('adminToken');
-    navigate('/');
+    navigate('/login');
   }
   function checkTokenValid() {
     const token = localStorage.getItem('adminToken');
@@ -94,7 +94,7 @@ function Profile() {
       if (field !== 'password') {
         setAdmin({ ...admin, [field]: form[field] });
       }
-      alert('✅ ' + data.message);
+      alert( data.message);
       // Reset alleen wachtwoord-velden
       setForm({
         ...form,

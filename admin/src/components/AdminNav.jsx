@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import './AdminNav.css';
+import LogoutButton from './LogoutButton';
 
 function AdminNav() {
+  
   return (
     <header>
       
@@ -37,7 +38,9 @@ function AdminNav() {
                 Admins
               </NavLink>
             </li>
-
+             <li>
+             <LogoutButton />
+             </li>
           </ul>
         </nav>
       </aside>
@@ -47,42 +50,4 @@ function AdminNav() {
 
 export default AdminNav;
 
-
-
-
-// import { NavLink } from 'react-router-dom';
-// import './AdminNav.css'; // optioneel voor styling
-// import tandweilPng from '../images/house-Tandwiel.png';
-// import profielIcon from '../images/profiel-icon.png';
-
-// const navItems = [
-//   { name: 'Dashboard', path: '/dashboard' },
-//   { name: 'Lijst van bedrijven', path: '/bedrijven' },
-//   { name: 'Lijst van Studenten', path: '/studenten' },
-//   { name: 'Speeddate', path: '/speeddates' },
-//   { name: 'Profiel', path: '/profile' },
-// ];
-
-// function AdminNav() {
-//   return (
-//     <nav className="admin-nav">
-//       <ul>
-//       <img className="logo" src={tandweilPng} alt="house tandwiel icon" />
-//         {navItems.map((item) => (
-//           <li key={item.path}>
-//             <NavLink
-//               to={item.path}
-//               className={({ isActive }) => (isActive ? 'active' : '')}
-//             >
-//               {item.name}
-//             </NavLink>
-//           </li>
-//         ))}
-//         <img className="profielIcon" src={profielIcon} alt="profiel icon" />
-//       </ul>
-//     </nav>
-//   );
-// }
-
-// export default AdminNav;
 
