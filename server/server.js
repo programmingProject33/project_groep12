@@ -11,6 +11,7 @@ const {
   sendAlternativeResponseEmail,
   sendCancellationNotificationEmail
 } = require('./mailer');
+const jwt = require('jsonwebtoken');
 
 // admin routes importeren 
 const adminLogin = require('./routes/adminLogin');           // POST /api/admin/login
@@ -21,6 +22,9 @@ const bedrijvenRoutes = require('./routes/bedrijven');       // GET /api/admin/b
 const studentenRoutes = require('./routes/studenten');       // GET /api/admin/studenten
 const speeddatesRoutes = require('./routes/speeddates');     // GET/POST/PUT /api/admin/speeddates
 const statistiekenRoutes = require('./routes/stats');        // GET /api/admin/stats
+
+// Publieke routes
+const publicBedrijvenRoutes = require('./routes/publicBedrijven');
 
 // --- START CONFIGURATIE VOOR AUTOMATISCHE TOEWIJZING ---
 
@@ -70,6 +74,9 @@ app.use('/api/admin', speeddatesRoutes);
 app.use('/api/admin', statistiekenRoutes);
 // admin routes eind
 
+// Publieke routes
+app.use('/api/bedrijven', publicBedrijvenRoutes);
+
 // === Initialisatie bedrijven-tabel verwijderd ===
 
 // Root route
@@ -79,51 +86,96 @@ app.get('/', (req, res) => {
 
 // User login endpoint
 app.post('/api/login', async (req, res) => {
-  const { gebruikersnaam, wachtwoord, type } = req.body;
+    const { gebruikersnaam, wachtwoord } = req.body;
+    console.log("Loginpoging voor:", gebruikersnaam);
 
-  try {
-    const table = type === 'student' ? 'gebruikers' : 'bedrijven';
-    
-    const [users] = await db.promise().query(
-      `SELECT * FROM ${table} WHERE gebruikersnaam = ?`,
-      [gebruikersnaam]
-    );
-
-    if (users.length === 0) {
-      return res.status(401).json({ error: 'Ongeldige gebruikersnaam of wachtwoord' });
+    if (!gebruikersnaam || !wachtwoord) {
+        return res.status(400).json({ message: 'Gebruikersnaam en wachtwoord zijn verplicht' });
     }
 
-    const user = users[0];
+    try {
+        // Probeer eerst in de 'gebruikers' tabel te vinden (via gebruikersnaam OF email)
+        let [userRows] = await db.promise().query(
+            "SELECT * FROM gebruikers WHERE gebruikersnaam = ? OR email = ?", 
+            [gebruikersnaam, gebruikersnaam]
+        );
+        let userType = 'student';
+        let user = userRows[0];
+        
+        console.log(`Zoeken naar gebruiker '${gebruikersnaam}' in gebruikers tabel, gevonden:`, userRows.length);
+        
+        // Als niet in 'gebruikers', probeer in 'bedrijven'
+        if (userRows.length === 0) {
+            let [companyRows] = await db.promise().query(
+                "SELECT * FROM bedrijven WHERE gebruikersnaam = ? OR email = ?", 
+                [gebruikersnaam, gebruikersnaam]
+            );
+            console.log(`Zoeken naar gebruiker '${gebruikersnaam}' in bedrijven tabel, gevonden:`, companyRows.length);
+            if (companyRows.length > 0) {
+                user = companyRows[0];
+                userType = 'bedrijf';
+            }
+        }
 
-    // Stap 1: Controleer of het account geverifieerd is.
+        if (!user) {
+            console.log("Gebruiker niet gevonden.");
+            return res.status(401).json({ message: 'Ongeldige inloggegevens' });
+        }
+
+        // Bepaal het juiste ID veld
+        const idColumn = userType === 'student' ? 'gebruiker_id' : 'bedrijf_id';
+        const userId = user[idColumn];
+
+        console.log("Gebruiker gevonden:", {
+            [idColumn]: userId,
+            gebruikersnaam: user.gebruikersnaam,
+            email: user.email,
+            is_verified: user.is_verified,
+            type: userType
+        });
+
     if (!user.is_verified) {
-      return res.status(403).json({ error: 'Account niet geverifieerd. Controleer je e-mail voor de verificatielink.' });
-    }
+            console.log("Login mislukt: gebruiker is niet geverifieerd.");
+            return res.status(401).json({ message: 'Account is niet geverifieerd. Controleer uw e-mail.' });
+        }
 
-    // Stap 2: Vergelijk het wachtwoord.
-    // Aanname: wachtwoorden zijn plain text opgeslagen. Voor productie is hashen essentieel.
-    const isMatch = await bcrypt.compare(wachtwoord, user.wachtwoord);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Ongeldige gebruikersnaam of wachtwoord' });
-    }
-    
-    // Stap 3: Login succesvol.
-    delete user.wachtwoord;
-    
-    res.json({
-      message: 'Login succesvol',
-      user: {
-        ...user,
-        type: type
-      }
-    });
+        // Log het wachtwoord dat wordt vergeleken (alleen voor debugging)
+        console.log("Vergelijk wachtwoord met hash:", user.wachtwoord.substring(0, 10) + "...");
+        
+        const isMatch = await bcrypt.compare(wachtwoord, user.wachtwoord);
+        console.log("Wachtwoord match:", isMatch);
 
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ 
-      error: 'Database error', 
-      details: err.message 
-    });
+        if (isMatch) {
+            // Bouw expliciet het user object voor de frontend met gebruiker_id
+            const userForFrontend = {
+                gebruiker_id: userId, // Gebruik consistent gebruiker_id
+                gebruikersnaam: user.gebruikersnaam,
+                email: user.email,
+                voornaam: user.voornaam,
+                naam: user.naam,
+                opleiding: user.opleiding,
+                opleiding_jaar: user.opleiding_jaar,
+                is_verified: user.is_verified,
+                type: userType
+            };
+            const token = jwt.sign(
+                { 
+                    id: userId, 
+                    gebruikersnaam: user.gebruikersnaam, 
+                    type: userType 
+                },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+            console.log("Login succesvol, stuur response:", { token: "***", user: userForFrontend });
+            res.json({ token, user: userForFrontend });
+        } else {
+            console.log("Login mislukt: ongeldig wachtwoord.");
+            res.status(401).json({ message: 'Ongeldige inloggegevens' });
+        }
+    } catch (error) {
+        console.error("Serverfout bij inloggen:", error);
+        res.status(500).json({ message: 'Serverfout' });
   }
 });
 
@@ -229,46 +281,96 @@ async function createTimeslotsForBedrijf(bedrijfId, dateStr) {
 
 // Route to handle email confirmation
 app.get('/api/confirm/:token', async (req, res) => {
-  try {
     const { token } = req.params;
+    console.log("=== VERIFICATIE START ===");
+    console.log("Verificatie-token ontvangen:", token);
 
     if (!token) {
-      return res.status(400).json({ error: 'Verificatietoken is vereist.' });
+        console.log("❌ Geen token ontvangen");
+        return res.status(400).json({ 
+            status: 'error',
+            message: 'Geen verificatietoken ontvangen.',
+            verified: false 
+        });
     }
 
-    // We controleren nu alleen nog de 'gebruikers' tabel voor studenten.
-    const [users] = await db.promise().query(
-      'SELECT * FROM gebruikers WHERE verification_token = ?',
-      [token]
-    );
+    try {
+        // Eerst zoeken in 'gebruikers' tabel
+        console.log("🔍 Zoeken in gebruikers tabel...");
+        let [userRows] = await db.promise().query("SELECT * FROM gebruikers WHERE verification_token = ?", [token]);
+        let tableName = 'gebruikers';
+        let idColumn = 'gebruiker_id'; // Altijd gebruiker_id voor gebruikers
 
-    if (users.length > 0) {
-      const user = users[0];
-      // Controleer of de token al gebruikt is
-      if (user.is_verified) {
-        // Stuur een specifieke respons als het account al geverifieerd is.
-        return res.status(200).json({ message: 'Dit account is al geverifieerd. U kunt inloggen.' });
-      }
+        console.log(`Gebruikers gevonden: ${userRows.length}`);
 
-      // Student gevonden, update de verificatiestatus
-      await db.promise().query(
-        'UPDATE gebruikers SET is_verified = TRUE, verification_token = NULL WHERE gebruiker_id = ?',
-        [user.gebruiker_id]
-      );
-      
-      // Stuur een duidelijke succesmelding die de frontend kan tonen
-      return res.status(200).json({ success: true, message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.' });
-    }
+        // Als niet gevonden in 'gebruikers', zoek in 'bedrijven'
+        if (userRows.length === 0) {
+            console.log("🔍 Zoeken in bedrijven tabel...");
+            [userRows] = await db.promise().query("SELECT * FROM bedrijven WHERE verification_token = ?", [token]);
+            tableName = 'bedrijven';
+            idColumn = 'bedrijf_id'; // Altijd bedrijf_id voor bedrijven
+            console.log(`Bedrijven gevonden: ${userRows.length}`);
+        }
 
-    // Als de token nergens wordt gevonden, is deze ongeldig.
-    res.status(404).json({ error: 'Ongeldige of verlopen verificatielink.' });
+        if (userRows.length > 0) {
+            const user = userRows[0];
+            const userId = user[idColumn];
+            console.log(`✅ gebruiker gevonden:`, user);
 
-  } catch (err) {
-    console.error('Fout bij e-mailverificatie:', err);
-    res.status(500).json({ 
-      error: 'Er is een serverfout opgetreden bij het verifiëren van uw e-mailadres.',
-      details: err.message 
-    });
+            // Check of gebruiker al geverifieerd is
+            if (user.is_verified === 1) {
+                console.log(`✅ gebruiker is al geverifieerd`);
+                return res.status(200).json({ 
+                    status: 'already_verified',
+                    message: "Je account is al geverifieerd. Je kunt nu inloggen.",
+                    verified: true 
+                });
+            }
+
+            // Check of token al is gebruikt (NULL)
+            if (user.verification_token === null) {
+                console.log(`✅ gebruiker heeft geen actieve token (al gebruikt)`);
+                return res.status(200).json({ 
+                    status: 'token_used',
+                    message: "Deze verificatielink is al gebruikt. Je account is geverifieerd.",
+                    verified: true 
+                });
+            }
+
+            // Update de status naar geverifieerd
+            console.log(`🔄 Updaten van ${tableName} met ${idColumn} ${userId}...`);
+            await db.promise().query(`UPDATE ${tableName} SET is_verified = 1, verification_token = NULL WHERE ${idColumn} = ?`, [userId]);
+            console.log(`✅ Update query uitgevoerd voor ${tableName} met ${idColumn} ${userId}`);
+
+            // Verifieer de update met een SELECT query
+            const [updatedRows] = await db.promise().query(`SELECT * FROM ${tableName} WHERE ${idColumn} = ?`, [userId]);
+            console.log(`✅ Na update: gebruiker-status:`, updatedRows[0]);
+
+            console.log("=== VERIFICATIE SUCCESVOL ===");
+            return res.status(200).json({ 
+                status: 'success',
+                message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.',
+                verified: true,
+                redirect: '/login'
+            });
+        } else {
+            // Token niet gevonden
+            console.log("❌ Token niet gevonden in database");
+            console.log("=== VERIFICATIE MISLUKT ===");
+            return res.status(400).json({ 
+                status: 'invalid_token',
+                message: 'Deze verificatielink is niet meer geldig. Als je je account nog niet hebt geverifieerd, registreer je opnieuw.',
+                verified: false 
+            });
+        }
+    } catch (error) {
+        console.error('❌ Fout bij e-mailverificatie:', error);
+        console.log("=== VERIFICATIE ERROR ===");
+        return res.status(500).json({ 
+            status: 'server_error',
+            message: 'Er is een serverfout opgetreden bij het verifiëren van uw e-mailadres.',
+            details: error.message 
+        });
   }
 });
 
@@ -288,20 +390,25 @@ app.post('/api/register', async (req, res) => {
         [email, gebruikersnaam]
       );
       if (existingUsers.length > 0) {
-        return res.status(400).json({ error: 'Email of gebruikersnaam bestaat al' });
+        return res.status(400).json({ message: 'Email of gebruikersnaam bestaat al' });
       }
+
+      // Hash het wachtwoord
+      const hashedPassword = await bcrypt.hash(wachtwoord, 10);
 
       const [result] = await db.promise().query(
         'INSERT INTO gebruikers (voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleiding_jaar, dienstverbanden, linkedin, is_verified, verification_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [voornaam, naam, email, gebruikersnaam, wachtwoord, opleiding, opleidingJaarValue, dienstverbandenStr, linkedin, false, verificationToken]
+        [voornaam, naam, email, gebruikersnaam, hashedPassword, opleiding, opleidingJaarValue, dienstverbandenStr, linkedin, false, verificationToken]
       );
+      console.log("Gebruiker succesvol toegevoegd in database:", email, "Token:", verificationToken);
       
       await sendVerificationEmail(email, verificationToken);
+      console.log("Verificatiemail succesvol verzonden naar:", email);
       
       res.status(201).json({ message: 'Account succesvol aangemaakt. Controleer je e-mail voor de verificatielink.' });
     } catch (err) {
-      console.error('Error in student registration:', err);
-      res.status(500).json({ error: 'Database error', details: err.message });
+      console.error("Registratiefout:", err);
+      res.status(500).json({ message: 'Interne fout bij het verwerken van je registratie.', details: err.message });
     }
   } else if (type === 'bedrijf') {
     const connection = await db.promise().getConnection();
@@ -314,6 +421,7 @@ app.post('/api/register', async (req, res) => {
         voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact,
         gebruikersnaam_bedrijf, wachtwoord_bedrijf
       } = userData;
+      console.log("Nieuwe registratie gestart:", emailbedrijf);
       
       const [existingCompanies] = await connection.query(
         'SELECT * FROM bedrijven WHERE email = ? OR gebruikersnaam = ?',
@@ -323,10 +431,14 @@ app.post('/api/register', async (req, res) => {
         throw new Error('Email of gebruikersnaam bestaat al');
       }
 
+      // Hash het wachtwoord
+      const hashedPassword = await bcrypt.hash(wachtwoord_bedrijf, 10);
+
       const [result] = await connection.query(
-        'INSERT INTO bedrijven (naam, BTW_nr, straatnaam, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen, is_verified, verification_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [bedrijfsnaam, btw, straat, gemeente, telbedrijf, emailbedrijf, voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact, gebruikersnaam_bedrijf, wachtwoord_bedrijf, sector, beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen, false, verificationToken]
+        'INSERT INTO bedrijven (naam, BTW_nr, straatnaam, gemeente, telefoon_nr, email, contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon, gebruikersnaam, wachtwoord, sector, beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen, is_verified, verification_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)',
+        [bedrijfsnaam, btw, straat, gemeente, telbedrijf, emailbedrijf, voornaam_contact, naam_contact, specialisatie, email_contact, tel_contact, gebruikersnaam_bedrijf, hashedPassword, sector, beschrijving, gezocht_profiel_omschrijving, gezochte_opleidingen, false, verificationToken]
       );
+      console.log("Bedrijf succesvol toegevoegd in database:", emailbedrijf, "Token:", verificationToken);
       
       const bedrijfId = result.insertId;
 
@@ -336,14 +448,15 @@ app.post('/api/register', async (req, res) => {
       }
 
       await sendVerificationEmail(emailbedrijf, verificationToken);
+      console.log("Verificatiemail succesvol verzonden naar:", emailbedrijf);
       
       await connection.commit();
       res.status(201).json({ message: 'Account succesvol aangemaakt. Controleer je e-mail voor de verificatielink.' });
 
     } catch (err) {
       await connection.rollback();
-      console.error('Error in company registration:', err);
-      res.status(500).json({ error: err.message || 'Database error' });
+      console.error("Registratiefout:", err);
+      res.status(500).json({ message: 'Interne fout bij het verwerken van je registratie.', error: err.message || 'Database error' });
     } finally {
       connection.release();
     }
@@ -1161,7 +1274,7 @@ app.post('/api/speeddates/create-for-all-companies', async (req, res) => {
   } catch (err) {
     console.error('Error creating timeslots for all companies:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
-  }
+    }
 });
 
 // GET bedrijfsprofiel data (inclusief dienstverbanden)
@@ -1246,6 +1359,7 @@ app.post('/api/register-bedrijf', async (req, res) => {
     if (usernameExists.length > 0) throw new Error('Deze gebruikersnaam is al in gebruik.');
 
     // === Stap 2: Data voorbereiden voor INSERT ===
+    const bcrypt = require('bcrypt');
     const hashedPassword = await bcrypt.hash(wachtwoord, 10);
     const [contact_voornaam, ...contact_naam_parts] = contactpersoon_naam.split(' ');
     const contact_naam = contact_naam_parts.join(' ');
@@ -1307,6 +1421,7 @@ app.post('/api/register-bedrijf', async (req, res) => {
 // === STUDENTENREGISTRATIE (met e-mailverificatie) ===
 app.post('/api/register-student', async (req, res) => {
     const { gebruikersnaam, email, wachtwoord, opleiding, LinkedIn_profiel, CV_link, motivatie, voorkeur_bedrijfstype, gezochte_dienstverband } = req.body;
+    console.log("Nieuwe registratie gestart:", email);
     if (!email || !wachtwoord || !gebruikersnaam) {
         return res.status(400).json({ error: 'Gebruikersnaam, e-mail en wachtwoord zijn verplicht.' });
     }
@@ -1326,6 +1441,7 @@ app.post('/api/register-student', async (req, res) => {
             throw new Error('Deze gebruikersnaam is al in gebruik.');
         }
 
+        const bcrypt = require('bcrypt');
         const hashedPassword = await bcrypt.hash(wachtwoord, 10);
         const verificationToken = crypto.randomBytes(32).toString('hex');
 
@@ -1348,18 +1464,20 @@ app.post('/api/register-student', async (req, res) => {
             'INSERT INTO gebruikers SET ?',
             newUser
         );
+        console.log("Gebruiker succesvol toegevoegd in database:", email);
 
         const verificationUrl = `${process.env.CLIENT_URL}/confirm/${verificationToken}`;
         await sendVerificationEmail(email, verificationUrl, gebruikersnaam);
+        console.log("Verificatiemail succesvol verzonden naar:", email);
 
         await connection.commit();
 
-        res.status(201).send({ message: 'Registratie succesvol! Controleer je e-mail om je account te verifiëren.' });
+        res.status(201).send({ message: 'Registratie geslaagd! Controleer je e-mail om je account te verifiëren.' });
 
     } catch (error) {
         if (connection) await connection.rollback();
-        console.error('Student registratie fout:', error);
-        res.status(409).json({ error: error.message || 'Kon student niet registreren.' });
+        console.error("Registratiefout:", error);
+        res.status(409).json({ message: "Interne fout bij het verwerken van je registratie.", error: error.message || 'Kon student niet registreren.' });
     } finally {
         if (connection) connection.release();
     }

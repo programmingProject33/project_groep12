@@ -172,11 +172,13 @@ export default function Registreer()   // Dit is een functionele component in Re
           dienstverbanden: []
         }),
       });
+      console.log("Response status:", response.status);
 
       const data = await response.json();
+      console.log("Response body:", data);
 
       if (!response.ok) {
-        throw new Error(data.error || 'Er is iets misgegaan');
+        throw new Error(data.message || 'Er is iets misgegaan');
       }
 
       // Registration successful
@@ -219,41 +221,23 @@ export default function Registreer()   // Dit is een functionele component in Re
     }
 
     try {
-      // Data opschonen en voorbereiden voor de server
-      const submissionData = {
-        bedrijfsnaam: companyForm.bedrijfsnaam || '',
-        gebruikersnaam: companyForm.gebruikersnaam_bedrijf || '',
-        wachtwoord: companyForm.wachtwoord_bedrijf || '',
-        email: companyForm.emailbedrijf || '',
-        kvk_nummer: companyForm.btw || '',
-        sector: companyForm.sector || '',
-        website_url: companyForm.website_url || '',
-        adres: companyForm.straat || '',
-        postcode: companyForm.postcode || '',
-        stad: companyForm.gemeente || '',
-        contactpersoon_naam: `${companyForm.contact_voornaam || ''} ${companyForm.contact_naam || ''}`.trim(),
-        contactpersoon_email: companyForm.contact_email || '',
-        contactpersoon_telefoon: companyForm.contact_telefoon || '',
-        gezocht_profiel_omschrijving: companyForm.gezocht_profiel_omschrijving || '',
-        specialisatie: companyForm.contact_specialisatie || '',
-        gezochte_opleidingen: companyForm.gezochte_opleidingen || [],
-        dienstverbanden: companyForm.dienstverbanden || [],
-        telbedrijf: companyForm.telbedrijf || '',
-        beschrijving: companyForm.beschrijving || '',
-      };
-
-      const response = await fetch('/api/register-bedrijf', { // Relatieve URL gebruiken
+      const response = await fetch('http://localhost:5000/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(submissionData),
+        body: JSON.stringify({
+          type: 'bedrijf',
+          ...companyForm
+        }),
       });
+      console.log("Response status:", response.status);
 
       const data = await response.json();
+      console.log("Response body:", data);
 
       if (!response.ok) {
-        throw new Error(data.error || 'Er is iets misgegaan bij de registratie.');
+        throw new Error(data.message || 'Er is iets misgegaan');
       }
 
       // Registratie succesvol

@@ -45,22 +45,33 @@ const Login = () => {
         }),
       });
 
+      console.log("Response status:", response.status);
       const data = await response.json();
+      console.log("Response body:", data);
 
       console.log("Login response user:", data.user);
 
       if (!response.ok) {
-        throw new Error(data.error || 'Er is iets misgegaan');
+        throw new Error(data.message || 'Er is iets misgegaan');
       }
 
-      // Store user data using context
-      setUser(data.user);
+      // Store user data using context (alleen als data.user of data.userType bestaat)
+      if (data.user) {
+        setUser(data.user);
+      }
       
-      // Redirect based on user type
-      if (data.user.type === 'student') {
+      // Redirect based on user type (alleen als userType bestaat)
+      if (data.user && data.user.type === 'student') {
         navigate('/student/dashboard');
-      } else {
+      } else if (data.user && data.user.type === 'bedrijf') {
         navigate('/bedrijf/home');
+      } else if (data.userType) {
+        // fallback voor oude backend response
+        if (data.userType === 'student') {
+          navigate('/student/dashboard');
+        } else if (data.userType === 'bedrijf') {
+          navigate('/bedrijf/home');
+        }
       }
     } catch (err) {
       setError(err.message);

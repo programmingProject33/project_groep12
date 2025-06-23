@@ -18,32 +18,53 @@ const VerificationPage = () => {
                 return;
             }
 
+            console.log("Verifieer token:", token);
+
             try {
-                const response = await fetch(`http://localhost:5000/api/confirm/${token}`, {
+                const response = await fetch(`/api/confirm/${token}`, {
                     method: 'GET',
                 });
+                console.log("Response status:", response.status);
+
+                const data = await response.json();
+                console.log("Response body:", data);
 
                 if (response.ok) {
-                    const data = await response.json();
-                    setVerificationStatus('✅ Account succesvol geverifieerd!');
-                    setUserType(data.type || 'gebruiker');
-                    setError(''); // Clear any previous errors
-                    
-                    // Redirect after a few seconds
-                    setTimeout(() => {
-                        navigate('/login');
-                    }, 4000);
-                } else {
-                    const data = await response.json();
-                    const errorMessage = data.error || 'Er is een onbekende fout opgetreden.';
-                    
-                    setVerificationStatus('Verificatie mislukt');
-
-                    if (errorMessage.includes('Ongeldige of verlopen')) {
-                        setError('Deze link is niet geldig. Waarschijnlijk is je account al geverifieerd. We sturen je nu door naar de loginpagina...');
+                    // Succesvolle verificatie
+                    if (data.status === 'success') {
+                        setVerificationStatus('✅ Account succesvol geverifieerd!');
+                        setError(''); // Clear any previous errors
+                        
+                        // Redirect after a few seconds
+                        setTimeout(() => {
+                            navigate(data.redirect || '/login');
+                        }, 3000);
+                    } else if (data.status === 'already_verified' || data.status === 'token_used') {
+                        // Account is al geverifieerd
+                        setVerificationStatus('✅ Account al geverifieerd!');
+                        setError('Je account is al geverifieerd. Je wordt doorgestuurd naar de loginpagina...');
                         setIsRedirecting(true);
-                        setTimeout(() => navigate('/login'), 4000);
+                        setTimeout(() => navigate('/login'), 3000);
                     } else {
+                        // Andere succesvolle status
+                        setVerificationStatus('✅ Verificatie voltooid!');
+                        setError(''); // Clear any previous errors
+                        setTimeout(() => navigate('/login'), 3000);
+                    }
+                } else {
+                    // Fout bij verificatie
+                    const errorMessage = data.message || 'Er is een onbekende fout opgetreden.';
+                    
+                    if (data.status === 'invalid_token') {
+                        setVerificationStatus('❌ Ongeldige verificatielink');
+                        setError('Deze link is niet meer geldig. Je wordt doorgestuurd naar de registratiepagina...');
+                        setIsRedirecting(true);
+                        setTimeout(() => navigate('/registreer'), 4000);
+                    } else if (data.status === 'server_error') {
+                        setVerificationStatus('❌ Serverfout');
+                        setError('Er is een technische fout opgetreden. Probeer het later opnieuw of neem contact op met de beheerder.');
+                    } else {
+                        setVerificationStatus('❌ Verificatie mislukt');
                         setError(errorMessage);
                     }
                 }
