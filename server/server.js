@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./db');
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 const { 
   sendVerificationEmail, 
   sendReservationNotificationEmail,
@@ -102,7 +103,8 @@ app.post('/api/login', async (req, res) => {
 
     // Stap 2: Vergelijk het wachtwoord.
     // Aanname: wachtwoorden zijn plain text opgeslagen. Voor productie is hashen essentieel.
-    if (user.wachtwoord !== wachtwoord) {
+    const isMatch = await bcrypt.compare(wachtwoord, user.wachtwoord);
+    if (!isMatch) {
       return res.status(401).json({ error: 'Ongeldige gebruikersnaam of wachtwoord' });
     }
     
@@ -235,53 +237,38 @@ app.get('/api/confirm/:token', async (req, res) => {
       return res.status(400).json({ error: 'Verificatietoken is vereist.' });
     }
 
-    // First, try to find the token in the 'gebruikers' table (students)
-    let [users] = await db.promise().query(
+    // We controleren nu alleen nog de 'gebruikers' tabel voor studenten.
+    const [users] = await db.promise().query(
       'SELECT * FROM gebruikers WHERE verification_token = ?',
       [token]
     );
 
     if (users.length > 0) {
-      // Student found, update the verification status
+      const user = users[0];
+      // Controleer of de token al gebruikt is
+      if (user.is_verified) {
+        // Stuur een specifieke respons als het account al geverifieerd is.
+        return res.status(200).json({ message: 'Dit account is al geverifieerd. U kunt inloggen.' });
+      }
+
+      // Student gevonden, update de verificatiestatus
       await db.promise().query(
         'UPDATE gebruikers SET is_verified = TRUE, verification_token = NULL WHERE gebruiker_id = ?',
-        [users[0].gebruiker_id]
+        [user.gebruiker_id]
       );
-
-      return res.status(200).json({ 
-        message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.',
-        type: 'student'
-      });
+      
+      // Stuur een duidelijke succesmelding die de frontend kan tonen
+      return res.status(200).json({ success: true, message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.' });
     }
 
-    // If not found in users, try the 'bedrijven' table (companies)
-    let [bedrijven] = await db.promise().query(
-      'SELECT * FROM bedrijven WHERE verification_token = ?',
-      [token]
-    );
-
-    if (bedrijven.length > 0) {
-      // Company found, update the verification status
-      await db.promise().query(
-        'UPDATE bedrijven SET is_verified = TRUE, verification_token = NULL WHERE bedrijf_id = ?',
-        [bedrijven[0].bedrijf_id]
-      );
-
-      return res.status(200).json({ 
-        message: 'E-mailadres succesvol geverifieerd! U kunt nu inloggen.',
-        type: 'bedrijf'
-      });
-    }
-
-    // Token not found in either table
-    return res.status(404).json({ 
-      error: 'Ongeldige of verlopen verificatietoken. De link is mogelijk verlopen of al gebruikt.' 
-    });
+    // Als de token nergens wordt gevonden, is deze ongeldig.
+    res.status(404).json({ error: 'Ongeldige of verlopen verificatielink.' });
 
   } catch (err) {
-    console.error('Error during email verification:', err);
+    console.error('Fout bij e-mailverificatie:', err);
     res.status(500).json({ 
-      error: 'Er is een technische fout opgetreden. Probeer het later opnieuw of neem contact op met de beheerder.' 
+      error: 'Er is een serverfout opgetreden bij het verifiëren van uw e-mailadres.',
+      details: err.message 
     });
   }
 });
@@ -1231,4 +1218,155 @@ app.get('/api/speeddates/:bedrijfId', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+// === BEDRIJFSREGISTRATIE (Correctie op basis van live DB schema) ===
+app.post('/api/register-bedrijf', async (req, res) => {
+  const {
+    bedrijfsnaam, gebruikersnaam, wachtwoord, email, kvk_nummer, sector, 
+    website_url, adres, postcode, stad, contactpersoon_naam, 
+    contactpersoon_email, contactpersoon_telefoon, specialisatie, 
+    gezochte_opleidingen, dienstverbanden, gezocht_profiel_omschrijving,
+    telbedrijf, beschrijving
+  } = req.body;
+
+  if (!bedrijfsnaam || !gebruikersnaam || !wachtwoord || !email) {
+    return res.status(400).json({ error: 'Verplichte velden ontbreken.' });
+  }
+
+  let connection;
+  try {
+    connection = await db.promise().getConnection();
+    await connection.beginTransaction();
+
+    // === Stap 1: Controleer op bestaande gebruikers/e-mails ===
+    const [emailExists] = await connection.execute('SELECT email FROM bedrijven WHERE email = ?', [email]);
+    if (emailExists.length > 0) throw new Error('Dit e-mailadres is al in gebruik.');
+
+    const [usernameExists] = await connection.execute('SELECT gebruikersnaam FROM bedrijven WHERE gebruikersnaam = ?', [gebruikersnaam]);
+    if (usernameExists.length > 0) throw new Error('Deze gebruikersnaam is al in gebruik.');
+
+    // === Stap 2: Data voorbereiden voor INSERT ===
+    const hashedPassword = await bcrypt.hash(wachtwoord, 10);
+    const [contact_voornaam, ...contact_naam_parts] = contactpersoon_naam.split(' ');
+    const contact_naam = contact_naam_parts.join(' ');
+    
+    // === Stap 3: Hoofd-INSERT in 'bedrijven' tabel ===
+    const insertBedrijfQuery = `
+      INSERT INTO bedrijven (
+        naam, BTW_nr, straatnaam, postcode, gemeente, telefoon_nr, email,
+        contact_voornaam, contact_naam, contact_specialisatie, contact_email, contact_telefoon,
+        gebruikersnaam, wachtwoord, sector, beschrijving, gezochte_opleidingen, 
+        gezocht_profiel_omschrijving, bedrijf_URL, is_verified
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `;
+    const bedrijfParams = [
+      bedrijfsnaam, kvk_nummer, adres, postcode, stad, telbedrijf, email,
+      contact_voornaam, contact_naam, specialisatie, contactpersoon_email, contactpersoon_telefoon,
+      gebruikersnaam, hashedPassword, sector, beschrijving, 
+      Array.isArray(gezochte_opleidingen) ? gezochte_opleidingen.join(', ') : '',
+      gezocht_profiel_omschrijving, website_url
+    ];
+
+    const [result] = await connection.execute(insertBedrijfQuery, bedrijfParams);
+    const nieuwBedrijfId = result.insertId;
+
+    // === Stap 4: Data invoegen in koppeltabel 'bedrijf_dienstverbanden' ===
+    if (dienstverbanden && Array.isArray(dienstverbanden) && dienstverbanden.length > 0) {
+      const [alleDienstverbanden] = await connection.execute('SELECT id, naam FROM dienstverbanden');
+      const dienstverbandIds = dienstverbanden
+        .map(naam => alleDienstverbanden.find(d => d.naam === naam)?.id)
+        .filter(id => id); 
+
+      if (dienstverbandIds.length > 0) {
+        const insertDienstverbandQuery = 'INSERT INTO bedrijf_dienstverbanden (bedrijf_id, dienstverband_id) VALUES ?';
+        const dienstverbandValues = dienstverbandIds.map(id => [nieuwBedrijfId, id]);
+        await connection.query(insertDienstverbandQuery, [dienstverbandValues]);
+      }
+    }
+
+    // === Stap 5: Tijdsloten aanmaken ===
+    await createTimeslotsForBedrijf(nieuwBedrijfId, EVENEMENT_DATUM);
+
+    // === Stap 6: Transactie afronden ===
+    await connection.commit();
+
+    res.status(201).json({ 
+      message: 'Bedrijf succesvol geregistreerd. U kunt nu inloggen.',
+      bedrijfId: nieuwBedrijfId 
+    });
+
+  } catch (error) {
+    if (connection) await connection.rollback();
+    console.error('FATALE FOUT TIJDENS BEDRIJFSREGISTRATIE:', error);
+    res.status(500).json({ error: error.message || 'Interne serverfout.' });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+// === STUDENTENREGISTRATIE (met e-mailverificatie) ===
+app.post('/api/register-student', async (req, res) => {
+    const { gebruikersnaam, email, wachtwoord, opleiding, LinkedIn_profiel, CV_link, motivatie, voorkeur_bedrijfstype, gezochte_dienstverband } = req.body;
+    if (!email || !wachtwoord || !gebruikersnaam) {
+        return res.status(400).json({ error: 'Gebruikersnaam, e-mail en wachtwoord zijn verplicht.' });
+    }
+
+    let connection;
+    try {
+        connection = await db.promise().getConnection();
+        await connection.beginTransaction();
+
+        const [emailExists] = await connection.execute('SELECT email FROM gebruikers WHERE email = ?', [email]);
+        if (emailExists.length > 0) {
+            throw new Error('Dit e-mailadres is al in gebruik.');
+        }
+
+        const [usernameExists] = await connection.execute('SELECT gebruikersnaam FROM gebruikers WHERE gebruikersnaam = ?', [gebruikersnaam]);
+        if (usernameExists.length > 0) {
+            throw new Error('Deze gebruikersnaam is al in gebruik.');
+        }
+
+        const hashedPassword = await bcrypt.hash(wachtwoord, 10);
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+
+        const newUser = {
+            gebruikersnaam,
+            email,
+            wachtwoord: hashedPassword,
+            opleiding,
+            LinkedIn_profiel,
+            CV_link,
+            motivatie,
+            voorkeur_bedrijfstype,
+            gezochte_dienstverband,
+            is_verified: 0,
+            verification_token: verificationToken,
+            rol: 'student'
+        };
+
+        await connection.execute(
+            'INSERT INTO gebruikers SET ?',
+            newUser
+        );
+
+        const verificationUrl = `${process.env.CLIENT_URL}/confirm/${verificationToken}`;
+        await sendVerificationEmail(email, verificationUrl, gebruikersnaam);
+
+        await connection.commit();
+
+        res.status(201).send({ message: 'Registratie succesvol! Controleer je e-mail om je account te verifiëren.' });
+
+    } catch (error) {
+        if (connection) await connection.rollback();
+        console.error('Student registratie fout:', error);
+        res.status(409).json({ error: error.message || 'Kon student niet registreren.' });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Fallback voor ongedefinieerde routes
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route niet gevonden' });
 });

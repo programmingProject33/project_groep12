@@ -38,7 +38,7 @@ export default function Registreer()   // Dit is een functionele component in Re
   // als je deze functie gebruikt. 'navigate' is een manier om van pagina te veranderen 
   // binnen je app zonder dat je de hele website opnieuw hoeft te laden.
 
-  // State for password visibility
+  // State for password
   const [showStudentPassword, setShowStudentPassword] = useState(false);
   const [showStudentPassword2, setShowStudentPassword2] = useState(false);
   const [showCompanyPassword, setShowCompanyPassword] = useState(false);
@@ -60,17 +60,20 @@ export default function Registreer()   // Dit is een functionele component in Re
   // State for company form
   const [companyForm, setCompanyForm] = useState({
     bedrijfsnaam: '',
-    kvk: '',
     btw: '',
+    website_url: '',
     straat: '',
+    huis_nr: '',
+    bus_nr: '',
+    postcode: '',
     gemeente: '',
     telbedrijf: '',
     emailbedrijf: '',
-    voornaam_contact: '',
-    naam_contact: '',
-    specialisatie: '',
-    email_contact: '',
-    tel_contact: '',
+    contact_voornaam: '',
+    contact_naam: '',
+    contact_specialisatie: '',
+    contact_email: '',
+    contact_telefoon: '',
     gebruikersnaam_bedrijf: '',
     wachtwoord_bedrijf: '',
     wachtwoord2_bedrijf: '',
@@ -197,66 +200,80 @@ export default function Registreer()   // Dit is een functionele component in Re
   const handleCompanySubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccessMessage(''); // Reset berichten bij nieuwe poging
+    setSuccessMessage('');
 
-    // Validate passwords match
+    // === ROBUUSTE VALIDATIE ===
+    if (!companyForm.wachtwoord_bedrijf || !companyForm.wachtwoord2_bedrijf) {
+      setError('Wachtwoordvelden mogen niet leeg zijn.');
+      return;
+    }
+    
     if (companyForm.wachtwoord_bedrijf !== companyForm.wachtwoord2_bedrijf) {
       setError('Wachtwoorden komen niet overeen');
       return;
     }
 
-    // Validate password length
     if (companyForm.wachtwoord_bedrijf.length < 6) {
       setError('Wachtwoord moet minimaal 6 tekens bevatten');
       return;
     }
 
-    // Always use gebruikersnaam from localStorage if available
-    const gebruikersnaam = localStorage.getItem('gebruikersnaam') || companyForm.gebruikersnaam;
-
     try {
-      const response = await fetch('http://localhost:5000/api/register', {
+      // Data opschonen en voorbereiden voor de server
+      const submissionData = {
+        bedrijfsnaam: companyForm.bedrijfsnaam || '',
+        gebruikersnaam: companyForm.gebruikersnaam_bedrijf || '',
+        wachtwoord: companyForm.wachtwoord_bedrijf || '',
+        email: companyForm.emailbedrijf || '',
+        kvk_nummer: companyForm.btw || '',
+        sector: companyForm.sector || '',
+        website_url: companyForm.website_url || '',
+        adres: companyForm.straat || '',
+        postcode: companyForm.postcode || '',
+        stad: companyForm.gemeente || '',
+        contactpersoon_naam: `${companyForm.contact_voornaam || ''} ${companyForm.contact_naam || ''}`.trim(),
+        contactpersoon_email: companyForm.contact_email || '',
+        contactpersoon_telefoon: companyForm.contact_telefoon || '',
+        gezocht_profiel_omschrijving: companyForm.gezocht_profiel_omschrijving || '',
+        specialisatie: companyForm.contact_specialisatie || '',
+        gezochte_opleidingen: companyForm.gezochte_opleidingen || [],
+        dienstverbanden: companyForm.dienstverbanden || [],
+        telbedrijf: companyForm.telbedrijf || '',
+        beschrijving: companyForm.beschrijving || '',
+      };
+
+      const response = await fetch('/api/register-bedrijf', { // Relatieve URL gebruiken
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          type: 'bedrijf',
-          ...companyForm,
-          gebruikersnaam // override or add
-        }),
+        body: JSON.stringify(submissionData),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Er is iets misgegaan');
+        throw new Error(data.error || 'Er is iets misgegaan bij de registratie.');
       }
 
-      // Registration successful
-      setSuccessMessage('🎉 Registratie succesvol! We hebben een verificatie-e-mail gestuurd naar je inbox. Klik op de link in de e-mail om je account te activeren. Controleer ook je spam-folder als je de e-mail niet ziet.');
+      // Registratie succesvol
+      setSuccessMessage('✅ Je bent succesvol geregistreerd! Je wordt nu doorgestuurd naar de loginpagina.');
+      
+      // Reset het formulier
       setCompanyForm({
-        bedrijfsnaam: '',
-        kvk: '',
-        btw: '',
-        straat: '',
-        gemeente: '',
-        telbedrijf: '',
-        emailbedrijf: '',
-        voornaam_contact: '',
-        naam_contact: '',
-        specialisatie: '',
-        email_contact: '',
-        tel_contact: '',
-        gebruikersnaam_bedrijf: '',
-        wachtwoord_bedrijf: '',
-        wachtwoord2_bedrijf: '',
-        sector: '',
-        beschrijving: '',
-        gezocht_profiel_omschrijving: '',
-        gezochte_opleidingen: [],
-        dienstverbanden: [],
+        bedrijfsnaam: '', btw: '', straat: '', gemeente: '', telbedrijf: '',
+        emailbedrijf: '', contact_voornaam: '', contact_naam: '', contact_specialisatie: '',
+        contact_email: '', contact_telefoon: '', gebruikersnaam_bedrijf: '', wachtwoord_bedrijf: '',
+        wachtwoord2_bedrijf: '', sector: '', beschrijving: '', gezocht_profiel_omschrijving: '',
+        gezochte_opleidingen: [], dienstverbanden: [], website_url: '', postcode: '',
+        huis_nr: '', bus_nr: '',
       });
+
+      // Stuur gebruiker door na 3 seconden
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
+
     } catch (err) {
       setError(err.message);
     }
@@ -291,6 +308,7 @@ export default function Registreer()   // Dit is een functionele component in Re
         </div>
 
         {error && <div className="error-message">{error}</div>}
+        {successMessage && <div className="success-message">{successMessage}</div>}
 
         <div className="registerstudent-content">
           {/* Dit stukje toont een formulier afhankelijk van welke tab actief is */}
@@ -443,8 +461,16 @@ export default function Registreer()   // Dit is een functionele component in Re
                       <input type="text" name="btw" value={companyForm.btw} onChange={handleCompanyChange} required className="form-input" />
                     </label>
                     <label className="form-label">
+                      <span>Website:</span>
+                      <input type="url" name="website_url" value={companyForm.website_url} onChange={handleCompanyChange} className="form-input" placeholder="https://www.voorbeeld.be" />
+                    </label>
+                     <label className="form-label">
                       <span>Telefoonnummer bedrijf:</span>
                       <input type="tel" name="telbedrijf" value={companyForm.telbedrijf} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Sector:</span>
+                      <input type="text" name="sector" value={companyForm.sector} onChange={handleCompanyChange} required className="form-input" />
                     </label>
                   </div>
                 </fieldset>
@@ -452,12 +478,24 @@ export default function Registreer()   // Dit is een functionele component in Re
                 <fieldset className="form-fieldset">
                   <legend className="fieldset-legend">Adresgegevens</legend>
                   <div className="form-grid">
-                    <label className="form-label">
-                      <span>Straat & nummer:</span>
+                    <label className="form-label grid-col-span-2">
+                      <span>Straat:</span>
                       <input type="text" name="straat" value={companyForm.straat} onChange={handleCompanyChange} required className="form-input" />
                     </label>
                     <label className="form-label">
-                      <span>Gemeente & postcode:</span>
+                      <span>Huisnummer:</span>
+                      <input type="text" name="huis_nr" value={companyForm.huis_nr} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                     <label className="form-label">
+                      <span>Bus (optioneel):</span>
+                      <input type="text" name="bus_nr" value={companyForm.bus_nr} onChange={handleCompanyChange} className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Postcode:</span>
+                      <input type="text" name="postcode" value={companyForm.postcode} onChange={handleCompanyChange} required className="form-input" />
+                    </label>
+                    <label className="form-label">
+                      <span>Gemeente:</span>
                       <input type="text" name="gemeente" value={companyForm.gemeente} onChange={handleCompanyChange} required className="form-input" />
                     </label>
                   </div>
@@ -506,23 +544,23 @@ export default function Registreer()   // Dit is een functionele component in Re
                   <div className="form-grid">
                     <label className="form-label">
                       <span>Voornaam:</span>
-                      <input type="text" name="voornaam_contact" value={companyForm.voornaam_contact} onChange={handleCompanyChange} required className="form-input" />
+                      <input type="text" name="contact_voornaam" value={companyForm.contact_voornaam} onChange={handleCompanyChange} required className="form-input" />
                     </label>
                     <label className="form-label">
                       <span>Naam:</span>
-                      <input type="text" name="naam_contact" value={companyForm.naam_contact} onChange={handleCompanyChange} required className="form-input" />
+                      <input type="text" name="contact_naam" value={companyForm.contact_naam} onChange={handleCompanyChange} required className="form-input" />
                     </label>
                     <label className="form-label">
                       <span>Functie/Specialisatie:</span>
-                      <input type="text" name="specialisatie" value={companyForm.specialisatie} onChange={handleCompanyChange} required className="form-input" />
+                      <input type="text" name="contact_specialisatie" value={companyForm.contact_specialisatie} onChange={handleCompanyChange} required className="form-input" />
                     </label>
                     <label className="form-label">
                       <span>Professioneel E-mailadres:</span>
-                      <input type="email" name="email_contact" value={companyForm.email_contact} onChange={handleCompanyChange} required className="form-input" />
+                      <input type="email" name="contact_email" value={companyForm.contact_email} onChange={handleCompanyChange} required className="form-input" />
                     </label>
                     <label className="form-label">
-                      <span>Telefoonnummer (optioneel):</span>
-                      <input type="tel" name="tel_contact" value={companyForm.tel_contact} onChange={handleCompanyChange} className="form-input" />
+                      <span>Telefoonnummer:</span>
+                      <input type="tel" name="contact_telefoon" value={companyForm.contact_telefoon} onChange={handleCompanyChange} className="form-input" />
                     </label>
                   </div>
                 </fieldset>
@@ -550,8 +588,6 @@ export default function Registreer()   // Dit is een functionele component in Re
                   </div>
                 </fieldset>
                 
-                {successMessage && <div className="success-message">{successMessage}</div>}
-
                 <button type="submit" className="registreer-button">Registreren</button>
               </form>
             </div>
