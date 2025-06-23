@@ -1,79 +1,114 @@
-# CareerLaunch Reserveringsplatform
+# 🎓 Career Launch Speeddate Website
 
-## 🧾 Inhoud
-- [Introductie](#introductie)
-- [✨ Features](#-features)
-- [🧑‍💻 Installatie & Opstart](#-installatie--opstart)
-- [📂 Structuur van het project](#-structuur-van-het-project)
-- [👥 Testaccounts](#-testaccounts)
-- [🛠 Developer info](#-developer-info)
-- [❓ Veelgestelde vragen](#-veelgestelde-vragen)
+Welkom bij **Career Launch**, het reserveringsplatform voor speeddates tussen studenten en bedrijven tijdens de Career Launch Beurs. Ons doel is om gerichte, waardevolle connecties te faciliteren tussen jong talent en innovatieve werkgevers in een moderne en gebruiksvriendelijke digitale omgeving.
 
 ---
 
-## 🧠 Introductie
-CareerLaunch is een reserveringsplatform voor speeddates tussen studenten en bedrijven. Studenten kunnen zich aanmelden voor tijdsloten bij bedrijven, bedrijven beheren hun eigen tijdsloten en reserveringen, en beheerders (admins) houden overzicht via een admin-dashboard. Het platform is bedoeld voor gebruik door studenten, bedrijven en beheerders van een hogeschool of universiteit.
+## 👨‍💻 Team
+
+Dit project is ontwikkeld door studenten van EhB:
+
+- **MEZIANI Bilal**
+- **IBRAHIM SHEXO Mohammad**
+- **LODHI Mutahir**
+- **ASSARAR Nisrine**
+
+Met ondersteuning van tools zoals **Figma**, **Trello**, **GitHub** en **ChatGPT** (voor tekstverfijning en documentatie).
 
 ---
 
-## ✨ Features
-- **Registratie & login** (met e-mailverificatie)
-- **Studentenlijst** met krachtige filters en zoekfunctie (voornaam, opleiding, dienstverband)
-- **Reserveringsmodule** per tijdslot (studenten reserveren, bedrijven beheren)
-- **Bedrijven-dashboard** met overzicht van reserveringen
-- **Admin-paneel** voor beheer van gebruikers, bedrijven, dienstverbanden en statistieken
-- **Automatisch aanmaken van tijdsloten** voor bedrijven
-- **E-mailnotificaties** bij registratie, verificatie en reserveringen
-- **Feedback en foutmeldingen** bij alle belangrijke acties
-- **404-pagina** voor niet-bestaande routes
+## 🎯 Doel van het project
+
+Een moderne webapplicatie waarmee:
+- 👥 Studenten zich kunnen registreren en speeddates reserveren bij bedrijven
+- 🏢 Bedrijven hun profiel en beschikbare tijdsloten beheren
+- 🛠️ Organisatoren het overzicht behouden via een krachtig admin-dashboard
 
 ---
 
-## 🧑‍💻 Installatie & Opstart
+## ✨ Functionaliteiten
 
-### 🔗 1. Vereisten
+- ✅ Registratie + login (student, bedrijf, admin) met e-mailverificatie
+- ✅ Automatische tijdslotgeneratie voor bedrijven
+- ✅ Filters + zoekfuncties voor studenten & bedrijven
+- ✅ Reserveringsbeheer met bevestiging via e-mail
+- ✅ Admin-dashboard met statistieken & beheerfuncties
+- ✅ Uploads: CV, motivatiebrief, LinkedIn
+- ✅ Fout- en succesmeldingen bij alle belangrijke acties
+- ✅ 404-pagina voor niet-bestaande routes
+- ✅ Responsive design & moderne UI
+
+---
+
+## 🧑‍💻 Voor wie?
+
+### 🧑 Studenten
+- Registreren als student
+- Reserveren van speeddate-afspraken
+- Annuleren van afspraken
+- Beheren van profiel & documenten (CV, motivatiebrief, LinkedIn)
+
+### 🏢 Bedrijven
+- Registreren als bedrijf
+- Automatisch tijdsloten beheren
+- Profielen van studenten bekijken
+- Reserveringen bekijken en opvolgen
+
+### 🛠️ Organisatoren/Admins
+- Goedkeuren of afwijzen van bedrijfsaanvragen
+- Studenten- en bedrijfsgegevens beheren
+- Reserveringsbeheer & dashboard met overzichten
+- Wachtwoordreset-systeem voor admins
+
+---
+
+## 🛠 Installatie & Opstart
+
+### Vereisten
 - Node.js (v18 of hoger)
-- MySQL (of phpMyAdmin)
-- (optioneel) Nodemailer / SMTP-server voor e-mailverificatie
+- MySQL (met phpMyAdmin of CLI)
+- `.env` bestand in de `server/` map (zie `.env.example`)
 
-### 📂 2. Projectstructuur
-```
-project-root/
-├── client/       → Frontend (Vite + React)
-├── server/       → Backend (Node.js + Express)
-├── server/database.sql  → Database structuur/dump
-├── .env.example  → Voorbeeld van de vereiste .env-config
-```
+### Installatiestappen
 
-### ⚙️ 3. Configuratie
-1. Maak een `.env` bestand aan in de map `server/` (gebruik `.env.example` als sjabloon).
-2. Vul de volgende velden in:
-   - `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
-   - `EMAIL_USER`, `EMAIL_PASS` (voor e-mailverificatie)
-   - `JWT_SECRET` (voor authenticatie)
+1. Clone de repository:
+   ```bash
+   git clone https://github.com/programmingProject33/project_groep12.git
+   ```
 
-### ▶️ 4. Website starten
-**Backend starten:**
-```bash
-cd server
-npm install
-npm run dev
-```
-**Frontend starten:**
+**Frontend installeren & starten:**
 ```bash
 cd client
 npm install
 npm run dev
 ```
-De site draait op:
-- Frontend: [http://localhost:5173](http://localhost:5173)
-- Backend: [http://localhost:5000](http://localhost:5000)
 
-Gebruik [http://localhost:5173](http://localhost:5173) om de app te testen.
+**Backend installeren & starten:**
+```bash
+cd ../server
+npm install
+npm run dev
+```
+
+**Database instellen:**
+- Maak een MySQL database aan met naam `careerlaunch`
+- Importeer het bestand `server/database.sql`
+- Maak een `.env` bestand aan in `server/` met:
+```ini
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=jeWachtwoord
+DB_NAME=careerlaunch
+JWT_SECRET=geheimesleutel
+EMAIL_USER=example@mail.com
+EMAIL_PASS=jeMailWachtwoord
+```
+
+Gebruik `http://localhost:5173` voor de frontend en `http://localhost:5000` voor de backend.
 
 ---
 
-## 📂 Structuur van het project
+## 📂 Projectstructuur
 ```
 project-root/
 ├── client/                # Frontend (React + Vite)
@@ -83,60 +118,70 @@ project-root/
 │   │   ├── inloggen-bedrijf/  # Bedrijf specifieke pagina's
 │   │   ├── pages/             # Algemene pagina's (verificatie, etc.)
 │   │   ├── AuthContext.jsx    # Auth context
-│   │   └── App.jsx           # Routing
-│   └── ...
+│   │   └── App.jsx            # Routing
+│
 ├── server/                # Backend (Node.js + Express)
-│   ├── routes/                # API-routes (gebruikers, bedrijven, reservaties, admin, ...)
-│   ├── db.js                  # Database connectie
-│   ├── mailer.js              # E-mail functionaliteit
+│   ├── routes/                # API-routes (gebruikers, bedrijven, reservaties, admin)
+│   ├── db.js                  # MySQL connectie
 │   ├── server.js              # Hoofdserver
-│   └── database.sql           # Database structuur
+│   ├── mailer.js              # E-mail functionaliteit
+│   └── database.sql           # SQL dump
+│
 ├── .env.example           # Voorbeeld .env-config
-└── README.md              # Deze handleiding
+└── README.md              # Projectdocumentatie (dit bestand)
 ```
 
 ---
 
 ## 👥 Testaccounts
-| Rol      | Gebruikersnaam | Wachtwoord  |
-|----------|----------------|-------------|
-| Student  | student1       | student123  |
-| Bedrijf  | bedrijf1       | bedrijf123  |
-| Admin    | admin          | admin123    |
+| Rol | Gebruikersnaam | Wachtwoord |
+|-----|----------------|------------|
+| Student | student1 | student123 |
+| Bedrijf | bedrijf1 | bedrijf123 |
+| Admin | admin | admin123 |
 
-Je kunt ook zelf registreren via de registratiepagina.
+Je kunt ook zelf registreren via de registratiepagina op de website.
 
 ---
 
-## 🛠 Developer info
-- **API-routes** vind je in `server/routes/` (gebruikers, bedrijven, reservaties, admin, ...)
-- **Database**: structuur staat in `server/database.sql`. Gebruik deze om de MySQL database aan te maken.
-- **Tijdsloten** worden automatisch aangemaakt voor bedrijven na registratie.
-- **E-mail**: wordt verstuurd via Nodemailer (SMTP-configuratie vereist in `.env`).
-- **Login**: JWT-authenticatie, tokens worden opgeslagen in localStorage.
-- **Foutmeldingen**: worden getoond in de UI, en zijn zichtbaar in de browserconsole (F12 > Console).
-- **Debugging**: Gebruik `console.log` in de frontend/backend, en de Network-tab in de browser voor API-verkeer.
-- **404-pagina**: Niet-bestaande routes tonen een nette foutpagina.
+## 🔐 Admin Functionaliteit
+
+### Admin login & beheer
+Admins loggen in via een aparte loginpagina. Na inloggen hebben ze toegang tot een uitgebreid dashboard met beheerfuncties voor bedrijven, studenten, dienstverbanden, reserveringen en statistieken. Enkel superadmins kunnen nieuwe admins beheren.
+
+### Belangrijke Admin API-routes
+- **POST /api/admin/login** – Inloggen als admin
+- **GET/POST/DELETE /api/admin/admins** – Admins beheren (alleen superadmin)
+- **GET /api/admin/bedrijven** – Overzicht bedrijven
+- **GET /api/admin/studenten** – Overzicht studenten
+- **GET /api/admin/speeddates** – Overzicht speeddates
+- **GET/PUT /api/admin/dienstverbanden** – Dienstverbanden beheren
+- **GET /api/admin/stats** – Statistieken
 
 ---
 
 ## ❓ Veelgestelde vragen
-**1. Ik krijg geen e-mail bij registratie/verificatie?**
-- Controleer je SMTP-instellingen in `.env`.
-- Kijk in je spamfolder.
 
-**2. Databasefout bij opstart?**
-- Controleer of MySQL draait en de database correct is aangemaakt met `server/database.sql`.
+**1. Geen e-mail ontvangen bij registratie/verificatie?**
+- Controleer je spamfolder.
+- Check je SMTP-instellingen in `.env`.
+
+**2. Databasefout bij opstarten?**
+- Zorg dat MySQL draait en dat je `server/database.sql` hebt geïmporteerd.
 
 **3. Hoe reset ik een wachtwoord?**
-- Neem contact op met de admin of implementeer een wachtwoord-resetfunctie.
+- Admins gebruiken "Wachtwoord vergeten" op de inlogpagina.
 
 **4. Hoe debug ik fouten?**
-- Bekijk de browserconsole (F12) en de Network-tab voor API-verkeer.
-- Check de backend logs in de terminal.
+- Gebruik `console.log()` in frontend/backend.
+- Bekijk de browserconsole (F12 > Console) en netwerkverkeer.
 
 ---
 
-Veel succes met CareerLaunch! 🚀
+## 📩 Contact
+Voor vragen, foutmeldingen of samenwerking:
+
+📧 support-careerlaunch@ehb.be
+📍 Nijverheidskaai 170, 1070 Anderlecht
 
 
