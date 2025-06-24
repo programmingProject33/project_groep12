@@ -148,7 +148,10 @@ Je kunt ook zelf registreren via de registratiepagina op de website.
 
 ### Admin login & beheer
 Admins loggen in via een aparte loginpagina. Na inloggen hebben ze toegang tot een uitgebreid dashboard met beheerfuncties voor bedrijven, studenten, dienstverbanden, reserveringen en statistieken. Enkel superadmins kunnen nieuwe admins beheren.
-
+#### Bij admin frontend installeert u de volgende freameworks:
+- npm install
+- Vite + React 
+- npm install @emailjs/browser, indien nodig installeer emailjs om email te kunnen sturen naar de aangemaakte admin
 ### Belangrijke Admin API-routes
 - **POST /api/admin/login** – Inloggen als admin
 - **GET/POST/DELETE /api/admin/admins** – Admins beheren (alleen superadmin)
